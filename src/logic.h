@@ -1,7 +1,14 @@
 #ifndef LOGIC_H
 #define LOGIC_H
-
 #include "main.h"
+
+enum SetFlags
+{
+	KEY_UNSET	= 1,
+	COL_UNSET	= 2,
+	MOUSE_UNSET = 4,	
+	SIZE_UNSET	= 8
+};
 
 /* На основе параметров запуска игры argv, в количестве argc, подбирается схема управления
  * и размер игрового поля. По умолчанию используются стрелки с мышью, поле имеет  размер 4x4*/

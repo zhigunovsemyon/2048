@@ -6,8 +6,6 @@
 #include <SDL2/SDL.h>
 #endif // !SDL_h_
 
-enum Errors {NOERR, SDLERR};
-
 typedef struct
 {
 	Uint64* Field;
@@ -24,7 +22,7 @@ typedef struct
 	Uint8 up;
 	Uint8 down;
 	Uint8 mouse;
-	Uint8 Dark;
+	Uint8 Flags;
 }
 Settings;
 

@@ -17,6 +17,11 @@ int main(int argc, const char **args)
 	// Возможность отключения вывода информации
 	if (SDL_TRUE)
 	{
+		if (Settings.Flags &= GLOB_FLAG_DARKMODE)
+			SDL_Log("Включён тёмный режим\n");
+		else
+			SDL_Log("Включён светлый режим\n");
+
 		if (Settings.mouse)
 			SDL_Log("Включено управление мышью\n");
 		else
@@ -44,6 +49,8 @@ int main(int argc, const char **args)
 
 		sprintf(title, "2048 | Очков: %lu", Game.Score);
 		SDL_SetWindowTitle(window, title);
+		
+		DrawBackground(rend, &WinSize, Settings.Flags);
 
 		SDL_RenderPresent(rend);
 	}

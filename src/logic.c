@@ -20,79 +20,72 @@ Uint8 LaunchOptions(int argc, const char **argv, Settings *Settings)
 	Settings->down	= SDL_SCANCODE_DOWN;
 	Settings->quit	= SDL_SCANCODE_ESCAPE;
 	Settings->mouse = SDL_TRUE;
-	Settings->Dark	= SDL_TRUE;
+	Settings->Flags	= 1;
 
 	//Если игра была запущена без флагов, 
 	//то используется стандартная раскладка
-	Uint8 key_unset = 1, mouse_unset = 1, size_unset = 1, col_unset = 1;
-	if (argc == 1)
-	{
-		key_unset	= 0; 
-		mouse_unset = 0;
-		col_unset	= 0;
-		size_unset	= 0;
-	}
+	Uint8 Setters = (argc != 1) ? 15 : 0;
 
 	/*Перебор аргументов, с которыми была запущена игра. Если их не было,
 	 * цикл ниже будет пропущен*/
-	for (Uint8 i = 1; (col_unset || key_unset || mouse_unset || size_unset) && (i < argc); ++i)
+	for (Uint8 i = 1; Setters && (i < argc); ++i)
 	{
-		if (!SDL_strcmp(argv[i],"--size=3") && size_unset)
+		if (!SDL_strcmp(argv[i],"--size=3") && (Setters & SIZE_UNSET))
 		{
-			size_unset = 0;
+			Setters &= ~SIZE_UNSET;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i],"--size=4") && size_unset)
+		if (!SDL_strcmp(argv[i],"--size=4") && (Setters & SIZE_UNSET))
 		{
-			size_unset = 0;
+			Setters &= ~SIZE_UNSET;
 			FieldSize = 4;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i],"--size=5") && size_unset)
+		if (!SDL_strcmp(argv[i],"--size=5") && (Setters & SIZE_UNSET))
 		{
-			size_unset = 0;
+			Setters &= ~SIZE_UNSET;
 			FieldSize = 5;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i],"--nomouse") && mouse_unset)
+		if (!SDL_strcmp(argv[i],"--nomouse") && (Setters & MOUSE_UNSET))
 		{
 			Settings->mouse = SDL_FALSE;
-			mouse_unset = 0;
+			Setters &= ~MOUSE_UNSET;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i],"--mouse") && mouse_unset) 
+		if (!SDL_strcmp(argv[i],"--mouse") && (Setters & MOUSE_UNSET)) 
 		{
-			mouse_unset = 0;
+			Setters &= ~MOUSE_UNSET;
 			continue;
 		}
 
-		if(!SDL_strcmp(argv[i], "--light") && col_unset)
+		if(!SDL_strcmp(argv[i], "--light") && (Setters & COL_UNSET))
 		{
-			col_unset = 0;
-			Settings->Dark = SDL_FALSE;
+			Setters &= ~COL_UNSET;
+			Settings->Flags &= ~1;
 			continue;
 		}
 
 
-		if(!SDL_strcmp(argv[i], "--dark") && col_unset)
+		if(!SDL_strcmp(argv[i], "--dark") && (Setters & COL_UNSET))
 		{
-			col_unset = 0;
+			Setters &= ~COL_UNSET;
 			continue;
 		}
 
-		if(!SDL_strcmp(argv[i], "--arrows") && key_unset)
+		if(!SDL_strcmp(argv[i], "--arrows") && (Setters & KEY_UNSET))
 		{
-			key_unset = 0;
+			Setters &= ~KEY_UNSET;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--wasd") && key_unset)
+		if (!SDL_strcmp(argv[i], "--wasd") && (Setters & KEY_UNSET))
 		{
-			key_unset = 0;
+			Setters &= ~KEY_UNSET;
 			Settings->left	= SDL_SCANCODE_A;
 			Settings->right = SDL_SCANCODE_D;
 			Settings->up	= SDL_SCANCODE_W;
@@ -100,9 +93,9 @@ Uint8 LaunchOptions(int argc, const char **argv, Settings *Settings)
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--vi") && key_unset)
+		if (!SDL_strcmp(argv[i], "--vi") && (Setters & KEY_UNSET))
 		{
-			key_unset = 0;
+			Setters &= ~KEY_UNSET;
 			Settings->left	= SDL_SCANCODE_H;
 			Settings->right = SDL_SCANCODE_L;
 			Settings->up	= SDL_SCANCODE_K;
