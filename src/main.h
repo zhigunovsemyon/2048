@@ -1,5 +1,5 @@
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef MAIN_H
+#define MAIN_H
 
 #include "SDL.h"
 #ifndef SDL_h_
@@ -24,8 +24,13 @@ typedef struct
 	Uint8 up;
 	Uint8 down;
 	Uint8 mouse;
+	Uint8 Dark;
 }
-Controls;
+Settings;
 
+#include "defines.h"
 #include "logic.h"
+#include "misc.h"
+#include "draw.h"
+
 #endif // !_MAIN_H_

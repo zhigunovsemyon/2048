@@ -1,32 +1,41 @@
-#ifndef _LOGIC_H_
-#define _LOGIC_H_
-
 #include "logic.h"
 
-Uint8 LaunchOptions(int argc, const char **argv, Controls *Controls)
+int MinOfTwo(int a, int b)
+{
+	return (a > b) ? b : a; 
+}
+
+int MaxOfTwo(int a, int b)
+{
+	return (a < b) ? b : a; 
+}
+
+Uint8 LaunchOptions(int argc, const char **argv, Settings *Settings)
 {
 	//Базовые параметры работы игры
 	Uint8 FieldSize = 4;
-	Controls->left	= SDL_SCANCODE_LEFT;
-	Controls->right = SDL_SCANCODE_RIGHT;
-	Controls->up	= SDL_SCANCODE_UP;
-	Controls->down	= SDL_SCANCODE_DOWN;
-	Controls->quit	= SDL_SCANCODE_ESCAPE;
-	Controls->mouse = SDL_TRUE;
+	Settings->left	= SDL_SCANCODE_LEFT;
+	Settings->right = SDL_SCANCODE_RIGHT;
+	Settings->up	= SDL_SCANCODE_UP;
+	Settings->down	= SDL_SCANCODE_DOWN;
+	Settings->quit	= SDL_SCANCODE_ESCAPE;
+	Settings->mouse = SDL_TRUE;
+	Settings->Dark	= SDL_TRUE;
 
 	//Если игра была запущена без флагов, 
 	//то используется стандартная раскладка
-	Uint8 key_unset = 1, mouse_unset = 1, size_unset = 1;
+	Uint8 key_unset = 1, mouse_unset = 1, size_unset = 1, col_unset = 1;
 	if (argc == 1)
 	{
 		key_unset	= 0; 
 		mouse_unset = 0;
+		col_unset	= 0;
 		size_unset	= 0;
 	}
 
 	/*Перебор аргументов, с которыми была запущена игра. Если их не было,
 	 * цикл ниже будет пропущен*/
-	for (Uint8 i = 1; (key_unset || mouse_unset || size_unset) && (i < argc); ++i)
+	for (Uint8 i = 1; (col_unset || key_unset || mouse_unset || size_unset) && (i < argc); ++i)
 	{
 		if (!SDL_strcmp(argv[i],"--size=3") && size_unset)
 		{
@@ -50,7 +59,7 @@ Uint8 LaunchOptions(int argc, const char **argv, Controls *Controls)
 
 		if (!SDL_strcmp(argv[i],"--nomouse") && mouse_unset)
 		{
-			Controls->mouse = SDL_FALSE;
+			Settings->mouse = SDL_FALSE;
 			mouse_unset = 0;
 			continue;
 		}
@@ -58,6 +67,20 @@ Uint8 LaunchOptions(int argc, const char **argv, Controls *Controls)
 		if (!SDL_strcmp(argv[i],"--mouse") && mouse_unset) 
 		{
 			mouse_unset = 0;
+			continue;
+		}
+
+		if(!SDL_strcmp(argv[i], "--light") && col_unset)
+		{
+			col_unset = 0;
+			Settings->Dark = SDL_FALSE;
+			continue;
+		}
+
+
+		if(!SDL_strcmp(argv[i], "--dark") && col_unset)
+		{
+			col_unset = 0;
 			continue;
 		}
 
@@ -70,23 +93,22 @@ Uint8 LaunchOptions(int argc, const char **argv, Controls *Controls)
 		if (!SDL_strcmp(argv[i], "--wasd") && key_unset)
 		{
 			key_unset = 0;
-			Controls->left	= SDL_SCANCODE_A;
-			Controls->right = SDL_SCANCODE_D;
-			Controls->up	= SDL_SCANCODE_W;
-			Controls->down	= SDL_SCANCODE_S;
+			Settings->left	= SDL_SCANCODE_A;
+			Settings->right = SDL_SCANCODE_D;
+			Settings->up	= SDL_SCANCODE_W;
+			Settings->down	= SDL_SCANCODE_S;
 			continue;
 		}
 
 		if (!SDL_strcmp(argv[i], "--vi") && key_unset)
 		{
 			key_unset = 0;
-			Controls->left	= SDL_SCANCODE_H;
-			Controls->right = SDL_SCANCODE_L;
-			Controls->up	= SDL_SCANCODE_K;
-			Controls->down	= SDL_SCANCODE_J;
+			Settings->left	= SDL_SCANCODE_H;
+			Settings->right = SDL_SCANCODE_L;
+			Settings->up	= SDL_SCANCODE_K;
+			Settings->down	= SDL_SCANCODE_J;
 			continue;
 		}
 	}
 	return FieldSize;
 }
-#endif /* ifndef _LOGIC_H_ */
