@@ -16,18 +16,13 @@ Game;
 
 typedef struct 
 {
-	Uint8 quit;
-	Uint8 left;
-	Uint8 right;
-	Uint8 up;
-	Uint8 down;
-	Uint8 mouse;
 	Uint8 Flags;
+	Uint8 Mode;
+	SDL_Point WinSize;
 }
-Settings;
+Params;
 
 #include "defines.h"
-#include "logic.h"
 #include "misc.h"
 #include "draw.h"
 

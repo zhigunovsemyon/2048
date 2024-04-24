@@ -1,7 +1,28 @@
 #ifndef MISC_H
 #define MISC_H
-
 #include "main.h"
+
+enum SetFlags
+{
+	KEY_UNSET	= 1,
+	COL_UNSET	= 2,
+	MOUSE_UNSET = 4,	
+	SIZE_UNSET	= 8
+};
+
+/* На основе параметров запуска игры argv, в количестве argc, подбирается схема управления
+ * и размер игрового поля. По умолчанию используются стрелки с мышью, поле имеет  размер 4x4*/
+Uint8 LaunchOptions(int argc, const char **argv, Params *Settings);
+
+/*Функция меняет режим работы программы на основе
+ уже выставленного режима работы и некоторого события */
+void SetMode(SDL_Event *event, Params *Params);
+
+//Вычисление меньшего из двух чисел
+int MinOfTwo(int,int);
+
+//Вычисление большего из двух чисел
+int MaxOfTwo(int,int);
 
 //Вызов SDL, создание окна под данным названием и рисовальщика 
 Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, const SDL_Point *WinSize);
