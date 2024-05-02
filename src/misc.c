@@ -4,12 +4,22 @@ void SetMode(SDL_Event *event, Params *Params)
 {
 	// Определение событий
 	while (!SDL_PollEvent(event))
-	{ // Если событий не было, сразу осуществляется выход
+	{ // Если событий не было, сразу осуществляется выход, режим не меняется
 		return;
 	}
 
 	switch (event->type)
 	{
+	// Если был запрошен выход из программы
+	case SDL_QUIT:
+		Params->Mode = MODE_QUIT;
+		return;
+
+	case SDL_MOUSEBUTTONUP:
+		if (Params->Flags & FLAG_MOUSEOFF)
+			return;
+		break;
+
 	case SDL_KEYUP: // Если была нажата клавиша
 
 		// Если програма отображает перемещение ячейки, то возможно только выйти из программы
@@ -20,7 +30,7 @@ void SetMode(SDL_Event *event, Params *Params)
 		}
 		if (Params->Mode != MODE_WAIT)
 			return;
-
+		/*дальнейший код выполняется только в режиме MODE_WAIT*/
 		switch (event->key.keysym.scancode)
 		{
 			/*Наборы клавиш "ВПРАВО" для разных схем*/
@@ -80,26 +90,6 @@ void SetMode(SDL_Event *event, Params *Params)
 			return;
 		}
 		break;
-
-	// Если был запрошен выход из программы
-	case SDL_QUIT:
-		Params->Mode = MODE_QUIT;
-		return;
-
-	// Если был изменён размер окна
-	case SDL_WINDOWEVENT:
-		if (event->window.event == SDL_WINDOWEVENT_RESIZED)
-		{
-			Params->Mode = MODE_RESIZE;
-			return;
-		}
-		break;
-
-	case SDL_MOUSEBUTTONUP:
-		if (Params->Flags & FLAG_MOUSEOFF)
-			return;
-		break;
-
 	default:
 		break;
 	}

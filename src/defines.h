@@ -37,9 +37,7 @@ enum Modes
 	MODE_CHECK_LEFT,//проверка хода влево
 	MODE_CHECK_DOWN,//проверка хода вних
 	MODE_CHECK_UP,	//проверка хода вверх
-	MODE_WAIT,		//ожидание ввода
-	//MODE_DRAW,		//
-	MODE_RESIZE		//изменение размеров окна
+	MODE_WAIT		//ожидание ввода
 };
 
 #endif // !DEFINES_H
