@@ -18,7 +18,7 @@ void SetMode(SDL_Event *event, Params *Params)
 			Params->Mode = MODE_QUIT;
 			return;
 		}
-		if (Params->Mode >= MODE_MOVE_RIGHT && Params->Mode <= MODE_MOVE_UP)
+		if (Params->Mode != MODE_WAIT)
 			return;
 
 		switch (event->key.keysym.scancode)

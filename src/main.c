@@ -54,7 +54,7 @@ int main(int argc, const char **args)
 		SetMode(&Events, &Params);
 		switch (Params.Mode)
 		{
-		case MODE_DO_NOTHING:
+		case MODE_WAIT:
 			continue;
 
 		case MODE_QUIT:

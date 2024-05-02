@@ -28,18 +28,18 @@ enum Flags
 
 enum Modes 
 {
-	MODE_QUIT,
-	MODE_MOVE_RIGHT,
-	MODE_MOVE_LEFT,
-	MODE_MOVE_DOWN,
-	MODE_MOVE_UP,
-	MODE_CHECK_RIGHT,
-	MODE_CHECK_LEFT,
-	MODE_CHECK_DOWN,
-	MODE_CHECK_UP,
-	MODE_DO_NOTHING,
-	MODE_DRAW,
-	MODE_RESIZE
+	MODE_QUIT,		//Выход из игры
+	MODE_MOVE_RIGHT,//перемещение вправо
+	MODE_MOVE_LEFT,	//перемещение влево
+	MODE_MOVE_DOWN,	//перемещение вниз
+	MODE_MOVE_UP,	//перемещение вверх
+	MODE_CHECK_RIGHT,//проверка хода вправо
+	MODE_CHECK_LEFT,//проверка хода влево
+	MODE_CHECK_DOWN,//проверка хода вних
+	MODE_CHECK_UP,	//проверка хода вверх
+	MODE_WAIT,		//ожидание ввода
+	//MODE_DRAW,		//
+	MODE_RESIZE		//изменение размеров окна
 };
 
 #endif // !DEFINES_H
