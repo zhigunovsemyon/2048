@@ -28,9 +28,9 @@ int MaxOfTwo(int,int);
 Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, const SDL_Point *WinSize);
 
 //Вывести сообщение об ошибки и выйти из программы
-Uint8 PrintErrorAndLeaveWithCode (Uint8 code, SDL_Window* win, SDL_Renderer* rend);
+Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game);
 
 //Закрытие всех окон и рисовальщиков
-Uint8 SilentLeaveWithCode (Uint8 code, SDL_Window* win, SDL_Renderer* rend);
+Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game);
 
 #endif // !MISC_H

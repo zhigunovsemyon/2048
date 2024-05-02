@@ -12,6 +12,7 @@ typedef struct
 	Uint64* Field;
 	Uint8 FieldSize;
 	Uint64 Score;
+	Uint64 MaxScore;
 }
 Game;
 

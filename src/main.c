@@ -34,6 +34,10 @@ int main(int argc, const char **args)
 	Game.Score = 0;
 
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
+	Game.Field = (Uint64*)SDL_calloc(sizeof(Uint64), //Выделение памяти под игровое поле
+		Game.FieldSize * Game.FieldSize);
+	if (!Game.Field)
+		return ERR_MALLOC;
 
 	// Возможность отключения вывода информации
 	SDL_Log("Используется размер поля: %u\n", Game.FieldSize);
@@ -41,7 +45,7 @@ int main(int argc, const char **args)
 
 	// Создание окна и рисовальщика
 	if (CreateWorkspace(&window, &rend, title, &Params.WinSize))
-		return PrintErrorAndLeaveWithCode(SDLERR, window, rend);
+		return PrintErrorAndLeaveWithCode(ERR_SDL, window, rend, &Game);
 
 	Params.Mode = UINT8_MAX;
 	// Игровой цикл
@@ -54,7 +58,7 @@ int main(int argc, const char **args)
 			continue;
 
 		case MODE_QUIT:
-			return SilentLeaveWithCode(NOERR, window, rend);
+			return SilentLeaveWithCode(ERR_NO, window, rend, &Game);
 
 		case MODE_RESIZE:
 			SDL_GetWindowSize(window, &Params.WinSize.x, &Params.WinSize.y);
