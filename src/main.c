@@ -52,28 +52,15 @@ int main(int argc, const char **args)
 	while (SDL_TRUE)
 	{
 		SetMode(&Events, &Params);	//Выбор режима работы в данный момент
-		// Если был изменён размер окна
-		if(Events.type == SDL_WINDOWEVENT)
-			if (Events.window.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				SDL_GetWindowSize(window, &Params.WinSize.x, &Params.WinSize.y);
-				if (Params.WinSize.x < WIN_MIN)
-					Params.WinSize.x = WIN_MIN;
-				if (Params.WinSize.y < WIN_MIN)
-					Params.WinSize.y = WIN_MIN;
-
-				SDL_SetWindowSize(window, Params.WinSize.x, Params.WinSize.y);
-				Params.Mode = UINT8_MAX;
-				continue;
-			}
+		CheckForResize(window, &Params, &Events, WIN_MIN);	//Проверка на изменение размера
 
 		switch (Params.Mode)
 		{
-		case MODE_WAIT:
-			continue;
-
 		case MODE_QUIT:
 			return SilentLeaveWithCode(ERR_NO, window, rend, &Game);
+
+		case MODE_WAIT:
+			continue;
 
 		case MODE_CHECK_UP:
 		case MODE_CHECK_DOWN:

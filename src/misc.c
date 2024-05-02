@@ -253,3 +253,22 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 	}
 	return FieldSize;
 }
+
+void CheckForResize(SDL_Window* win, Params* Params, SDL_Event* ev, Uint16 win_min)
+{
+	// Если был изменён размер окна
+	if (ev->type != SDL_WINDOWEVENT)
+		return;
+	
+	if (ev->window.event != SDL_WINDOWEVENT_RESIZED)
+		return;
+
+	/*Если ev->type != SDL_WINDOWEVENT и ev->window.event != SDL_WINDOWEVENT_RESIZED*/
+	SDL_GetWindowSize(win, &Params->WinSize.x, &Params->WinSize.y);
+	if (Params->WinSize.x < win_min)
+		Params->WinSize.x = win_min;
+	if (Params->WinSize.y < win_min)
+		Params->WinSize.y = win_min;
+
+	SDL_SetWindowSize(win, Params->WinSize.x, Params->WinSize.y);
+}

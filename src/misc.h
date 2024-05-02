@@ -33,4 +33,8 @@ Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend
 //Закрытие всех окон и рисовальщиков
 Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game);
 
+/*Проверка окна win на изменение его размеров в Params, через ивенты ev.
+Меняет на win_min при чрезмерном уменьшении*/
+void CheckForResize(SDL_Window* win, Params* Params, SDL_Event* ev, Uint16 win_min);
+
 #endif // !MISC_H
