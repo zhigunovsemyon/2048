@@ -168,13 +168,13 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 		if (!SDL_strcmp(argv[i],"--size=3") && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
-			FieldSize = 3;
 			continue;
 		}
 
 		if (!SDL_strcmp(argv[i],"--size=4") && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
+			FieldSize = 4;
 			continue;
 		}
 
@@ -182,13 +182,6 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 		{
 			Setters &= ~SIZE_UNSET;
 			FieldSize = 5;
-			continue;
-		}
-
-		if (!SDL_strcmp(argv[i],"--size=6") && (Setters & SIZE_UNSET))
-		{
-			Setters &= ~SIZE_UNSET;
-			FieldSize = 6;
 			continue;
 		}
 

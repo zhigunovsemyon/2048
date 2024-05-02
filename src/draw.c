@@ -1,4 +1,6 @@
 #include "draw.h"
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
 
 Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 {
