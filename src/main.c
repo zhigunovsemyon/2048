@@ -28,7 +28,7 @@ int main(int argc, const char **args)
 	SDL_Event Events;
 	char title[40]; // = "2048 | Очков: 00000000000000000000";
 	Params.WinSize.x = WIN_WIDTH;
-	Params.WinSize.x = WIN_HEIGHT;
+	Params.WinSize.y = WIN_HEIGHT;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
 	Game.Score = 0;

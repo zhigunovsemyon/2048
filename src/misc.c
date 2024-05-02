@@ -24,44 +24,60 @@ void SetMode(SDL_Event *event, Params *Params)
 
 		switch (event->key.keysym.scancode)
 		{
+			/*Наборы клавиш "ВПРАВО" для разных схем*/
 		case SDL_SCANCODE_L:
-			Params->Mode = ((Params->Flags & FLAG_VIMKEY)) ? MODE_CHECK_RIGHT : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_VIMKEY))
+				Params->Mode = MODE_CHECK_RIGHT;
 			return;
 		case SDL_SCANCODE_D:
-			Params->Mode = ((Params->Flags & FLAG_WASDKEY)) ? MODE_CHECK_RIGHT : MODE_DO_NOTHING;
+			if((Params->Flags & FLAG_WASDKEY)) 
+				Params->Mode = MODE_CHECK_RIGHT;
 			return;
 		case SDL_SCANCODE_RIGHT:
-			Params->Mode = ((Params->Flags & FLAG_ARROWKEY)) ? MODE_CHECK_RIGHT : MODE_DO_NOTHING;
+			if((Params->Flags & FLAG_ARROWKEY)) 
+				Params->Mode = MODE_CHECK_RIGHT;
 			return;
 
+			/*Наборы клавиш "ВЛЕВО" для разных схем*/
 		case SDL_SCANCODE_H:
-			Params->Mode = ((Params->Flags & FLAG_VIMKEY)) ? MODE_CHECK_LEFT : MODE_DO_NOTHING;
+			if((Params->Flags & FLAG_VIMKEY))
+				Params->Mode = MODE_CHECK_LEFT;
 			return;
 		case SDL_SCANCODE_A:
-			Params->Mode = ((Params->Flags & FLAG_WASDKEY)) ? MODE_CHECK_LEFT : MODE_DO_NOTHING;
+			if((Params->Flags & FLAG_WASDKEY))
+				Params->Mode =	MODE_CHECK_LEFT;
 			return;
 		case SDL_SCANCODE_LEFT:
-			Params->Mode = ((Params->Flags & FLAG_ARROWKEY)) ? MODE_CHECK_LEFT : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_ARROWKEY))
+				Params->Mode = MODE_CHECK_LEFT;
 			return;
 
+			/*Наборы клавиш "ВВЕРХ" для разных схем*/
 		case SDL_SCANCODE_K:
-			Params->Mode = ((Params->Flags & FLAG_VIMKEY)) ? MODE_CHECK_UP : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_VIMKEY)) 
+				Params->Mode = MODE_CHECK_UP;
 			return;
 		case SDL_SCANCODE_W:
-			Params->Mode = ((Params->Flags & FLAG_WASDKEY)) ? MODE_CHECK_UP : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_WASDKEY)) 
+				Params->Mode = MODE_CHECK_UP;
 			return;
 		case SDL_SCANCODE_UP:
-			Params->Mode = ((Params->Flags & FLAG_ARROWKEY)) ? MODE_CHECK_UP : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_ARROWKEY)) 
+				Params->Mode = MODE_CHECK_UP;
 			return;
 
+			/*Наборы клавиш "ВНИЗ" для разных схем*/
 		case SDL_SCANCODE_J:
-			Params->Mode = ((Params->Flags & FLAG_VIMKEY)) ? MODE_CHECK_DOWN : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_VIMKEY))
+				Params->Mode = MODE_CHECK_DOWN;
 			return;
 		case SDL_SCANCODE_S:
-			Params->Mode = ((Params->Flags & FLAG_WASDKEY)) ? MODE_CHECK_DOWN : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_WASDKEY))
+				Params->Mode = MODE_CHECK_DOWN;
 			return;
 		case SDL_SCANCODE_DOWN:
-			Params->Mode = ((Params->Flags & FLAG_ARROWKEY)) ? MODE_CHECK_DOWN : MODE_DO_NOTHING;
+			if ((Params->Flags & FLAG_ARROWKEY))
+				Params->Mode = MODE_CHECK_DOWN;
 			return;
 		}
 		break;
@@ -168,13 +184,13 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 		if (!SDL_strcmp(argv[i],"--size=3") && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
+			FieldSize = 3;
 			continue;
 		}
 
 		if (!SDL_strcmp(argv[i],"--size=4") && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
-			FieldSize = 4;
 			continue;
 		}
 
@@ -182,6 +198,13 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 		{
 			Setters &= ~SIZE_UNSET;
 			FieldSize = 5;
+			continue;
+		}
+
+		if (!SDL_strcmp(argv[i], "--size=6") && (Setters & SIZE_UNSET))
+		{
+			Setters &= ~SIZE_UNSET;
+			FieldSize = 6;
 			continue;
 		}
 
