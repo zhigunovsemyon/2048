@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <stdio.h> //sprintf
+#include <stdio.h>
 #include "SDL.h"
 #ifndef SDL_h_
 #include <SDL2/SDL.h>
