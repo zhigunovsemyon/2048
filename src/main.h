@@ -2,9 +2,15 @@
 #define MAIN_H
 
 #include <stdio.h>
+
 #include "SDL.h"
 #ifndef SDL_h_
 #include <SDL2/SDL.h>
+#endif // !SDL_h_
+
+#include "SDL_ttf.h"
+#ifndef SDL_TTF_H_
+#include <SDL2/SDL_ttf.h>
 #endif // !SDL_h_
 
 typedef struct
