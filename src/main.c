@@ -42,7 +42,7 @@ int main(int argc, const char **args)
 	// Возможность отключения вывода информации
 	SDL_Log("Используется размер поля: %u\n", Game.FieldSize);
 	PrintSetup(&Params);
-
+	TTF_Init();
 	// Создание окна и рисовальщика
 	if (CreateWorkspace(&window, &rend, title, &Params.WinSize))
 		return PrintErrorAndLeaveWithCode(ERR_SDL, window, rend, &Game);
@@ -57,6 +57,7 @@ int main(int argc, const char **args)
 		switch (Params.Mode)
 		{
 		case MODE_QUIT:
+			TTF_Quit();
 			return SilentLeaveWithCode(ERR_NO, window, rend, &Game);
 
 		case MODE_WAIT:
