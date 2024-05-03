@@ -10,14 +10,18 @@ if (POLICY CMP0141)
 endif()
 
 project ("2048")
+file(GLOB C_FILES "src/*.c")
 
 if(WIN32)
-	set(SDL2_DIR "c:\\sdl2\\")
+	set(SDL2_PATH "c:\\sdl2\\")
+	set(SDL2_TTF_PATH "c:\\sdl2_ttf\\")
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 endif(WIN32)
 
 find_package (SDL2 REQUIRED)
+find_package (SDL2_TTF REQUIRED)
 
-include_directories(${SDL2_INCLUDE_DIRS})
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
 
-add_executable (${PROJECT_NAME} "src/main.c" "src/draw.c" "src/misc.c") 
-target_link_libraries (${PROJECT_NAME} ${SDL2_LIBRARIES})
+add_executable (${PROJECT_NAME} ${C_FILES}) 
+target_link_libraries (${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
