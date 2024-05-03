@@ -24,4 +24,4 @@ find_package (SDL2_TTF REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
 
 add_executable (${PROJECT_NAME} ${C_FILES}) 
-target_link_libraries (${PROJECT_NAME} ${SDL2_LIBRARIES} SDL2_ttf)
+target_link_libraries (${PROJECT_NAME} ${SDL2_LIBRARIES} SDL2::TTF)
