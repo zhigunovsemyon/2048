@@ -43,6 +43,7 @@ int main(int argc, const char **args)
 	SDL_Log("Используется размер поля: %u\n", Game.FieldSize);
 	PrintSetup(&Params);
 	TTF_Init();
+
 	// Создание окна и рисовальщика
 	if (CreateWorkspace(&window, &rend, title, &Params.WinSize))
 		return PrintErrorAndLeaveWithCode(ERR_SDL, window, rend, &Game);
