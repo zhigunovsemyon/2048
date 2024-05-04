@@ -18,8 +18,6 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 	float TileSize = FieldSize / TileCount;							  // Размер одного поля
 	SDL_Point Corner =												  // Координаты угла поля
 		{(Params->WinSize.x - FieldSize) * 0.5, (Params->WinSize.y - FieldSize) * 0.5};
-	SDL_Log("Размер поля: %f\n", FieldSize);
-	SDL_Log("Размер плитки: %f\n", TileSize);
 
 	// Задание цвета фона
 	if (SDL_SetRenderDrawColor(rend, FG_brightness, FG_brightness, FG_brightness, 0xff))

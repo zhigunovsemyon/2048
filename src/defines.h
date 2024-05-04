@@ -14,7 +14,8 @@ enum Errors
 {
 	ERR_NO,
 	ERR_SDL,
-	ERR_MALLOC
+	ERR_MALLOC,
+	ERR_TTF
 };
 
 enum Flags

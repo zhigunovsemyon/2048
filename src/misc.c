@@ -88,6 +88,9 @@ void SetMode(SDL_Event *event, Params *Params)
 			if ((Params->Flags & FLAG_ARROWKEY))
 				Params->Mode = MODE_CHECK_DOWN;
 			return;
+
+		default:
+			break;
 		}
 		break;
 	default:
@@ -118,6 +121,10 @@ Uint8 SilentLeaveWithCode (Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game
 	if(win)
 		SDL_DestroyWindow(win);
 	
+	//Завершение работы SDL и SDL_ttf
+	TTF_Quit();
+	SDL_Quit();
+
 	//Возврат кода ошибки для выхода
 	return code;
 }
@@ -126,10 +133,11 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 {
 	// Вызов SDL
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
-	{
-		// Завершение работы, если не удалось вызвать SDL
-		return ERR_SDL;
-	}
+		return ERR_SDL;// Завершение работы, если не удалось вызвать SDL
+
+	// Вызов SDL_ttf
+	if(TTF_Init())
+		return ERR_TTF;//Завершение работы, если не удалось вызвать TTF
 
 	//Создание окна
 	*win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
