@@ -1,5 +1,11 @@
 #include "misc.h"
 
+Sint8 AddElement(Game *Game)
+{
+	Game->Field[3] = 2;
+	return 1;
+}
+
 void SetMode(SDL_Event *event, Params *Params)
 {
 	// Определение событий

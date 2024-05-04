@@ -25,6 +25,7 @@ int main(int argc, const char **args)
 {
 	srand(time(NULL));
 	Uint8 errCode;
+	Sint8 NewElementIndex;
 	Game Game;
 	Params Params;
 	SDL_Event Events;
@@ -49,7 +50,7 @@ int main(int argc, const char **args)
 	if ((errCode = CreateWorkspace(&window, &rend, title, &Params.WinSize)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game);
 
-	Params.Mode = UINT8_MAX;
+	Params.Mode = MODE_ADD;
 	// Игровой цикл
 	while (SDL_TRUE)
 	{
@@ -64,12 +65,21 @@ int main(int argc, const char **args)
 		case MODE_WAIT:
 			continue;
 
+		case MODE_ADD:
+			NewElementIndex = AddElement(&Game);
+			Params.Mode = (NewElementIndex < 0) ? 
+				MODE_QUIT : MODE_DRAW;
+			break;
+
 		case MODE_CHECK_UP:
 		case MODE_CHECK_DOWN:
 		case MODE_CHECK_RIGHT:
 		case MODE_CHECK_LEFT:
 			SDL_Log("Проверка поля\n");
 			continue;
+
+		case MODE_DRAW:
+			// break;
 
 		default:
 			sprintf(title, "2048 | Очков: %lu", Game.Score);

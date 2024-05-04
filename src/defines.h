@@ -10,6 +10,12 @@
 #define BG_DARK_BRIGHTNESS		0x20
 #define BG_LIGHT_BRIGHTNESS		0xdf
 
+enum Textues
+{
+	TEX_SCORE,
+	TEX_SQ2
+};
+
 enum Errors
 {
 	ERR_NO,
@@ -30,6 +36,7 @@ enum Flags
 enum Modes 
 {
 	MODE_QUIT,		//Выход из игры
+	MODE_DRAW,		//Рисование нового элемента
 	MODE_MOVE_RIGHT,//перемещение вправо
 	MODE_MOVE_LEFT,	//перемещение влево
 	MODE_MOVE_DOWN,	//перемещение вниз
@@ -38,7 +45,8 @@ enum Modes
 	MODE_CHECK_LEFT,//проверка хода влево
 	MODE_CHECK_DOWN,//проверка хода вних
 	MODE_CHECK_UP,	//проверка хода вверх
-	MODE_WAIT		//ожидание ввода
+	MODE_WAIT,		//ожидание ввода
+	MODE_ADD		//добавление нового элемента
 };
 
 #endif // !DEFINES_H
