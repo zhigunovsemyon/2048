@@ -16,10 +16,17 @@
 
 typedef struct
 {
-	Uint64* Field;
-	Uint8 FieldSize;
-	Uint64 Score;
-	Uint64 MaxScore;
+	Uint64 val;		//Значение ячейки
+	SDL_Point pos;	//Положение в пискселях
+}
+Tile;
+
+typedef struct
+{
+	Tile* Field;	//Поле ячеек
+	Uint8 FieldSize;//Размер поля
+	Uint64 Score;	//Текущий счёт
+	Uint64 MaxScore;//Максимальный счёт
 }
 Game;
 
@@ -28,6 +35,7 @@ typedef struct
 	Uint8 Flags;
 	Uint8 Mode;
 	SDL_Point WinSize;
+	SDL_Point Corner;
 }
 Params;
 

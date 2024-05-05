@@ -37,7 +37,7 @@ int main(int argc, const char **args)
 	Game.Score = 0;
 
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
-	Game.Field = (Uint64*)SDL_calloc(sizeof(Uint64), //Выделение памяти под игровое поле
+	Game.Field = (Tile*)SDL_calloc(sizeof(Tile), //Выделение памяти под игровое поле
 		Game.FieldSize * Game.FieldSize);
 	if (!Game.Field)
 		return ERR_MALLOC;
