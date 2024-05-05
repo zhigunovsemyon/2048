@@ -35,9 +35,14 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 	SDL_Texture *greet = CreateGreetingTexture(rend, Params, &txt_size, FONT, message);
 	if(!greet)
 		return ERR_SDL;
-
+	
+	Uint8 BG_brightness = (Params->Flags & FLAG_DARKMODE) ? BG_DARK_BRIGHTNESS : BG_LIGHT_BRIGHTNESS;
 	SDL_SetWindowTitle(window, "Добро пожаловать");
-	DrawBackground(rend, Game->FieldSize, Params);
+	// Заливка фона
+	if (SDL_SetRenderDrawColor(rend, BG_brightness, BG_brightness, BG_brightness, 0xff))
+		return ERR_SDL;
+	if (SDL_RenderClear(rend))
+		return ERR_SDL;
 	SDL_RenderCopy(rend, greet, NULL, &txt_size);
 	SDL_RenderPresent(rend);
 
@@ -56,7 +61,11 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 			if (!greet)
 				return ERR_SDL;
 
-			DrawBackground(rend, Game->FieldSize, Params);
+			// Заливка фона
+			if (SDL_SetRenderDrawColor(rend, BG_brightness, BG_brightness, BG_brightness, 0xff))
+				return ERR_SDL;
+			if (SDL_RenderClear(rend))
+				return ERR_SDL;
 			SDL_RenderCopy(rend, greet, NULL, &txt_size);
 			SDL_RenderPresent(rend);
 		}

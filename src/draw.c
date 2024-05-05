@@ -3,37 +3,56 @@
 SDL_Texture *CreateGreetingTexture(SDL_Renderer *rend, Params *Params, SDL_Rect *txt_size, 
 								   const char *font_name, const char *message)
 {
-	TTF_Font *font = TTF_OpenFont(font_name, Params->WinSize.y / 20);
-	if (!font)
-		return NULL;
-
-	SDL_Colour txt_col;
+	TTF_Font* font;
+	SDL_Surface* txt_surf;
+	SDL_Colour txt_col;	//Определение цвета шрифта
 	txt_col.a = 0xFF;
-	if (FLAG_DARKMODE & Params->Flags)
+	if (FLAG_DARKMODE & Params->Flags)//Светлый текст для тёмного режима
 	{
 		txt_col.r = BG_LIGHT_BRIGHTNESS;
 		txt_col.g = BG_LIGHT_BRIGHTNESS;
 		txt_col.b = BG_LIGHT_BRIGHTNESS;
 	}
-	else
+	else	//Тёмный текст для светлого режима
 	{
 		txt_col.r = BG_DARK_BRIGHTNESS;
 		txt_col.b = BG_DARK_BRIGHTNESS;
 		txt_col.g = BG_DARK_BRIGHTNESS;
 	}
 
-	SDL_Surface *txt_surf = TTF_RenderUTF8_Solid_Wrapped(font, message, txt_col, 0);
-	if (!txt_surf)
+	Uint8 scaler = 12; //Отношение размера буквы к размеру окна
+	do
 	{
+		//Открытие шрифта, проверка
+		font = TTF_OpenFont(font_name, Params->WinSize.y / scaler);
+		if (!font)
+			return NULL;
+
+		//Создание поверхности с надписью, проверка
+		txt_surf = TTF_RenderUTF8_Solid_Wrapped(font, message, txt_col, 0);
+		if (!txt_surf)
+		{
+			TTF_CloseFont(font);
+			return NULL;
+		}
+		//Если размер текста меньше размера окна, цикл прерывается
+		if (txt_surf->h < Params->WinSize.y && txt_surf->w < Params->WinSize.x)
+			break;
+
+		/*Если размер текста больше по одной из плоскостей, старый текст и 
+		поверхность очищаются, коэфициент увеличивается*/
+		scaler++;
 		TTF_CloseFont(font);
-		return NULL;
-	}
+		SDL_FreeSurface(txt_surf);
+	} while (SDL_TRUE); //Условие завершения описано внутри
+	
+	//Создание текстуры из поверхности с надписью
 	SDL_Texture *ret = SDL_CreateTextureFromSurface(rend, txt_surf);
-	TTF_CloseFont(font);
-	txt_size->w = txt_surf->w;
+	TTF_CloseFont(font);		//Закрытие шрифта
+	txt_size->w = txt_surf->w,	//Передача размера надписи во вне
 	txt_size->h = txt_surf->h;
-	SDL_FreeSurface(txt_surf);
-	return ret;
+	SDL_FreeSurface(txt_surf);	//Очистка поверхности
+	return ret;					//Возврат тексутры, либо NULL
 }
 
 Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
