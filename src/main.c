@@ -26,7 +26,7 @@ int main(int argc, const char **args)
 
 	//Вывод приветствия
 	if ((errCode = Greeting(window, rend, &Events, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(ERR_SDL, window, rend, &Game);
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game);
 
 	// Игровой цикл
 	while (SDL_TRUE)

@@ -47,6 +47,19 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 		{ // Если событий не было, сразу осуществляется выход, режим не меняется
 			continue;
 		}
+
+		/*Если, на экране приветствия, изменился размер окна, надпись отрисовывается по новой*/
+		if (CheckForResize(window, Params, ev, WIN_MIN))
+		{
+			SDL_DestroyTexture(greet);
+			greet = CreateGreetingTexture(rend, Params, &txt_size, FONT, message);
+			if (!greet)
+				return ERR_SDL;
+
+			DrawBackground(rend, Game->FieldSize, Params);
+			SDL_RenderCopy(rend, greet, NULL, &txt_size);
+			SDL_RenderPresent(rend);
+		}
 	
 		switch (ev->type)
 		{
@@ -336,14 +349,14 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 	return FieldSize;
 }
 
-void CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev, Uint16 win_min)
+Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev, Uint16 win_min)
 {
 	// Если был изменён размер окна
 	if (ev->type != SDL_WINDOWEVENT)
-		return;
+		return SDL_FALSE;
 
 	if (ev->window.event != SDL_WINDOWEVENT_RESIZED)
-		return;
+		return SDL_FALSE;
 
 	/*Если ev->type != SDL_WINDOWEVENT и ev->window.event != SDL_WINDOWEVENT_RESIZED*/
 	SDL_GetWindowSize(win, &Params->WinSize.x, &Params->WinSize.y);
@@ -353,4 +366,5 @@ void CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev, Uint16 win_m
 		Params->WinSize.y = win_min;
 
 	SDL_SetWindowSize(win, Params->WinSize.x, Params->WinSize.y);
+	return SDL_TRUE;
 }
