@@ -10,6 +10,10 @@ enum SetFlags
 	SIZE_UNSET	= 8
 };
 
+/*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
+ * параметров игры Params, настроек игры Game. Возврат нуля при отсутствии ошибок, либо SDL_ERR*/
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game);
+
 /*Добавление нового элемента в игровое поле. Возврат индекса нового тайла,
  *  если нет свободного места, возврат -1*/
 Sint8 AddElement(Game *Game);
