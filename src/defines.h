@@ -10,7 +10,13 @@
 #define BG_DARK_BRIGHTNESS		0x20
 #define BG_LIGHT_BRIGHTNESS		0xdf
 
-#define MSG_LEN  363
+#define MSG_LEN  365
+
+#if WIN32
+#define FONT "..\\..\\..\\monospace"
+#else
+#define FONT "monospace"
+#endif
 
 enum Textues
 {

@@ -32,7 +32,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 #define GREET_RET MODE_ADD
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0;
-	SDL_Texture *greet = CreateGreetingTexture(rend, Params, &txt_size, "monospace", message);
+	SDL_Texture *greet = CreateGreetingTexture(rend, Params, &txt_size, FONT, message);
 	if(!greet)
 		return ERR_SDL;
 
