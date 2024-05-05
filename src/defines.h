@@ -46,7 +46,8 @@ enum Modes
 	MODE_CHECK_DOWN,//проверка хода вних
 	MODE_CHECK_UP,	//проверка хода вверх
 	MODE_WAIT,		//ожидание ввода
-	MODE_ADD		//добавление нового элемента
+	MODE_ADD,		//добавление нового элемента
+	MODE_START		//приветствие игрока
 };
 
 #endif // !DEFINES_H

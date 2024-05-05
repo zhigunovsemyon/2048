@@ -2,7 +2,7 @@
 
 Sint8 AddElement(Game *Game)
 {
-	Game->Field[3] = 2;
+	Game->Field[3].val = 2;
 	return 1;
 }
 
