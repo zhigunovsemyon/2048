@@ -1,13 +1,32 @@
 #include "misc.h"
+#define _SQ(A) (A) * (A) 
 
 Sint8 AddElement(Game *Game)
 {
-	/*Сохранение позиции элемента*/
-	Uint8 pos = RandomInt(0, Game->FieldSize * Game->FieldSize);
-	/*Запись значения элемента с некоторым шансом. Если RandomInt 
-	вернула 0 (раз в CHANCE_OF_FOUR), то сохраняется 4, в противном случае -- 2*/
-	Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
-	return pos;
+	Sint8 pos; 
+	Uint8 tries = 0;
+	/*Случайный перебор*/
+	for (; tries < _SQ(Game->FieldSize); tries++)
+	{
+		pos = RandomInt(0, _SQ(Game->FieldSize));
+		if (Game->Field[pos].val)
+			continue;//Если там уже есть значение, то перебор продолжается
+		/*В противном случае в эту позицию сохраняется число*/
+		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
+		return pos;//Позиция нового элемента возвращается
+	}
+	/*Если случайно подобрать положение не удалось, функция перебирает ячейки по очереди
+	с конца, проводя аналогичную проверку*/
+	for (pos = tries - 1; pos >= 0; pos--)
+	{
+		if (Game->Field[pos].val/*!= 0*/)
+			continue;
+		/*else*/
+		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
+		return pos; 
+	}
+	//Если свободных ячеек не нашлось, значит возвращается соответствующий флаг
+	return -1;
 }
 
 Uint8 dtCount(void)
