@@ -2,8 +2,12 @@
 
 Sint8 AddElement(Game *Game)
 {
-	Game->Field[3].val = 2;
-	return 1;
+	/*Сохранение позиции элемента*/
+	Uint8 pos = RandomInt(0, Game->FieldSize * Game->FieldSize);
+	/*Запись значения элемента с некоторым шансом. Если RandomInt 
+	вернула 0 (раз в CHANCE_OF_FOUR), то сохраняется 4, в противном случае -- 2*/
+	Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
+	return pos;
 }
 
 Uint8 dtCount(void)
@@ -13,6 +17,18 @@ Uint8 dtCount(void)
 	Uint8 ret = newtime - lasttime;
 	lasttime = newtime;
 	return ret;
+}
+
+Sint32 RandomInt(Sint32 a, Sint32 b)
+{
+	//"Переворот чисел при необходимости"
+	if (a > b)
+	{
+		Sint32 tmp = a;
+		a = b;
+		b = tmp;
+	}
+	return (rand() % (b - a)) + a;
 }
 
 Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game)

@@ -5,9 +5,12 @@
 #define WIN_MIN 200
 #define WIN_HEIGHT (WIN_MIN * 3)
 #define WIN_WIDTH (WIN_MIN * 4)
+
+//Коэффициенты
 #define FIELD_SIZE_COEFFICIENT 0.9f
 #define TILE_SIZE_COEFFICIENT 0.9f
 #define ANIM_SPEED 500.0f
+#define CHANCE_OF_FOUR 10
 
 #define BG_DARK_BRIGHTNESS		0x20
 #define BG_LIGHT_BRIGHTNESS		0xdf
