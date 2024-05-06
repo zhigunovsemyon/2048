@@ -56,15 +56,23 @@ int main(int argc, const char **args)
 			continue;
 
 		case MODE_DRAW:
-			// break;
+			if (NewElementIndex)
+			{
+				DrawBackground(rend, Game.FieldSize, &Params);
+				DrawNewElement(rend, &Params, &Game, NewElementIndex);
+				NewElementIndex = 0;
+				SDL_RenderPresent(rend);
+			}
+			break;
 
 		default:
-			sprintf(title, "2048 | Очков: %lu", Game.Score);
-			SDL_SetWindowTitle(window, title);
-
-			DrawBackground(rend, Game.FieldSize, &Params);
-
-			SDL_RenderPresent(rend);
+			break;
+			// sprintf(title, "2048 | Очков: %lu", Game.Score);
+			// SDL_SetWindowTitle(window, title);
+			//
+			// DrawBackground(rend, Game.FieldSize, &Params);
+			//
+			// SDL_RenderPresent(rend);
 		}
 	}
 }

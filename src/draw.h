@@ -2,6 +2,7 @@
 #define DRAW_H
 #include "main.h"
 
+Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index);
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0, 
  * тёмной при Col_Mode в противном случае */ 
 Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);

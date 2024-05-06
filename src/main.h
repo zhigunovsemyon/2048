@@ -35,7 +35,7 @@ typedef struct
 	Uint8 Flags;
 	Uint8 Mode;
 	SDL_Point WinSize;
-	SDL_Point Corner;
+	// SDL_Point Corner;
 }
 Params;
 
