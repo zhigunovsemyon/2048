@@ -93,29 +93,40 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 
 Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index)
 {
+	if(DrawBackground(rend, Game->FieldSize, Params)/*== ERR_SDL*/)
+		return ERR_SDL;
+
 	SDL_Rect Tile;
 	// Размер поля и плитки
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
-	// Размер одного поля хранится в h, размер плитки в w
-	Tile.h = FieldSize / Game->FieldSize;
-	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
-
-	// Положение угла поля в координатах
-	Tile.x = (Params->WinSize.x - FieldSize) * 0.5;
-	Tile.y = (Params->WinSize.y - FieldSize) * 0.5;
-
-	//Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
-	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-
-	Tile.h = Tile.w;//Запись корректной высоты плитки
 	// Задание цвета фона
 	if (SDL_SetRenderDrawColor(rend, 0xFF, 0, 0, 0xff))
 		return ERR_SDL;
-	if(SDL_RenderFillRect(rend, &Tile))
-		return ERR_SDL;
 
+	for (float tile_k = 0.0f; tile_k < TILE_SIZE_COEFFICIENT; tile_k += 0.16)
+	{
+		// Размер одного поля хранится в h, размер плитки в w
+		Tile.h = FieldSize / Game->FieldSize;
+		Tile.w = Tile.h * tile_k;
+		if (Tile.w < 1)
+			continue;
+
+		// Положение угла поля в координатах
+		Tile.x = (Params->WinSize.x - FieldSize) * 0.5;
+		Tile.y = (Params->WinSize.y - FieldSize) * 0.5;
+
+		//Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
+		Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+		Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+
+		Tile.h = Tile.w;//Запись корректной высоты плитки
+		
+		if (SDL_RenderFillRect(rend, &Tile))
+			return ERR_SDL;
+
+		SDL_RenderPresent(rend);
+	}
 	return ERR_NO;
 }

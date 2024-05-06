@@ -3,7 +3,7 @@ int main(int argc, const char **args)
 {
 	srand(time(NULL));
 	Uint8 errCode;
-	Sint8 NewElementIndex;
+	Sint8 NewElementIndex = -1;
 	Game Game;
 	Params Params;
 	SDL_Event Events;
@@ -56,12 +56,10 @@ int main(int argc, const char **args)
 			continue;
 
 		case MODE_DRAW:
-			if (NewElementIndex)
+			if (NewElementIndex >= 0)
 			{
-				DrawBackground(rend, Game.FieldSize, &Params);
 				DrawNewElement(rend, &Params, &Game, NewElementIndex);
-				NewElementIndex = 0;
-				SDL_RenderPresent(rend);
+				NewElementIndex = -1;
 			}
 			break;
 
