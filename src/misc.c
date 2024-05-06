@@ -6,6 +6,15 @@ Sint8 AddElement(Game *Game)
 	return 1;
 }
 
+Uint8 dtCount(void)
+{
+	static Uint32 lasttime = 0;
+	Uint32 newtime = SDL_GetTicks();
+	Uint8 ret = newtime - lasttime;
+	lasttime = newtime;
+	return ret;
+}
+
 Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game)
 {
 	char message[MSG_LEN] = "Добро пожаловать в игру 2048!\n";
@@ -32,7 +41,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 #define GREET_RET MODE_ADD
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0;
-	SDL_Texture *greet = CreateGreetingTexture(rend, Params, &txt_size, FONT, message);
+	SDL_Texture *greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
 	if(!greet)
 		return ERR_SDL;
 	
@@ -57,7 +66,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 		if (CheckForResize(window, Params, ev, WIN_MIN))
 		{
 			SDL_DestroyTexture(greet);
-			greet = CreateGreetingTexture(rend, Params, &txt_size, FONT, message);
+			greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
 			if (!greet)
 				return ERR_SDL;
 

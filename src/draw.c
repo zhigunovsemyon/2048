@@ -1,6 +1,6 @@
 #include "draw.h"
 
-SDL_Texture *CreateGreetingTexture(SDL_Renderer *rend, Params *Params, SDL_Rect *txt_size, 
+SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, Params *Params, SDL_Rect *txt_size, 
 								   const char *font_name, const char *message)
 {
 	TTF_Font* font;
@@ -93,11 +93,12 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 
 Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index)
 {
+	//Рисование поля
 	if(DrawBackground(rend, Game->FieldSize, Params)/*== ERR_SDL*/)
 		return ERR_SDL;
 
 	SDL_Rect Tile;
-	// Размер поля и плитки
+	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
@@ -105,14 +106,16 @@ Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index)
 	if (SDL_SetRenderDrawColor(rend, 0xFF, 0, 0, 0xff))
 		return ERR_SDL;
 
-	for (float tile_k = 0.0f; tile_k < TILE_SIZE_COEFFICIENT; tile_k += 0.16)
+	Tile.w = 0;
+	for (float size = 0; /*Перед циклом размер зануляется*/
+		/*Пограничное условие*/
+		size / TILE_SIZE_COEFFICIENT < (FieldSize / Game->FieldSize);
+		/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
+		Tile.w = (int)(size += ANIM_SPEED * dtCount() / 1000.0f))
 	{
-		// Размер одного поля хранится в h, размер плитки в w
+		// Размер одного поля хранится в h
 		Tile.h = FieldSize / Game->FieldSize;
-		Tile.w = Tile.h * tile_k;
-		if (Tile.w < 1)
-			continue;
-
+		
 		// Положение угла поля в координатах
 		Tile.x = (Params->WinSize.x - FieldSize) * 0.5;
 		Tile.y = (Params->WinSize.y - FieldSize) * 0.5;
@@ -123,9 +126,10 @@ Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index)
 
 		Tile.h = Tile.w;//Запись корректной высоты плитки
 		
+		/*Рисование и отображение прямоугольника*/
 		if (SDL_RenderFillRect(rend, &Tile))
 			return ERR_SDL;
-
+		
 		SDL_RenderPresent(rend);
 	}
 	return ERR_NO;
