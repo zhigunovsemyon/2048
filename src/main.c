@@ -25,7 +25,7 @@ int main(int argc, const char **args)
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game);
 
 	//Вывод приветствия
-	if ((errCode = Greeting(window, rend, &Events, &Params, &Game)))
+	if ((errCode = Greeting(window, rend, &Events, &Params, &Game, MODE_DRAW)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game);
 
 	// Игровой цикл

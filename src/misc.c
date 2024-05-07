@@ -50,7 +50,7 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 	return (rand() % (b - a)) + a;
 }
 
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game)
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game, Uint8 NextMode)
 {
 	char message[MSG_LEN] = "Добро пожаловать в игру 2048!\n";
 	if (Params->Flags & FLAG_DARKMODE)
@@ -73,7 +73,6 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 	sprintf(message + SDL_strlen(message), "Используется размер поля: %u\n", Game->FieldSize);
 	SDL_strlcat(message, "Для выхода нажмите q.\nДля прододжения нажмите любую клавишу\n", MSG_LEN);
 
-#define GREET_RET MODE_ADD
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0;
 	SDL_Texture *greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
@@ -129,13 +128,13 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 			if (Params->Flags & FLAG_MOUSEOFF)
 				continue;
 			SDL_DestroyTexture(greet);
-			Params->Mode = GREET_RET;
+			Params->Mode = NextMode;
 			return ERR_NO;
 	
 		case SDL_KEYUP: // Если была нажата клавиша
 			SDL_DestroyTexture(greet);
 			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ?
-				MODE_QUIT : GREET_RET;
+				MODE_QUIT : NextMode;
 			return ERR_NO;
 		}
 	}
