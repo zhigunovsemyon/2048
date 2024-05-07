@@ -1,4 +1,5 @@
 #include "main.h"
+
 int main(int argc, const char **args)
 {
 	srand(time(NULL));
