@@ -7,7 +7,8 @@ enum SetFlags
 	KEY_UNSET	= 1,
 	COL_UNSET	= 2,
 	MOUSE_UNSET = 4,	
-	SIZE_UNSET	= 8
+	SIZE_UNSET	= 8,
+	VSYNC_UNSET = 0x10
 };
 
 /*Возвращает случайное число из диапазона. 
@@ -41,7 +42,8 @@ int MinOfTwo(int,int);
 int MaxOfTwo(int,int);
 
 //Вызов SDL, создание окна под данным названием и рисовальщика 
-Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, const SDL_Point *WinSize);
+Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
+					  const SDL_Point *WinSize, Uint8 Flags);
 
 //Вывести сообщение об ошибки и выйти из программы
 Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game);

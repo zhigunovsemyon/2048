@@ -34,6 +34,7 @@ Uint8 dtCount(void)
 	static Uint32 lasttime = 0;
 	Uint32 newtime = SDL_GetTicks();
 	Uint8 ret = newtime - lasttime;
+	SDL_Log("%hhu", ret);
 	lasttime = newtime;
 	return ret;
 }
@@ -50,7 +51,8 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 	return (rand() % (b - a)) + a;
 }
 
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game, Uint8 NextMode)
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, 
+			   Params *Params, Game *Game, Uint8 NextMode)
 {
 	char message[MSG_LEN] = "Добро пожаловать в игру 2048!\n";
 	if (Params->Flags & FLAG_DARKMODE)
@@ -269,7 +271,8 @@ Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game 
 	return code;
 }
 
-Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, const SDL_Point *WinSize)
+Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
+					  const SDL_Point *WinSize, Uint8 Flag)
 {
 	// Вызов SDL
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
@@ -288,7 +291,8 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 	}
 
 	// Создание рисовальщика
-	*rend = SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	*rend = SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | 
+							(Flag & FLAG_VSYNC) ? SDL_RENDERER_PRESENTVSYNC : 0);
 	if (!(*rend))
 	{
 		return ERR_SDL;
@@ -298,12 +302,12 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 	return ERR_NO;
 }
 
-int MinOfTwo(int a, int b)
+Sint32 MinOfTwo(Sint32 a, Sint32 b)
 {
 	return (a > b) ? b : a;
 }
 
-int MaxOfTwo(int a, int b)
+Sint32 MaxOfTwo(Sint32 a, Sint32 b)
 {
 	return (a < b) ? b : a;
 }
@@ -312,7 +316,7 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 {
 	// Базовые параметры работы игры
 	Uint8 FieldSize = 4;
-	Settings->Flags = (FLAG_DARKMODE | FLAG_ARROWKEY);
+	Settings->Flags = (FLAG_VSYNC | FLAG_DARKMODE | FLAG_ARROWKEY);
 
 	// Если игра была запущена без флагов,
 	// то используется стандартная раскладка
@@ -322,6 +326,19 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 	 * цикл ниже будет пропущен*/
 	for (Uint8 i = 1; Setters && (i < argc); ++i)
 	{
+		if (!SDL_strcmp(argv[i], "--vsync-off") && (Setters & VSYNC_UNSET))
+		{
+			Setters &= ~VSYNC_UNSET;
+			Settings->Flags |= FLAG_VSYNC;
+			continue;
+		}
+
+		if (!SDL_strcmp(argv[i], "--vsync-on") && (Setters & VSYNC_UNSET))
+		{
+			Setters &= ~VSYNC_UNSET;
+			continue;
+		}
+
 		if (!SDL_strcmp(argv[i], "--size=3") && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;

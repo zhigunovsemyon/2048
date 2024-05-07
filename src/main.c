@@ -21,11 +21,11 @@ int main(int argc, const char **args)
 		return ERR_MALLOC;
 
 	// Создание окна и рисовальщика
-	if ((errCode = CreateWorkspace(&window, &rend, title, &Params.WinSize)))
+	if ((errCode = CreateWorkspace(&window, &rend, title, &Params.WinSize, Params.Flags)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game);
 
 	//Вывод приветствия
-	if ((errCode = Greeting(window, rend, &Events, &Params, &Game, MODE_DRAW)))
+	if ((errCode = Greeting(window, rend, &Events, &Params, &Game, MODE_ADD)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game);
 
 	// Игровой цикл

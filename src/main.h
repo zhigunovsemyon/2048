@@ -16,8 +16,8 @@
 
 typedef struct
 {
-	Uint64 val;		//Значение ячейки
-	SDL_Point pos;	//Положение в пискселях
+	Uint64 val;//Значение ячейки
+	Uint8 mode;//Состояние данной плитки
 }
 Tile;
 
