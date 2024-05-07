@@ -1,31 +1,31 @@
 #include "misc.h"
-#define _SQ(A) (A) * (A) 
+#define _SQ(A) (A) * (A)
 
 Sint8 AddElement(Game *Game)
 {
-	Sint8 pos; 
+	Sint8 pos;
 	Uint8 tries = 0;
 	/*Случайный перебор*/
 	for (; tries < _SQ(Game->FieldSize); tries++)
 	{
 		pos = RandomInt(0, _SQ(Game->FieldSize));
 		if (Game->Field[pos].val)
-			continue;//Если там уже есть значение, то перебор продолжается
+			continue; // Если там уже есть значение, то перебор продолжается
 		/*В противном случае в эту позицию сохраняется число*/
 		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
-		return pos;//Позиция нового элемента возвращается
+		return pos; // Позиция нового элемента возвращается
 	}
 	/*Если случайно подобрать положение не удалось, функция перебирает ячейки по очереди
 	с конца, проводя аналогичную проверку*/
 	for (pos = tries - 1; pos >= 0; pos--)
 	{
-		if (Game->Field[pos].val/*!= 0*/)
+		if (Game->Field[pos].val /*!= 0*/)
 			continue;
 		/*else*/
 		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
-		return pos; 
+		return pos;
 	}
-	//Если свободных ячеек не нашлось, значит возвращается соответствующий флаг
+	// Если свободных ячеек не нашлось, значит возвращается соответствующий флаг
 	return -1;
 }
 
@@ -34,7 +34,6 @@ Uint8 dtCount(void)
 	static Uint32 lasttime = 0;
 	Uint32 newtime = SDL_GetTicks();
 	Uint8 ret = newtime - lasttime;
-	SDL_Log("%hhu", ret);
 	lasttime = newtime;
 	return ret;
 }
@@ -51,8 +50,7 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 	return (rand() % (b - a)) + a;
 }
 
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, 
-			   Params *Params, Game *Game, Uint8 NextMode)
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game, Uint8 NextMode)
 {
 	char message[MSG_LEN] = "Добро пожаловать в игру 2048!\n";
 	if (Params->Flags & FLAG_DARKMODE)
@@ -78,9 +76,9 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev,
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0;
 	SDL_Texture *greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
-	if(!greet)
+	if (!greet)
 		return ERR_SDL;
-	
+
 	Uint8 BG_brightness = (Params->Flags & FLAG_DARKMODE) ? BG_DARK_BRIGHTNESS : BG_LIGHT_BRIGHTNESS;
 	SDL_SetWindowTitle(window, "Добро пожаловать");
 	// Заливка фона
@@ -91,7 +89,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev,
 	SDL_RenderCopy(rend, greet, NULL, &txt_size);
 	SDL_RenderPresent(rend);
 
-	while(SDL_TRUE)
+	while (SDL_TRUE)
 	{
 		while (!SDL_PollEvent(ev))
 		{ // Если событий не было, сразу осуществляется выход, режим не меняется
@@ -114,7 +112,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev,
 			SDL_RenderCopy(rend, greet, NULL, &txt_size);
 			SDL_RenderPresent(rend);
 		}
-	
+
 		switch (ev->type)
 		{
 		default:
@@ -125,18 +123,17 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev,
 			SDL_DestroyTexture(greet);
 			Params->Mode = MODE_QUIT;
 			return ERR_NO;
-	
+
 		case SDL_MOUSEBUTTONUP:
 			if (Params->Flags & FLAG_MOUSEOFF)
 				continue;
 			SDL_DestroyTexture(greet);
 			Params->Mode = NextMode;
 			return ERR_NO;
-	
+
 		case SDL_KEYUP: // Если была нажата клавиша
 			SDL_DestroyTexture(greet);
-			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ?
-				MODE_QUIT : NextMode;
+			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
 			return ERR_NO;
 		}
 	}
@@ -271,8 +268,7 @@ Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game 
 	return code;
 }
 
-Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
-					  const SDL_Point *WinSize, Uint8 Flag)
+Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, const SDL_Point *WinSize, Uint8 Flag)
 {
 	// Вызов SDL
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
@@ -291,8 +287,8 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
 	}
 
 	// Создание рисовальщика
-	*rend = SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | 
-							(Flag & FLAG_VSYNC) ? SDL_RENDERER_PRESENTVSYNC : 0);
+	*rend =
+		SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | ((Flag & FLAG_VSYNC) ? SDL_RENDERER_PRESENTVSYNC : 0));
 	if (!(*rend))
 	{
 		return ERR_SDL;
@@ -319,8 +315,8 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 	Settings->Flags = (FLAG_VSYNC | FLAG_DARKMODE | FLAG_ARROWKEY);
 
 	// Если игра была запущена без флагов,
-	// то используется стандартная раскладка
-	Uint8 Setters = (argc != 1) ? 15 : 0;
+	Uint8 Setters = (argc == 1) ? 0 : // то используется стандартная раскладка
+						(VSYNC_UNSET | COL_UNSET | KEY_UNSET | MOUSE_UNSET | SIZE_UNSET);
 
 	/*Перебор аргументов, с которыми была запущена игра. Если их не было,
 	 * цикл ниже будет пропущен*/
@@ -329,7 +325,7 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 		if (!SDL_strcmp(argv[i], "--vsync-off") && (Setters & VSYNC_UNSET))
 		{
 			Setters &= ~VSYNC_UNSET;
-			Settings->Flags |= FLAG_VSYNC;
+			Settings->Flags &= ~FLAG_VSYNC;
 			continue;
 		}
 

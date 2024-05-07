@@ -52,6 +52,7 @@ int main(int argc, const char **args)
 		case MODE_CHECK_DOWN:
 		case MODE_CHECK_RIGHT:
 		case MODE_CHECK_LEFT:
+			Params.Mode = MODE_ADD;
 			SDL_Log("Проверка поля\n");
 			continue;
 
@@ -60,6 +61,10 @@ int main(int argc, const char **args)
 			{
 				DrawNewElement(rend, &Params, &Game, NewElementIndex);
 				NewElementIndex = -1;
+			}
+			else 
+			{
+				Params.Mode = MODE_WAIT;
 			}
 			break;
 

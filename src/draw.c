@@ -93,6 +93,7 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 
 Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index)
 {
+	dtCount();
 	SDL_Rect Tile;
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
