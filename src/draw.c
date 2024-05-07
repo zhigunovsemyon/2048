@@ -41,7 +41,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, Params *Params, SDL_Rect *
 
 		/*Если размер текста больше по одной из плоскостей, старый текст и 
 		поверхность очищаются, коэфициент увеличивается*/
-		scaler++;
+		++scaler;
 		TTF_CloseFont(font);
 		SDL_FreeSurface(txt_surf);
 	} while (SDL_TRUE); //Условие завершения описано внутри
