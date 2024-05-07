@@ -93,18 +93,10 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 
 Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index)
 {
-	//Рисование поля
-	if(DrawBackground(rend, Game->FieldSize, Params)/*== ERR_SDL*/)
-		return ERR_SDL;
-
 	SDL_Rect Tile;
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-
-	// Задание цвета фона
-	if (SDL_SetRenderDrawColor(rend, 0xFF, 0, 0, 0xff))
-		return ERR_SDL;
 
 	Tile.w = 0;
 	for (float size = 0; /*Перед циклом размер зануляется*/
@@ -113,6 +105,14 @@ Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index)
 		/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
 		Tile.w = (int)(size += ANIM_SPEED * dtCount() / 1000.0f))
 	{
+		//Рисование поля
+		if(DrawBackground(rend, Game->FieldSize, Params)/*== ERR_SDL*/)
+			return ERR_SDL;
+	
+		// Задание цвета фона
+		if (SDL_SetRenderDrawColor(rend, 0xFF, 0, 0, 0xff))
+			return ERR_SDL;
+
 		// Размер одного поля хранится в h
 		Tile.h = FieldSize / Game->FieldSize;
 		
