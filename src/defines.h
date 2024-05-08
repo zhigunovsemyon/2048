@@ -2,9 +2,9 @@
 #define DEFINES_H
 
 // Минимальные размеры окна
-#define WIN_MIN 200
-#define WIN_HEIGHT (WIN_MIN * 3)
-#define WIN_WIDTH (WIN_MIN * 4)
+#define WIN_MIN 320
+#define WIN_HEIGHT (WIN_MIN * 2)
+#define WIN_WIDTH (WIN_MIN * 3)
 
 //Коэффициенты
 #define FIELD_SIZE_COEFFICIENT 0.9f

@@ -11,6 +11,9 @@ enum SetFlags
 	VSYNC_UNSET = 0x10
 };
 
+//Считает число переносов строки 
+Uint8 CountLines(const char *source);
+
 /*Возвращает случайное число из диапазона. 
 Требует предварительной инициализации через srand*/
 Sint32 RandomInt(Sint32, Sint32);

@@ -1,6 +1,20 @@
 #include "misc.h"
 #define _SQ(A) (A) * (A)
 
+Uint8 CountLines(const char *source)
+{
+	Uint8 i = 1;//Если в тексте нет переносов, значит там одна строка
+	/*Когда функция находит перенос, она возвращает указатель на него,
+	в противном случае -- NULL, цикл завершается */
+	while((source = SDL_strchr(source, '\n')))
+	{
+		source++;
+		if(*source/*!= 0*/)
+			i++;
+	}
+	return i;
+}
+
 Sint8 AddElement(Game *Game)
 {
 	Sint8 pos;
@@ -129,11 +143,13 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 				continue;
 			SDL_DestroyTexture(greet);
 			Params->Mode = NextMode;
+			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			return ERR_NO;
 
 		case SDL_KEYUP: // Если была нажата клавиша
 			SDL_DestroyTexture(greet);
 			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
+			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			return ERR_NO;
 		}
 	}

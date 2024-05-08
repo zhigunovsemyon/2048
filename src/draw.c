@@ -20,7 +20,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, Params *Params, SDL_Rect *
 		txt_col.g = BG_DARK_BRIGHTNESS;
 	}
 
-	Uint8 scaler = 12; //Отношение размера буквы к размеру окна
+	Uint8 scaler = CountLines(message); //Отношение размера буквы к размеру окна
 	do
 	{
 		//Открытие шрифта, проверка
