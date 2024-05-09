@@ -15,7 +15,7 @@
 #define BG_DARK_BRIGHTNESS		0x20
 #define BG_LIGHT_BRIGHTNESS		0xdf
 
-#define MSG_LEN  365
+#define MSG_LEN  400
 
 #if WIN32
 #define FONT "..\\..\\..\\monospace"

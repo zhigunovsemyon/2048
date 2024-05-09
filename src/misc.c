@@ -88,18 +88,49 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 	SDL_strlcat(message, "Для выхода нажмите q.\nДля прододжения нажмите любую клавишу\n", MSG_LEN);
 
 	SDL_Rect txt_size;
-	txt_size.x = 0, txt_size.y = 0;
-	SDL_Texture *greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
+	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
+
+	SDL_Colour txt_col, bg_col;
+	txt_col.a = 0xFF;
+	bg_col.a = 0xFF;
+	if (Params->Flags & FLAG_DARKMODE)
+	{
+		txt_col.r = BG_LIGHT_BRIGHTNESS;
+		txt_col.g = BG_LIGHT_BRIGHTNESS;
+		txt_col.b = BG_LIGHT_BRIGHTNESS;
+	}
+	else
+	{
+		txt_col.r = BG_DARK_BRIGHTNESS;
+		txt_col.g = BG_DARK_BRIGHTNESS;
+		txt_col.b = BG_DARK_BRIGHTNESS;
+	}
+
+	if (Params->Flags & FLAG_DARKMODE)
+	{
+		bg_col.r = BG_DARK_BRIGHTNESS;
+		bg_col.g = BG_DARK_BRIGHTNESS;
+		bg_col.b = BG_DARK_BRIGHTNESS;
+	}
+	else
+	{
+		bg_col.r = BG_LIGHT_BRIGHTNESS;
+		bg_col.g = BG_LIGHT_BRIGHTNESS;
+		bg_col.b = BG_LIGHT_BRIGHTNESS;
+	}
+// SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour txt_col, SDL_Colour *bg_col,
+// 								  SDL_Rect *txt_size, const char *font_name, const char *message);
+	SDL_Texture *greet = CreateMessageTexture(rend, &txt_col, &bg_col, &txt_size, FONT, message);
 	if (!greet)
 		return ERR_SDL;
 
 	Uint8 BG_brightness = (Params->Flags & FLAG_DARKMODE) ? BG_DARK_BRIGHTNESS : BG_LIGHT_BRIGHTNESS;
 	SDL_SetWindowTitle(window, "Добро пожаловать");
 	// Заливка фона
-	if (SDL_SetRenderDrawColor(rend, BG_brightness, BG_brightness, BG_brightness, 0xff))
-		return ERR_SDL;
-	if (SDL_RenderClear(rend))
-		return ERR_SDL;
+	// if (SDL_SetRenderDrawColor(rend, BG_brightness, BG_brightness, BG_brightness, 0xff))
+	// 	return ERR_SDL;
+	// if (SDL_RenderClear(rend))
+	// 	return ERR_SDL;
 	SDL_RenderCopy(rend, greet, NULL, &txt_size);
 	SDL_RenderPresent(rend);
 
@@ -114,7 +145,8 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 		if (CheckForResize(window, Params, ev, WIN_MIN))
 		{
 			SDL_DestroyTexture(greet);
-			greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
+			greet = CreateMessageTexture(rend, &txt_col, &bg_col, &txt_size, FONT, message);
+			// greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
 			if (!greet)
 				return ERR_SDL;
 
