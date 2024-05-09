@@ -112,6 +112,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 		if (CheckForResize(window, Params, ev, WIN_MIN))
 		{
 			SDL_DestroyTexture(greet);
+			txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
 			greet = CreateMessageTexture(rend, &Params->cols[COL_FG],
 										   &Params->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
 			if (!greet)

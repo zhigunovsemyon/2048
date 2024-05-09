@@ -32,10 +32,10 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture, 
 								SDL_Colour *ColourSet, SDL_Rect *Tile, Game *Game)
 {
-	if(!OldTexture)
+	if(OldTexture)
 		SDL_DestroyTexture(OldTexture);
 
-	char text[42];
+	char text[64];
 	sprintf(text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score, Game->MaxScore);
 	return CreateMessageTexture(rend, ColourSet + COL_BG, 
 							 ColourSet + COL_FG, Tile, FONT, text, SDL_FALSE);
@@ -111,7 +111,9 @@ int main(int argc, const char **args)
 	Params.textures = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
-	Game.Score = 0;
+	//Забил очки максимальными числами для проверки строк с ними
+	Game.Score = UINT64_MAX;
+	Game.Score = UINT64_MAX;
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска*/
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
@@ -146,10 +148,10 @@ int main(int argc, const char **args)
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params);
 
 		case MODE_WAIT:
-			if(CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
+			if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 			{
-				Params.textures = UpdateTextureSet(rend, Params.textures, 
-										  Params.cols, &Params.WinSize, &Game);
+				Params.textures = UpdateTextureSet(rend, Params.textures,
+					Params.cols, &Params.WinSize, &Game);
 				DrawOldElements(rend, &Params, &Game);
 				SDL_RenderPresent(rend);
 			};
