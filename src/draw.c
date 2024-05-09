@@ -1,7 +1,9 @@
 #include "draw.h"
+#include <SDL2/SDL_stdinc.h>
+#include <stdio.h>
 
 SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col, SDL_Colour *bg_col, SDL_Rect *txt_size,
-								  const char *font_name, const char *message)
+								  const char *font_name, const char *message, Uint8 IsCentred)
 {
 	TTF_Font *font;
 	SDL_Surface *txt_surf;
@@ -22,7 +24,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 			return NULL;
 		}
 		// Если размер текста меньше размера окна, цикл прерывается
-		if (txt_surf->h < txt_size->h && txt_surf->w < txt_size->w)
+		if (txt_surf->h <= txt_size->h && txt_surf->w <= txt_size->w)
 			break;
 
 		/*Если размер текста больше по одной из плоскостей, старый текст и
@@ -31,6 +33,12 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		TTF_CloseFont(font);
 		SDL_FreeSurface(txt_surf);
 	} while (SDL_TRUE); // Условие завершения описано внутри
+
+	if(IsCentred)
+	{
+		txt_surf->clip_rect.x += ((txt_size->w - txt_surf->w) / 2);
+		txt_surf->clip_rect.y += ((txt_size->h - txt_surf->h) / 2);
+	}
 
 	SDL_Surface *bg = SDL_CreateRGBSurfaceWithFormat(0, txt_size->w, txt_size->h, 32, SDL_PIXELFORMAT_ARGB8888);
 	if (!bg)
@@ -47,7 +55,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		return NULL;
 	}
 
-	if (SDL_BlitSurface(txt_surf, &txt_surf->clip_rect, bg, NULL))
+	if (SDL_BlitSurface(txt_surf, NULL, bg, &txt_surf->clip_rect))
 	{
 		SDL_FreeSurface(txt_surf);
 		TTF_CloseFont(font);
@@ -102,7 +110,8 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 
 Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
 {
-	dtCount(); // Сброс счётчика длинны кадра
+	char TileName[22];
+	sprintf(TileName, "%lu", Game->Field[Index].val);
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
@@ -111,8 +120,9 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
 	SDL_Colour tile_col = {0xFF, 0, 0, 0xff},	//Цвет фона
 			txt_col = {0xFF, 0xFF, 0xFF, 0xff};	//Цвет текста
-	SDL_Texture *tile_texture = CreateMessageTexture(rend, &txt_col, &tile_col, &Tile, FONT, "a");
+	SDL_Texture *tile_texture = CreateMessageTexture(rend, &txt_col, &tile_col, &Tile, FONT, TileName, SDL_TRUE);
 
+	dtCount(); // Сброс счётчика длинны кадра
 	Tile.w = 0;
 	for (float size = 0; /*Перед циклом размер зануляется*/
 		 /*Пограничное условие*/
