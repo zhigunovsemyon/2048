@@ -79,6 +79,11 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 	else
 		SDL_strlcat(message, "Включено управление мышью\n", MSG_LEN);
 
+	if (Params->Flags & FLAG_VSYNC)
+		SDL_strlcat(message, "Включен V-Sync\n", MSG_LEN);
+	else
+		SDL_strlcat(message, "V-Sync отключен\n", MSG_LEN);
+
 	if (Params->Flags & FLAG_WASDKEY)
 		SDL_strlcat(message, "Используется управление WASD\n", MSG_LEN);
 	if (Params->Flags & FLAG_VIMKEY)
