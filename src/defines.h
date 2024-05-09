@@ -1,6 +1,11 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+//Макросы
+#define _SQ(A) (A) * (A)
+#define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a 
+#define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a 
+
 // Минимальные размеры окна
 #define WIN_MIN 320
 #define WIN_HEIGHT (WIN_MIN * 2)

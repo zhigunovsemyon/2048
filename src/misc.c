@@ -1,7 +1,4 @@
 #include "misc.h"
-#define _SQ(A) (A) * (A)
-#define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a 
-#define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a 
 
 Uint8 CountLines(const char *source)
 {

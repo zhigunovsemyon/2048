@@ -172,6 +172,7 @@ int main(int argc, const char **args)
 			}
 			else
 			{
+				// DrawOldElements(rend, &Params, &Game);
 				Params.Mode = MODE_WAIT;
 			}
 			break;

@@ -1,6 +1,4 @@
 #include "draw.h"
-#define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a 
-#define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a 
 
 SDL_Texture *GetTextureForTile(SDL_Renderer *rend, Uint64 TileValue, Params *Params)
 {
@@ -139,6 +137,36 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 	return ERR_NO;
 }
 
+Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
+{
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	SDL_Rect Tile;
+	Uint16 CellWidth = FieldSize / Game->FieldSize;
+	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * CellWidth;
+
+	// Рисование поля
+	if (DrawBackground(rend, Game->FieldSize, Params) /*== ERR_SDL*/)
+		return ERR_SDL;
+
+	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
+	{
+		if(Game->Field[i].mode != TILE_OLD)
+			continue;
+		// Положение угла поля в координатах +
+		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
+		Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5
+		 	 + CellWidth * (i% Game->FieldSize);
+		Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5
+		 	 + CellWidth * (i/ Game->FieldSize);
+		SDL_Texture *tile_texture = GetTextureForTile(rend, Game->Field[i].val, Params);
+		SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
+	}
+	return ERR_NO;
+}
+
 Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
 {
 	// Размер поля
@@ -146,19 +174,19 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
 	SDL_Rect Tile;
-	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
+	Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
 	SDL_Texture *tile_texture = GetTextureForTile(rend, Game->Field[Index].val, Params);
 
 	dtCount(); // Сброс счётчика длинны кадра
 	Tile.w = 0;
 	for (float size = 0; /*Перед циклом размер зануляется*/
 		 /*Пограничное условие*/
-		 size / TILE_SIZE_COEFFICIENT < (FieldSize / Game->FieldSize);
+		 size / TILE_SIZE_COEFFICIENT <= (FieldSize / Game->FieldSize);
 		 /*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
 		 Tile.w = (int)(size += ANIM_SPEED * dtCount() / 1000.0f))
 	{
 		// Рисование поля
-		if (DrawBackground(rend, Game->FieldSize, Params) /*== ERR_SDL*/)
+		if (DrawOldElements(rend, Params, Game) /*== ERR_SDL*/)
 			return ERR_SDL;
 
 		// Размер одного поля хранится в h
@@ -177,5 +205,6 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 		SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
 		SDL_RenderPresent(rend);
 	}
+	Game->Field[Index].mode = TILE_OLD;
 	return ERR_NO;
 }

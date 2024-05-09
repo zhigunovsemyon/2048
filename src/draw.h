@@ -2,6 +2,7 @@
 #define DRAW_H
 #include "main.h"
 
+Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game);
 Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index);
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0, 
