@@ -63,14 +63,14 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		SDL_FreeSurface(txt_surf);
 	} while (SDL_TRUE); // Условие завершения описано внутри
 
-	if (IsCentred)	//Если был передан флаг выравнивания по центу
-	{	/*К положению поверхностей прибавляется половина разницы между
-		размером внешенего прямоугольника и прямоугольника с текстом */
+	if (IsCentred) // Если был передан флаг выравнивания по центу
+	{ /*К положению поверхностей прибавляется половина разницы между
+	  размером внешенего прямоугольника и прямоугольника с текстом */
 		txt_surf->clip_rect.x += ((txt_size->w - txt_surf->w) / 2);
 		txt_surf->clip_rect.y += ((txt_size->h - txt_surf->h) / 2);
 	}
 
-	//Создание поверхности с фоном, проверка
+	// Создание поверхности с фоном, проверка
 	SDL_Surface *bg = SDL_CreateRGBSurfaceWithFormat(0, txt_size->w, txt_size->h, 32, SDL_PIXELFORMAT_ARGB8888);
 	if (!bg)
 	{
@@ -79,7 +79,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		return NULL;
 	}
 
-	//Заливка поверхности с фоном
+	// Заливка поверхности с фоном
 	if (SDL_FillRect(bg, &bg->clip_rect, SDL_MapRGBA(bg->format, SPLIT_COL_LINK(bg_col))))
 	{
 		SDL_FreeSurface(txt_surf);
@@ -88,7 +88,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		return NULL;
 	}
 
-	//Склейка поверхности с текстом на прямоугольник, проверка
+	// Склейка поверхности с текстом на прямоугольник, проверка
 	if (SDL_BlitSurface(txt_surf, NULL, bg, &txt_surf->clip_rect))
 	{
 		SDL_FreeSurface(bg);
@@ -153,14 +153,12 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
 	{
-		if(Game->Field[i].mode != TILE_OLD)
+		if (Game->Field[i].mode != TILE_OLD)
 			continue;
 		// Положение угла поля в координатах +
 		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
-		Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5
-		 	 + CellWidth * (i% Game->FieldSize);
-		Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5
-		 	 + CellWidth * (i/ Game->FieldSize);
+		Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5 + CellWidth * (i % Game->FieldSize);
+		Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5 + CellWidth * (i / Game->FieldSize);
 		SDL_Texture *tile_texture = GetTextureForTile(rend, Game->Field[i].val, Params);
 		SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
 	}
@@ -205,6 +203,17 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 		SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
 		SDL_RenderPresent(rend);
 	}
+
+	// Отрисовка окончательного положения квадрата
+	Tile.h = FieldSize / Game->FieldSize;
+	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
+	// Положение угла поля в координатах
+	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
+	Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.h = Tile.w; // Запись корректной высоты плитки
+	SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
+	SDL_RenderPresent(rend);
 	Game->Field[Index].mode = TILE_OLD;
 	return ERR_NO;
 }

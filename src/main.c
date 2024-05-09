@@ -139,9 +139,6 @@ int main(int argc, const char **args)
 	while (SDL_TRUE)
 	{
 		SetMode(&Events, &Params); // Выбор режима работы в данный момент
-		if(CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
-			Params.textures = UpdateTextureSet(rend, Params.textures, 
-									  Params.cols, &Params.WinSize, &Game);
 
 		switch (Params.Mode)
 		{
@@ -149,6 +146,13 @@ int main(int argc, const char **args)
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params);
 
 		case MODE_WAIT:
+			if(CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
+			{
+				Params.textures = UpdateTextureSet(rend, Params.textures, 
+										  Params.cols, &Params.WinSize, &Game);
+				DrawOldElements(rend, &Params, &Game);
+				SDL_RenderPresent(rend);
+			};
 			continue;
 
 		case MODE_ADD:
@@ -169,10 +173,6 @@ int main(int argc, const char **args)
 			{
 				DrawNewElement(rend, &Params, &Game, NewElementIndex);
 				NewElementIndex = -1;
-			}
-			else
-			{
-				// DrawOldElements(rend, &Params, &Game);
 				Params.Mode = MODE_WAIT;
 			}
 			break;
