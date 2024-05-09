@@ -23,10 +23,47 @@
 #define FONT "monospace"
 #endif
 
-enum Textues
+enum TileMode
+{
+	TILE_NEW,
+	TILE_OLD
+};
+
+#define COLOURS_COUNT 14
+enum ColourIndexes
+{
+	COL_BG,
+	COL_FG,
+	COL_SQ2,
+	COL_SQ4,
+	COL_SQ8,
+	COL_SQ16,
+	COL_SQ32,
+	COL_SQ64,
+	COL_SQ128,
+	COL_SQ256,
+	COL_SQ512,
+	COL_SQ1024,
+	COL_SQ2048,
+	COL_MAX
+};
+
+#define TEXTURES_COUNT 13
+enum TextureIndexes
 {
 	TEX_SCORE,
-	TEX_SQ2
+	TEX_SQ2,
+	TEX_SQ4,
+	TEX_SQ8,
+	TEX_SQ16,
+	TEX_SQ32,
+	TEX_SQ64,
+	TEX_SQ128,
+	TEX_SQ256,
+	TEX_SQ512,
+	TEX_SQ1024,
+	TEX_SQ2048,
+	TEX_MAX
 };
 
 enum Errors

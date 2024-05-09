@@ -1,6 +1,35 @@
 #include "draw.h"
-#include <SDL2/SDL_stdinc.h>
-#include <stdio.h>
+
+SDL_Texture *GetTextureForTile(SDL_Renderer *rend, Uint64 TileValue, Params *Params)
+{
+	switch (TileValue)
+	{
+	case 2:
+		return Params->textures[TEX_SQ2];
+	case 4:
+		return Params->textures[TEX_SQ4];
+	case 8:
+		return Params->textures[TEX_SQ8];
+	case 16:
+		return Params->textures[TEX_SQ16];
+	case 32:
+		return Params->textures[TEX_SQ32];
+	case 64:
+		return Params->textures[TEX_SQ64];
+	case 128:
+		return Params->textures[TEX_SQ128];
+	case 256:
+		return Params->textures[TEX_SQ256];
+	case 512:
+		return Params->textures[TEX_SQ512];
+	case 1024:
+		return Params->textures[TEX_SQ1024];
+	case 2048:
+		return Params->textures[TEX_SQ2048];
+	default:
+		return Params->textures[TEX_MAX];
+	}
+}
 
 SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col, SDL_Colour *bg_col, SDL_Rect *txt_size,
 								  const char *font_name, const char *message, Uint8 IsCentred)
@@ -34,7 +63,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		SDL_FreeSurface(txt_surf);
 	} while (SDL_TRUE); // Условие завершения описано внутри
 
-	if(IsCentred)
+	if (IsCentred)
 	{
 		txt_surf->clip_rect.x += ((txt_size->w - txt_surf->w) / 2);
 		txt_surf->clip_rect.y += ((txt_size->h - txt_surf->h) / 2);
@@ -66,8 +95,6 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	SDL_Texture *ret = SDL_CreateTextureFromSurface(rend, bg);
 	TTF_CloseFont(font); // Закрытие шрифта
 	SDL_FreeSurface(txt_surf);
-	// txt_size->w = txt_surf->w,	//Передача размера надписи во вне
-	// txt_size->h = txt_surf->h;
 	SDL_FreeSurface(bg); // Очистка поверхности
 	return ret;			 // Возврат тексутры, либо NULL
 }
@@ -110,17 +137,13 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 
 Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
 {
-	char TileName[22];
-	sprintf(TileName, "%lu", Game->Field[Index].val);
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
 	SDL_Rect Tile;
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
-	SDL_Colour tile_col = {0xFF, 0, 0, 0xff},	//Цвет фона
-			txt_col = {0xFF, 0xFF, 0xFF, 0xff};	//Цвет текста
-	SDL_Texture *tile_texture = CreateMessageTexture(rend, &txt_col, &tile_col, &Tile, FONT, TileName, SDL_TRUE);
+	SDL_Texture *tile_texture = GetTextureForTile(rend, Game->Field[Index].val, Params);
 
 	dtCount(); // Сброс счётчика длинны кадра
 	Tile.w = 0;

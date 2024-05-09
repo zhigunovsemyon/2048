@@ -35,6 +35,8 @@ typedef struct
 	Uint8 Flags;
 	Uint8 Mode;
 	SDL_Point WinSize;
+	SDL_Texture **textures;
+	SDL_Colour *cols;
 }
 Params;
 

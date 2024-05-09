@@ -1,4 +1,6 @@
 #include "misc.h"
+#include "defines.h"
+#include <SDL2/SDL_render.h>
 #define _SQ(A) (A) * (A)
 
 Uint8 CountLines(const char *source)
@@ -27,6 +29,7 @@ Sint8 AddElement(Game *Game)
 			continue; // Если там уже есть значение, то перебор продолжается
 		/*В противном случае в эту позицию сохраняется число*/
 		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
+		Game->Field[pos].mode = TILE_NEW;
 		return pos; // Позиция нового элемента возвращается
 	}
 	/*Если случайно подобрать положение не удалось, функция перебирает ячейки по очереди
@@ -37,6 +40,7 @@ Sint8 AddElement(Game *Game)
 			continue;
 		/*else*/
 		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
+		Game->Field[pos].mode = TILE_NEW;
 		return pos;
 	}
 	// Если свободных ячеек не нашлось, значит возвращается соответствующий флаг
@@ -283,14 +287,26 @@ void SetMode(SDL_Event *event, Params *Params)
 	return;
 }
 
-Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game *Game)
+Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game *Game, Params *Params)
 {
 	SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s\n", SDL_GetError());
-	return SilentLeaveWithCode(code, win, rend, Game);
+	return SilentLeaveWithCode(code, win, rend, Game, Params);
 }
 
-Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game *Game)
+Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game *Game, Params *Params)
 {
+	//Освобождение цветов
+	if(Params->cols)
+		SDL_free(Params->cols);
+
+	//Освобождение текстур
+	if(Params->textures)
+	{
+		for(Uint8 i = 0; i < TEXTURES_COUNT; ++i)
+			SDL_DestroyTexture(Params->textures[i]);
+		SDL_free(Params->textures);
+	}
+
 	// Освобождение поля
 	if (Game->Field)
 		SDL_free(Game->Field);

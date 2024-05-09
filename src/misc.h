@@ -49,10 +49,10 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
 					  const SDL_Point *WinSize, Uint8 Flags);
 
 //Вывести сообщение об ошибки и выйти из программы
-Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game);
+Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game, Params *Params);
 
 //Закрытие всех окон и рисовальщиков
-Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game);
+Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game, Params *Params);
 
 /*Проверка окна win на изменение его размеров в Params, через ивенты ev.
 Меняет на win_min при чрезмерном уменьшении. Возврат true, если размер изменён, либо false*/
