@@ -1,7 +1,7 @@
 #include "misc.h"
-#include "defines.h"
-#include <SDL2/SDL_render.h>
 #define _SQ(A) (A) * (A)
+#define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a 
+#define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a 
 
 Uint8 CountLines(const char *source)
 {
@@ -58,7 +58,7 @@ Uint8 dtCount(void)
 
 Sint32 RandomInt(Sint32 a, Sint32 b)
 {
-	//"Переворот чисел при необходимости"
+	//"Переворот" чисел при необходимости
 	if (a > b)
 	{
 		Sint32 tmp = a;
@@ -68,8 +68,9 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 	return (rand() % (b - a)) + a;
 }
 
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game, Uint8 NextMode)
-{
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, 
+			   Game *Game, Uint8 NextMode)
+{	//Создание сообщения
 	char message[MSG_LEN] = "Добро пожаловать в игру 2048!\n";
 	if (Params->Flags & FLAG_DARKMODE)
 		SDL_strlcat(message, "Включён тёмный режим\n", MSG_LEN);
@@ -94,41 +95,11 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
 
-	SDL_Colour txt_col, bg_col;
-	txt_col.a = 0xFF;
-	bg_col.a = 0xFF;
-	if (Params->Flags & FLAG_DARKMODE)
-	{
-		txt_col.r = BG_LIGHT_BRIGHTNESS;
-		txt_col.g = BG_LIGHT_BRIGHTNESS;
-		txt_col.b = BG_LIGHT_BRIGHTNESS;
-	}
-	else
-	{
-		txt_col.r = BG_DARK_BRIGHTNESS;
-		txt_col.g = BG_DARK_BRIGHTNESS;
-		txt_col.b = BG_DARK_BRIGHTNESS;
-	}
-
-	if (Params->Flags & FLAG_DARKMODE)
-	{
-		bg_col.r = BG_DARK_BRIGHTNESS;
-		bg_col.g = BG_DARK_BRIGHTNESS;
-		bg_col.b = BG_DARK_BRIGHTNESS;
-	}
-	else
-	{
-		bg_col.r = BG_LIGHT_BRIGHTNESS;
-		bg_col.g = BG_LIGHT_BRIGHTNESS;
-		bg_col.b = BG_LIGHT_BRIGHTNESS;
-	}
-// SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour txt_col, SDL_Colour *bg_col,
-// 								  SDL_Rect *txt_size, const char *font_name, const char *message);
-	SDL_Texture *greet = CreateMessageTexture(rend, &txt_col, &bg_col, &txt_size, FONT, message, SDL_FALSE);
+	SDL_Texture *greet = CreateMessageTexture(rend, &Params->cols[COL_FG],
+										   &Params->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
 	if (!greet)
 		return ERR_SDL;
 
-	Uint8 BG_brightness = (Params->Flags & FLAG_DARKMODE) ? BG_DARK_BRIGHTNESS : BG_LIGHT_BRIGHTNESS;
 	SDL_SetWindowTitle(window, "Добро пожаловать");
 	SDL_RenderCopy(rend, greet, NULL, &txt_size);
 	SDL_RenderPresent(rend);
@@ -144,13 +115,13 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 		if (CheckForResize(window, Params, ev, WIN_MIN))
 		{
 			SDL_DestroyTexture(greet);
-			greet = CreateMessageTexture(rend, &txt_col, &bg_col, &txt_size, FONT, message, SDL_FALSE);
-			// greet = CreateMessageTexture(rend, Params, &txt_size, FONT, message);
+			greet = CreateMessageTexture(rend, &Params->cols[COL_FG],
+										   &Params->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
 			if (!greet)
 				return ERR_SDL;
 
 			// Заливка фона
-			if (SDL_SetRenderDrawColor(rend, BG_brightness, BG_brightness, BG_brightness, 0xff))
+			if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Params->cols[COL_BG])))
 				return ERR_SDL;
 			if (SDL_RenderClear(rend))
 				return ERR_SDL;

@@ -1,4 +1,6 @@
 #include "draw.h"
+#define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a 
+#define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a 
 
 SDL_Texture *GetTextureForTile(SDL_Renderer *rend, Uint64 TileValue, Params *Params)
 {
@@ -26,7 +28,7 @@ SDL_Texture *GetTextureForTile(SDL_Renderer *rend, Uint64 TileValue, Params *Par
 		return Params->textures[TEX_SQ1024];
 	case 2048:
 		return Params->textures[TEX_SQ2048];
-	default:
+	default: //>2048
 		return Params->textures[TEX_MAX];
 	}
 }
@@ -63,12 +65,14 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		SDL_FreeSurface(txt_surf);
 	} while (SDL_TRUE); // Условие завершения описано внутри
 
-	if (IsCentred)
-	{
+	if (IsCentred)	//Если был передан флаг выравнивания по центу
+	{	/*К положению поверхностей прибавляется половина разницы между
+		размером внешенего прямоугольника и прямоугольника с текстом */
 		txt_surf->clip_rect.x += ((txt_size->w - txt_surf->w) / 2);
 		txt_surf->clip_rect.y += ((txt_size->h - txt_surf->h) / 2);
 	}
 
+	//Создание поверхности с фоном, проверка
 	SDL_Surface *bg = SDL_CreateRGBSurfaceWithFormat(0, txt_size->w, txt_size->h, 32, SDL_PIXELFORMAT_ARGB8888);
 	if (!bg)
 	{
@@ -77,36 +81,36 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		return NULL;
 	}
 
-	if (SDL_FillRect(bg, &bg->clip_rect, SDL_MapRGBA(bg->format, bg_col->r, bg_col->g, bg_col->b, bg_col->a)))
+	//Заливка поверхности с фоном
+	if (SDL_FillRect(bg, &bg->clip_rect, SDL_MapRGBA(bg->format, SPLIT_COL_LINK(bg_col))))
 	{
 		SDL_FreeSurface(txt_surf);
+		SDL_FreeSurface(bg);
 		TTF_CloseFont(font);
 		return NULL;
 	}
 
+	//Склейка поверхности с текстом на прямоугольник, проверка
 	if (SDL_BlitSurface(txt_surf, NULL, bg, &txt_surf->clip_rect))
 	{
+		SDL_FreeSurface(bg);
 		SDL_FreeSurface(txt_surf);
 		TTF_CloseFont(font);
 		return NULL;
 	}
 
-	// Создание текстуры из поверхности с надписью
+	// Создание текстуры из поверхности с надписью, проверка на корректность осуществляется вовне
 	SDL_Texture *ret = SDL_CreateTextureFromSurface(rend, bg);
 	TTF_CloseFont(font); // Закрытие шрифта
 	SDL_FreeSurface(txt_surf);
-	SDL_FreeSurface(bg); // Очистка поверхности
+	SDL_FreeSurface(bg); // Очистка поверхностей
 	return ret;			 // Возврат тексутры, либо NULL
 }
 
 Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 {
-	// Определение яркости фона и сетки
-	Uint8 BG_brightness = (Params->Flags & FLAG_DARKMODE) ? BG_DARK_BRIGHTNESS : BG_LIGHT_BRIGHTNESS;
-	Uint8 FG_brightness = (!(Params->Flags & FLAG_DARKMODE)) ? BG_DARK_BRIGHTNESS : BG_LIGHT_BRIGHTNESS;
-
 	// Заливка фона
-	if (SDL_SetRenderDrawColor(rend, BG_brightness, BG_brightness, BG_brightness, 0xff))
+	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Params->cols[COL_BG])))
 		return ERR_SDL;
 	if (SDL_RenderClear(rend))
 		return ERR_SDL;
@@ -114,12 +118,12 @@ Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 	// Размер поля и плитки
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-	float TileSize = FieldSize / TileCount;							  // Размер одного поля
+	float TileSize = FieldSize / TileCount;							  // Размер одного тайла
 	SDL_Point Corner =												  // Координаты угла поля
 		{(Params->WinSize.x - FieldSize) * 0.5, (Params->WinSize.y - FieldSize) * 0.5};
 
 	// Задание цвета фона
-	if (SDL_SetRenderDrawColor(rend, FG_brightness, FG_brightness, FG_brightness, 0xff))
+	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Params->cols[COL_FG])))
 		return ERR_SDL;
 
 	// Цикл, рисующий линии поля

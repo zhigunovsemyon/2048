@@ -1,5 +1,4 @@
 #include "main.h"
-#include "defines.h"
 
 SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 {
@@ -9,7 +8,7 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
 		set[i].a = 0xFF;
 
-	if (DarkModeFlag)
+	if (DarkModeFlag) //Если включена тёмная тема, в цвета фона передаются соответствующие значения
 	{
 		set[COL_BG].r = BG_DARK_BRIGHTNESS, set[COL_BG].g = BG_DARK_BRIGHTNESS;
 		set[COL_BG].b = BG_DARK_BRIGHTNESS, set[COL_FG].r = BG_LIGHT_BRIGHTNESS;
@@ -92,6 +91,9 @@ SDL_Texture **UpdateTextureSet(SDL_Renderer *rend, SDL_Texture **OldSet,
 	for (Uint8 i = 0; i < TEXTURES_COUNT; ++i)
 		SDL_DestroyTexture(OldSet[i]);
 
+	//Освобождать сам массив из памяти на данном этапе не нужно,
+	//так как он заменится новыми текстурами.
+	//Его освобождение должно происходить только на выходе из программы
 	return CreateTextureSet(rend, ColourSet, WinSize, Game);
 }
 
@@ -111,6 +113,7 @@ int main(int argc, const char **args)
 	SDL_Renderer *rend = NULL;
 	Game.Score = 0;
 
+	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска*/
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
 	Game.Field = (Tile *)SDL_calloc(sizeof(Tile), // Выделение памяти под игровое поле
 									Game.FieldSize * Game.FieldSize);
