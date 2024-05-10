@@ -78,8 +78,14 @@ Uint8 dtCount(void)
 	static Uint32 lasttime = 0;
 	Uint32 newtime = SDL_GetTicks();
 	Uint8 ret = newtime - lasttime;
+	if (!ret)
+	{
+		SDL_Delay(1);
+		newtime = SDL_GetTicks();
+		ret = newtime - lasttime;
+	}
 	lasttime = newtime;
-	return (ret) ? ret : 1; //Если прошло мало времени, возврат 1
+	return  ret; //Если прошло мало времени, возврат 1
 }
 
 Sint32 RandomInt(Sint32 a, Sint32 b)
