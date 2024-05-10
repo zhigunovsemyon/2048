@@ -237,7 +237,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 	return ERR_NO;
 }
 
-Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index, float *size)
+Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
 {
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
@@ -247,7 +247,7 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	SDL_Texture *tile_texture = GetTextureForTile(Game->Field[Index].val, Params->textures);
 
 	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
-	Tile.w = (int)(*size += ANIM_SPEED * dtCount() / 1000.0f);
+	Tile.w = (int)(Game->Field[Index].size += ANIM_SPEED * dtCount() / 1000.0f);
 
 	// Размер одной ячейки хранится в h
 	Tile.h = FieldSize / Game->FieldSize;
@@ -263,7 +263,7 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
 	/*Если размер плитки ещё слишком мал*/
-	if (*size / TILE_SIZE_COEFFICIENT < (FieldSize / Game->FieldSize))
+	if (Game->Field[Index].size / TILE_SIZE_COEFFICIENT < (FieldSize / Game->FieldSize))
 	{	//Отрисовка промежуточного значения. Если SDL_RenderCopy упал, возврат кода ошибки
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
@@ -283,6 +283,6 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
 	Game->Field[Index].mode = TILE_OLD;	//Установка флага, что теперь эта ячейка отрисована
-	*size = 0;		//Сброс параметра размера
+	Game->Field[Index].size = 0;		//Сброс параметра размера
 	return ERR_NO;
 }

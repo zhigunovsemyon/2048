@@ -8,7 +8,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game);
 
 /*Отрисовка нового элемента Index из Game и фона рисовальщиком rend, с учётом параметров Params. 
 size определяет текущий размер в цикле отрисовки. Возврат кода ошибки ERR_SDL либо 0*/
-Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index, float *size);
+Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index);
 
 /*Обновление OldTexture или, если передан NULL, создание тексутры с числом очков из Game, 
 рисовальщиком rend, с цветами из набора ColourSet, вписанный в Tile. Возврат кода ошибки ERR_SDL либо 0*/

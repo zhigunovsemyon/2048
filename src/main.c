@@ -3,7 +3,7 @@ int main(int argc, const char **args)
 {
 	srand(time(NULL));
 	Uint8 errCode;
-	float sizeOfNew;
+	// float sizeOfNew;
 	Sint8 NewElementIndex = -1;
 	Game Game;
 	Params Params;
@@ -64,7 +64,8 @@ int main(int argc, const char **args)
 
 		case MODE_ADD:
 			NewElementIndex = AddElement(&Game);
-			sizeOfNew = 0;	//Сброс размера нового квадрата
+			Game.Field[NewElementIndex].size = 0;
+			// sizeOfNew = 0;	//Сброс размера нового квадрата
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
 			В противном случае там -1, что приведёт к выходу из программы*/
 			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
@@ -86,12 +87,12 @@ int main(int argc, const char **args)
 				if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
 					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 
-				if ((errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex, &sizeOfNew)))
+				if ((errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex)))
 					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 				SDL_RenderPresent(rend);
 				/*Если размер был сброшен, значит цикл отрисовки пора прервать,
 					выставив соответстветствующие флаги */
-				if (!sizeOfNew) 
+				if (!Game.Field[NewElementIndex].size) 
 				{
 					NewElementIndex = -1;
 					Params.Mode = MODE_WAIT;

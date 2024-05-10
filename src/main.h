@@ -18,6 +18,11 @@ typedef struct
 {
 	Uint64 val;//Значение ячейки
 	Uint8 mode;//Состояние данной плитки
+	union
+	{
+		float size;		//Размеры новой ячейки
+		float offset;	//Сдвиг перемещаемой ячейки
+	};
 }
 Tile;
 
