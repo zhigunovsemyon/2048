@@ -2,25 +2,25 @@
 #define DEFINES_H
 
 //Макросы
-#define _SQ(A) (A) * (A)
-#define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a 
-#define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a 
+#define _SQ(A) (A) * (A)//Квадрат числа
+#define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a//Разложение ссылки на цвет на отдельные аргументы
+#define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a	//Разложение значения цвета на отдельные аргументы
 
-// Минимальные размеры окна
-#define WIN_MIN 320
-#define WIN_HEIGHT (WIN_MIN * 2)
-#define WIN_WIDTH (WIN_MIN * 3)
+
+#define WIN_MIN 320	// Минимальные размеры окна
+#define WIN_HEIGHT (WIN_MIN * 2)	//Базовый размер окна по высоте (640)
+#define WIN_WIDTH (WIN_MIN * 3)		//Базовый размер окна по ширине (960)
 
 //Коэффициенты
-#define FIELD_SIZE_COEFFICIENT 0.9f
-#define TILE_SIZE_COEFFICIENT 0.9f
-#define ANIM_SPEED 500.0f
-#define CHANCE_OF_FOUR 10
+#define FIELD_SIZE_COEFFICIENT 0.9f	//Отношение размера поля к меньшему из размеров экрана
+#define TILE_SIZE_COEFFICIENT 0.9f	//Отношение размер тайла к размеру ячейки с тайлом
+#define ANIM_SPEED 500.0f			//Скорость анимации
+#define CHANCE_OF_FOUR 10			//Шанс выпадения 4ки
 
-#define BG_DARK_BRIGHTNESS		0x20
-#define BG_LIGHT_BRIGHTNESS		0xdf
+#define BG_DARK_BRIGHTNESS		0x20//Яркость тёмного цвета
+#define BG_LIGHT_BRIGHTNESS		0xdf//Яркость светлого цвета
 
-#define MSG_LEN  400
+#define MSG_LEN  400	//Длинна приветственного сообщения
 
 #if WIN32
 #define FONT "..\\..\\..\\monospace"
@@ -30,10 +30,13 @@
 
 enum TileMode
 {
-	TILE_NEW,
-	TILE_OLD
+	TILE_NEW,	//Новый тайл
+	TILE_OLD,	//Статичный тайл
+	TILE_MOVE_X,//Тайл, движимый по горизонтали
+	TILE_MOVE_Y	//Тайл, движимый по вертикали
 };
 
+//Число всех цветов в игре
 #define COLOURS_COUNT 14
 enum ColourIndexes
 {
@@ -53,6 +56,7 @@ enum ColourIndexes
 	COL_MAX
 };
 
+//Число всех текстур в игре
 #define TEXTURES_COUNT 13
 enum TextureIndexes
 {
@@ -73,10 +77,10 @@ enum TextureIndexes
 
 enum Errors
 {
-	ERR_NO,
-	ERR_SDL,
-	ERR_MALLOC,
-	ERR_TTF
+	ERR_NO,		//Отсутствие ошибок
+	ERR_SDL,	//Ошибка SDL
+	ERR_MALLOC,	//Ошибка malloc
+	ERR_TTF		//Ошибка SDL_ttf
 };
 
 enum Flags
