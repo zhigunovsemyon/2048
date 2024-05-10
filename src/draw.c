@@ -176,6 +176,7 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 
 	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
 	Tile.w = (int)(*size += ANIM_SPEED * dtCount() / 1000.0f);
+	SDL_Log("%f", *size);
 
 	// Размер одной ячейки хранится в h
 	Tile.h = FieldSize / Game->FieldSize;

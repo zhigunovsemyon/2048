@@ -160,8 +160,11 @@ int main(int argc, const char **args)
 
 		case MODE_ADD:
 			NewElementIndex = AddElement(&Game);
-			sizeOfNew = 1;
+			sizeOfNew = 0;	//Сброс размера нового квадрата
+			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
+			В противном случае там -1, что приведёт к выходу из программы*/
 			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW;
+			dtCount();	//Сброс счётчика времени кадра перед отрисовкой
 			break;
 
 		case MODE_CHECK_UP:
@@ -175,13 +178,16 @@ int main(int argc, const char **args)
 		case MODE_DRAW:
 			if (NewElementIndex >= 0)
 			{
-				// Рисование поля
-				if (DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/)
-					return ERR_SDL;
+				// Рисование поля со старыми элементами
+				if (errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/)
+					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 
-				DrawNewElement(rend, &Params, &Game, NewElementIndex, &sizeOfNew);
+				if (errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex, &sizeOfNew))
+					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 				SDL_RenderPresent(rend);
-				if (sizeOfNew < 2)
+				/*Если размер был сброшен, значит цикл отрисовки пора прервать,
+					выставив соответстветствующие флаги */
+				if (!sizeOfNew) 
 				{
 					NewElementIndex = -1;
 					Params.Mode = MODE_WAIT;
