@@ -101,6 +101,7 @@ int main(int argc, const char **args)
 {
 	srand(time(NULL));
 	Uint8 errCode;
+	float sizeOfNew;
 	Sint8 NewElementIndex = -1;
 	Game Game;
 	Params Params;
@@ -141,6 +142,13 @@ int main(int argc, const char **args)
 	while (SDL_TRUE)
 	{
 		SetMode(&Events, &Params); // Выбор режима работы в данный момент
+		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
+		{
+			Params.textures = UpdateTextureSet(rend, Params.textures,
+				Params.cols, &Params.WinSize, &Game);
+			DrawOldElements(rend, &Params, &Game);
+			SDL_RenderPresent(rend);
+		}
 
 		switch (Params.Mode)
 		{
@@ -148,17 +156,11 @@ int main(int argc, const char **args)
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params);
 
 		case MODE_WAIT:
-			if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
-			{
-				Params.textures = UpdateTextureSet(rend, Params.textures,
-					Params.cols, &Params.WinSize, &Game);
-				DrawOldElements(rend, &Params, &Game);
-				SDL_RenderPresent(rend);
-			};
 			continue;
 
 		case MODE_ADD:
 			NewElementIndex = AddElement(&Game);
+			sizeOfNew = 1;
 			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW;
 			break;
 
@@ -173,9 +175,17 @@ int main(int argc, const char **args)
 		case MODE_DRAW:
 			if (NewElementIndex >= 0)
 			{
-				DrawNewElement(rend, &Params, &Game, NewElementIndex);
-				NewElementIndex = -1;
-				Params.Mode = MODE_WAIT;
+				// Рисование поля
+				if (DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/)
+					return ERR_SDL;
+
+				DrawNewElement(rend, &Params, &Game, NewElementIndex, &sizeOfNew);
+				SDL_RenderPresent(rend);
+				if (sizeOfNew < 2)
+				{
+					NewElementIndex = -1;
+					Params.Mode = MODE_WAIT;
+				}				
 			}
 			break;
 

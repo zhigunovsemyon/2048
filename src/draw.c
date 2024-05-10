@@ -165,45 +165,39 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 	return ERR_NO;
 }
 
-Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
+Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index, float *size)
 {
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
 	SDL_Rect Tile;
-	Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
 	SDL_Texture *tile_texture = GetTextureForTile(rend, Game->Field[Index].val, Params);
 
-	dtCount(); // Сброс счётчика длинны кадра
-	Tile.w = 0;
-	for (float size = 0; /*Перед циклом размер зануляется*/
-		 /*Пограничное условие*/
-		 size / TILE_SIZE_COEFFICIENT <= (FieldSize / Game->FieldSize);
-		 /*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
-		 Tile.w = (int)(size += ANIM_SPEED * dtCount() / 1000.0f))
-	{
-		// Рисование поля
-		if (DrawOldElements(rend, Params, Game) /*== ERR_SDL*/)
+	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
+	Tile.w = (int)(*size += ANIM_SPEED * dtCount() / 1000.0f);
+
+	// Размер одной ячейки хранится в h
+	Tile.h = FieldSize / Game->FieldSize;
+
+	// Положение угла поля в координатах
+	Tile.x = (Params->WinSize.x - FieldSize) * 0.5;
+	Tile.y = (Params->WinSize.y - FieldSize) * 0.5;
+
+	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
+	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+		
+	Tile.h = Tile.w; // Запись корректной высоты плитки
+
+	/*Если размер плитки ещё слишком мал*/
+	if (*size / TILE_SIZE_COEFFICIENT < (FieldSize / Game->FieldSize))
+	{	//Отрисовка промежуточного значения. Если SDL_RenderCopy упал, возврат кода ошибки
+		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
-
-		// Размер одного поля хранится в h
-		Tile.h = FieldSize / Game->FieldSize;
-
-		// Положение угла поля в координатах
-		Tile.x = (Params->WinSize.x - FieldSize) * 0.5;
-		Tile.y = (Params->WinSize.y - FieldSize) * 0.5;
-
-		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
-		Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-		Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-
-		Tile.h = Tile.w; // Запись корректной высоты плитки
-
-		SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
-		SDL_RenderPresent(rend);
+		return ERR_NO;
 	}
-
+		
 	// Отрисовка окончательного положения квадрата
 	Tile.h = FieldSize / Game->FieldSize;
 	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
@@ -212,8 +206,10 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 	Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 	Tile.h = Tile.w; // Запись корректной высоты плитки
+
+	//Отрисовка конечного тайла
 	SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
-	SDL_RenderPresent(rend);
-	Game->Field[Index].mode = TILE_OLD;
+	Game->Field[Index].mode = TILE_OLD;	//Установка флага, что теперь эта ячейка отрисована
+	*size = 0;		//Сброс параметра размера
 	return ERR_NO;
 }
