@@ -49,4 +49,8 @@ Params;
 #include "misc.h"
 #include "draw.h"
 
+/*Набор функций расстановки сдвигов тайлов поля Game.
+используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
+extern Uint8(**CheckMove)(Game*);
+
 #endif // !_MAIN_H_

@@ -1,4 +1,31 @@
 #include "misc.h"
+static Uint8 CheckRightMove(Game* Game)
+{
+	Uint8 MoveFlag = 0;
+	SDL_Log("Проверка справа");
+	return MODE_MOVE_RIGHT;
+}
+
+static Uint8 CheckLeftMove(Game* Game)
+{
+	Uint8 MoveFlag = 0;
+	SDL_Log("Проверка слева");
+	return MODE_MOVE_LEFT;
+}
+
+static Uint8 CheckUpMove(Game* Game)
+{
+	Uint8 MoveFlag = 0;
+	SDL_Log("Проверка сверху");
+	return MODE_MOVE_UP;
+}
+
+static Uint8 CheckDownMove(Game* Game)
+{
+	Uint8 MoveFlag = 0;
+	SDL_Log("Проверка снизу");
+	return MODE_MOVE_DOWN;
+}
 
 SDL_Colour* CreateColourSet(Uint8 DarkModeFlag)
 {
@@ -138,7 +165,6 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 	if (!greet)
 		return ERR_SDL;
 
-	SDL_SetWindowTitle(window, "Добро пожаловать");
 	SDL_RenderCopy(rend, greet, NULL, &txt_size);
 	SDL_RenderPresent(rend);
 
@@ -502,3 +528,9 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev, Uint16 win_
 	SDL_SetWindowSize(win, Params->WinSize.x, Params->WinSize.y);
 	return SDL_TRUE;
 }
+
+static Uint8(*int_CheckMove[])(Game*) = { CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove };
+
+/*Набор функций расстановки сдвигов тайлов поля Game.
+используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
+Uint8(**CheckMove)(Game*) = int_CheckMove - MODE_CHECK_RIGHT;

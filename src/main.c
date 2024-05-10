@@ -3,12 +3,10 @@ int main(int argc, const char **args)
 {
 	srand(time(NULL));
 	Uint8 errCode;
-	// float sizeOfNew;
 	Sint8 NewElementIndex = -1;
 	Game Game;
 	Params Params;
 	SDL_Event Events;
-	char title[40]; // = "2048 | Очков: 00000000000000000000";
 	Params.WinSize.x = WIN_WIDTH;
 	Params.WinSize.y = WIN_HEIGHT;
 	Params.textures = NULL;
@@ -30,7 +28,7 @@ int main(int argc, const char **args)
 		return ERR_MALLOC;
 
 	// Создание окна и рисовальщика
-	if ((errCode = CreateWorkspace(&window, &rend, title, &Params.WinSize, Params.Flags)))
+	if ((errCode = CreateWorkspace(&window, &rend, "Добро пожаловать", &Params.WinSize, Params.Flags)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 
 	// Вывод приветствия
@@ -65,7 +63,6 @@ int main(int argc, const char **args)
 		case MODE_ADD:
 			NewElementIndex = AddElement(&Game);
 			Game.Field[NewElementIndex].size = 0;
-			// sizeOfNew = 0;	//Сброс размера нового квадрата
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
 			В противном случае там -1, что приведёт к выходу из программы*/
 			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
@@ -74,10 +71,16 @@ int main(int argc, const char **args)
 
 		case MODE_CHECK_RIGHT:
 		case MODE_CHECK_LEFT:
-		case MODE_CHECK_UP:
 		case MODE_CHECK_DOWN:
+		case MODE_CHECK_UP:
+			Params.Mode = CheckMove[Params.Mode](&Game);
+			continue;
+			
+		case MODE_MOVE_RIGHT:
+		case MODE_MOVE_LEFT:
+		case MODE_MOVE_UP:
+		case MODE_MOVE_DOWN:
 			Params.Mode = MODE_ADD;
-			SDL_Log("Проверка поля\n");
 			continue;
 
 		case MODE_DRAW_NEW:
