@@ -1,33 +1,104 @@
 #include "draw.h"
+/*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
+ * тёмной при Col_Mode в противном случае */
+static Uint8 DrawBackground(SDL_Renderer* rend, Uint8 TileCount, Params* Params);
 
-SDL_Texture *GetTextureForTile(SDL_Renderer *rend, Uint64 TileValue, Params *Params)
+SDL_Texture* GetScoreTexture(SDL_Renderer* rend, SDL_Texture* OldTexture,
+	SDL_Colour* ColourSet, SDL_Rect* Tile, Game* Game)
+{
+	if (OldTexture)
+		SDL_DestroyTexture(OldTexture);
+
+	char text[64];
+	sprintf(text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score, Game->MaxScore);
+	return CreateMessageTexture(rend, ColourSet + COL_BG,
+		ColourSet + COL_FG, Tile, FONT, text, SDL_FALSE);
+}
+
+SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game)
+{
+	char text[40];
+	Uint64 TileValue = 1;
+	SDL_Colour txt_col = { 0xFF, 0xFF, 0xFF, 0xFF };
+	SDL_Texture** set = (SDL_Texture**)SDL_malloc(TEXTURES_COUNT * sizeof(SDL_Texture*));
+	if (!set)
+		return NULL;
+
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+		MinOfTwo(WinSize->x, WinSize->y); // Меньший и размеров окон
+
+	SDL_Rect Tile;
+	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
+
+	for (Uint8 i = TEX_SQ2; i < TEXTURES_COUNT; ++i)
+	{
+		TileValue <<= 1;
+		sprintf(text, "%lu", TileValue);
+		set[i] = CreateMessageTexture(rend, &txt_col, ColourSet + i + 1, &Tile, FONT, text, SDL_TRUE);
+		if (!(set[i]))
+		{	//Очистка всех остальных текстур
+			SDL_DestroyTexture(set[i]);
+			for (; i; i--)
+				SDL_DestroyTexture(set[i - 1]);
+			SDL_free(set);
+			return NULL;
+		}
+	}
+
+	//Создание текстуры числа очков
+	Tile.w *= 2;
+	if (!(set[TEX_SCORE] = GetScoreTexture(rend, NULL, ColourSet, &Tile, Game)))
+	{	//Очистка всех остальных текстур
+		for (Uint8 i = TEX_SCORE; i; i--)
+			SDL_DestroyTexture(set[i - 1]);
+		SDL_free(set);
+		return NULL;
+	}
+	return set;
+}
+
+SDL_Texture** UpdateTextureSet(SDL_Renderer* rend, SDL_Texture** OldSet,
+	SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game)
+{
+	/*Освобождение всех текстур*/
+	for (Uint8 i = 0; i < TEXTURES_COUNT; ++i)
+		SDL_DestroyTexture(OldSet[i]);
+
+	//Освобождать сам массив из памяти на данном этапе не нужно,
+	//так как он заменится новыми текстурами.
+	//Его освобождение должно происходить только на выходе из программы
+	return CreateTextureSet(rend, ColourSet, WinSize, Game);
+}
+
+SDL_Texture *GetTextureForTile(Uint64 TileValue, SDL_Texture **textures)
 {
 	switch (TileValue)
 	{
 	case 2:
-		return Params->textures[TEX_SQ2];
+		return textures[TEX_SQ2];
 	case 4:
-		return Params->textures[TEX_SQ4];
+		return textures[TEX_SQ4];
 	case 8:
-		return Params->textures[TEX_SQ8];
+		return textures[TEX_SQ8];
 	case 16:
-		return Params->textures[TEX_SQ16];
+		return textures[TEX_SQ16];
 	case 32:
-		return Params->textures[TEX_SQ32];
+		return textures[TEX_SQ32];
 	case 64:
-		return Params->textures[TEX_SQ64];
+		return textures[TEX_SQ64];
 	case 128:
-		return Params->textures[TEX_SQ128];
+		return textures[TEX_SQ128];
 	case 256:
-		return Params->textures[TEX_SQ256];
+		return textures[TEX_SQ256];
 	case 512:
-		return Params->textures[TEX_SQ512];
+		return textures[TEX_SQ512];
 	case 1024:
-		return Params->textures[TEX_SQ1024];
+		return textures[TEX_SQ1024];
 	case 2048:
-		return Params->textures[TEX_SQ2048];
+		return textures[TEX_SQ2048];
 	default: //>2048
-		return Params->textures[TEX_MAX];
+		return textures[TEX_MAX];
 	}
 }
 
@@ -105,7 +176,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	return ret;			 // Возврат тексутры, либо NULL
 }
 
-Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
+static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 {
 	// Заливка фона
 	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Params->cols[COL_BG])))
@@ -159,8 +230,9 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
 		Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5 + CellWidth * (i % Game->FieldSize);
 		Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5 + CellWidth * (i / Game->FieldSize);
-		SDL_Texture *tile_texture = GetTextureForTile(rend, Game->Field[i].val, Params);
-		SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
+		SDL_Texture *tile_texture = GetTextureForTile(Game->Field[i].val, Params->textures);
+		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
+			return ERR_SDL;
 	}
 	return ERR_NO;
 }
@@ -172,11 +244,10 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
 	SDL_Rect Tile;
-	SDL_Texture *tile_texture = GetTextureForTile(rend, Game->Field[Index].val, Params);
+	SDL_Texture *tile_texture = GetTextureForTile(Game->Field[Index].val, Params->textures);
 
 	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
 	Tile.w = (int)(*size += ANIM_SPEED * dtCount() / 1000.0f);
-	SDL_Log("%f", *size);
 
 	// Размер одной ячейки хранится в h
 	Tile.h = FieldSize / Game->FieldSize;
@@ -209,7 +280,8 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
 	//Отрисовка конечного тайла
-	SDL_RenderCopy(rend, tile_texture, NULL, &Tile);
+	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
+		return ERR_SDL;
 	Game->Field[Index].mode = TILE_OLD;	//Установка флага, что теперь эта ячейка отрисована
 	*size = 0;		//Сброс параметра размера
 	return ERR_NO;

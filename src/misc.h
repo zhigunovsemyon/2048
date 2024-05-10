@@ -18,6 +18,9 @@ Uint8 CountLines(const char *source);
 Требует предварительной инициализации через srand*/
 Sint32 RandomInt(Sint32, Sint32);
 
+/*Создание набора цветов для текстур*/
+SDL_Colour* CreateColourSet(Uint8 DarkModeFlag);
+
 /*Считает и возвращает длинну кадра в мс*/
 Uint8 dtCount(void);
 

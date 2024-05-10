@@ -1,5 +1,34 @@
 #include "misc.h"
 
+SDL_Colour* CreateColourSet(Uint8 DarkModeFlag)
+{
+	SDL_Colour* set = (SDL_Colour*)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour));
+	if (!set)
+		return NULL;
+	for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
+		set[i].a = 0xFF;
+
+	if (DarkModeFlag) //Если включена тёмная тема, в цвета фона передаются соответствующие значения
+	{
+		set[COL_BG].r = BG_DARK_BRIGHTNESS, set[COL_BG].g = BG_DARK_BRIGHTNESS;
+		set[COL_BG].b = BG_DARK_BRIGHTNESS, set[COL_FG].r = BG_LIGHT_BRIGHTNESS;
+		set[COL_FG].g = BG_LIGHT_BRIGHTNESS, set[COL_FG].b = BG_LIGHT_BRIGHTNESS;
+	}
+	else
+	{
+		set[COL_BG].r = BG_LIGHT_BRIGHTNESS, set[COL_BG].g = BG_LIGHT_BRIGHTNESS;
+		set[COL_BG].b = BG_LIGHT_BRIGHTNESS, set[COL_FG].r = BG_DARK_BRIGHTNESS;
+		set[COL_FG].g = BG_DARK_BRIGHTNESS, set[COL_FG].b = BG_DARK_BRIGHTNESS;
+	}
+	for (Uint8 i = 2; i < COLOURS_COUNT; ++i)
+	{
+		set[i].r = 0xFF;
+		set[i].g = 0;
+		set[i].b = 0;
+	}
+	return set;
+}
+
 Uint8 CountLines(const char *source)
 {
 	Uint8 i = 1;//Если в тексте нет переносов, значит там одна строка

@@ -2,12 +2,30 @@
 #define DRAW_H
 #include "main.h"
 
+/*Отрисовка статичных элементов из Game и фона рисовальщиком rend, 
+с учётом параметров Params. Возврат кода ошибки ERR_SDL либо 0*/
 Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game);
+
+/*Отрисовка нового элемента Index из Game и фона рисовальщиком rend, с учётом параметров Params. 
+size определяет текущий размер в цикле отрисовки. Возврат кода ошибки ERR_SDL либо 0*/
 Uint8 DrawNewElement(SDL_Renderer *rend,Params *Params, Game *Game, Sint8 Index, float *size);
 
-/*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0, 
- * тёмной при Col_Mode в противном случае */ 
-Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
+/*Обновление OldTexture или, если передан NULL, создание тексутры с числом очков из Game, 
+рисовальщиком rend, с цветами из набора ColourSet, вписанный в Tile. Возврат кода ошибки ERR_SDL либо 0*/
+SDL_Texture* GetScoreTexture(SDL_Renderer* rend, SDL_Texture* OldTexture,
+	SDL_Colour* ColourSet, SDL_Rect* Tile, Game* Game);
+
+/*Создание рисовальщиком rend набора текстур, используемая игрой, из набора цветов ColourSet,
+с учётом размера экрана WinSize, размеров поля и очков игры из Game*/
+SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game);
+
+/*Обновление рисовальщиком rend набора текстур OldSet, используемая игрой, из набора цветов ColourSet,
+с учётом размера экрана WinSize, размеров поля и очков игры из Game*/
+SDL_Texture** UpdateTextureSet(SDL_Renderer* rend, SDL_Texture** OldSet,
+	SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game);
+
+//Подбор текстуры из набора textures для ячейки размерности TileValue
+SDL_Texture* GetTextureForTile(Uint64 TileValue, SDL_Texture **textures);
 
 /*Рисование приветственного сообщения message рисовальщиком rend шрифтом font_name
  * на основе пареметров Params, c записью размеров текстуры в txt_size, */
