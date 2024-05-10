@@ -67,19 +67,19 @@ int main(int argc, const char **args)
 			sizeOfNew = 0;	//Сброс размера нового квадрата
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
 			В противном случае там -1, что приведёт к выходу из программы*/
-			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW;
+			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
 			dtCount();	//Сброс счётчика времени кадра перед отрисовкой
 			break;
 
-		case MODE_CHECK_UP:
-		case MODE_CHECK_DOWN:
 		case MODE_CHECK_RIGHT:
 		case MODE_CHECK_LEFT:
+		case MODE_CHECK_UP:
+		case MODE_CHECK_DOWN:
 			Params.Mode = MODE_ADD;
 			SDL_Log("Проверка поля\n");
 			continue;
 
-		case MODE_DRAW:
+		case MODE_DRAW_NEW:
 			if (NewElementIndex >= 0)
 			{
 				// Рисование поля со старыми элементами

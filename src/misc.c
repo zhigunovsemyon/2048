@@ -26,6 +26,7 @@ SDL_Colour* CreateColourSet(Uint8 DarkModeFlag)
 		set[i].g = 0;
 		set[i].b = 0;
 	}
+	set[COL_SQ4].g = 0xFF;
 	return set;
 }
 
@@ -78,9 +79,9 @@ Uint8 dtCount(void)
 	static Uint32 lasttime = 0;
 	Uint32 newtime = SDL_GetTicks();
 	Uint8 ret = newtime - lasttime;
-	if (!ret)
+	if (ret < MIN_FRAMETIME)
 	{
-		SDL_Delay(1);
+		SDL_Delay(MIN_FRAMETIME);
 		newtime = SDL_GetTicks();
 		ret = newtime - lasttime;
 	}
