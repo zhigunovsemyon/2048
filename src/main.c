@@ -48,7 +48,9 @@ int main(int argc, const char **args)
 		{
 			Params.textures = UpdateTextureSet(rend, Params.textures,
 				Params.cols, &Params.WinSize, &Game);
-			DrawOldElements(rend, &Params, &Game);
+			// Рисование поля со старыми элементами
+			if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
+				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 			SDL_RenderPresent(rend);
 		}
 
@@ -81,10 +83,10 @@ int main(int argc, const char **args)
 			if (NewElementIndex >= 0)
 			{
 				// Рисование поля со старыми элементами
-				if (errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/)
+				if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
 					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 
-				if (errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex, &sizeOfNew))
+				if ((errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex, &sizeOfNew)))
 					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 				SDL_RenderPresent(rend);
 				/*Если размер был сброшен, значит цикл отрисовки пора прервать,

@@ -9,7 +9,7 @@ SDL_Texture* GetScoreTexture(SDL_Renderer* rend, SDL_Texture* OldTexture,
 	if (OldTexture)
 		SDL_DestroyTexture(OldTexture);
 
-	char text[64];
+	char text[80];
 	sprintf(text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score, Game->MaxScore);
 	return CreateMessageTexture(rend, ColourSet + COL_BG,
 		ColourSet + COL_FG, Tile, FONT, text, SDL_FALSE);
@@ -17,7 +17,7 @@ SDL_Texture* GetScoreTexture(SDL_Renderer* rend, SDL_Texture* OldTexture,
 
 SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game)
 {
-	char text[40];
+	char text[32];
 	Uint64 TileValue = 1;
 	SDL_Colour txt_col = { 0xFF, 0xFF, 0xFF, 0xFF };
 	SDL_Texture** set = (SDL_Texture**)SDL_malloc(TEXTURES_COUNT * sizeof(SDL_Texture*));
