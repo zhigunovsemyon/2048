@@ -23,19 +23,19 @@ void DoOffset(Game *Game, Params *Params)
 				}
 		}
 	}
-	// for (Uint8 i = 0; i < Game->FieldSize; i++)
-	// { // Цикл перебора каждого столбца с конца
-	// 	for (Uint8 j = 0; j < Game->FieldSize; j++)
-	// 	{ // Если данная ячейка не пустая
-	// 		if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
-	// 			if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X ||
-	// 				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
-	// 			{
-	// 				if (Game->Field[i * Game->FieldSize + j].offset)
-	// 					Game->Field[i * Game->FieldSize + j].offset--;// *= CellWidth;
-	// 			}
-	// 	}
-	// }
+	for (Uint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Uint8 j = 0; j < Game->FieldSize; j++)
+		{ // Если данная ячейка не пустая
+			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
+				if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X ||
+					Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
+				{
+					if (Game->Field[i * Game->FieldSize + j].offset)
+						Game->Field[i * Game->FieldSize + j].offset--;// *= CellWidth;
+				}
+		}
+	}
 }
 
 static Uint8 CheckRightMove(Game* Game)
@@ -63,7 +63,9 @@ static Uint8 CheckRightMove(Game* Game)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
+	//!!! вернуть MODE_WAIT потом !!!
+	// return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_ADD;
 }
 
 static Uint8 CheckLeftMove(Game* Game)

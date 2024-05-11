@@ -64,22 +64,25 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 					* тайл сдвинулся на целый блок, */
 					float shift = SDL_fmodf(SDL_roundf(Game->Field[i * Game->FieldSize + j].offset), CellWidth);
 					if (shift <= 0)
-					{	//Если у тайла закончился оффсет, ему выставляется статичный флаг,
+					{	
+						Flag--;
+						Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
+						Game->Field[i * Game->FieldSize + j + 1].offset -= CellWidth + 1;
+						if(Game->Field[i * Game->FieldSize + j + 1].offset < 0)
+							Game->Field[i * Game->FieldSize + j + 1].offset = 0;//CellWidth + 1;
+
+						SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
+						//Если у тайла закончился оффсет, ему выставляется статичный флаг,
 						//цикл переходит к следующему элементу
-						if(!SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+						if(!SDL_roundf(Game->Field[i * Game->FieldSize + j + 1].offset))
 						{
 							Game->Field[i * Game->FieldSize + j].mode = TILE_OLD;
-							Flag--;
-							continue;
 						}
-						Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
-						Game->Field[i * Game->FieldSize + j + 1].offset -= CellWidth;
-						SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
 						DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j + 1,0);
 						continue;
 					}
 					/*else*/
-					Game->Field[i * Game->FieldSize + j].offset -= ANIM_SPEED * dtCount() / 1000.0f;// *= CellWidth;
+					Game->Field[i * Game->FieldSize + j].offset--;//= ANIM_SPEED * dtCount() / 1000.0f;// *= CellWidth;
 					DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j,CellWidth - shift);
 				}
 		}
@@ -165,6 +168,8 @@ SDL_Texture *GetTextureForTile(Uint64 TileValue, SDL_Texture **textures)
 {
 	switch (TileValue)
 	{
+	case 0:	//ноль не должен быть значением рисуемой клетки
+		return NULL;
 	case 2:
 		return textures[TEX_SQ2];
 	case 4:
