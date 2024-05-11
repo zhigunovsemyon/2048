@@ -1,4 +1,5 @@
 #include "misc.h"
+
 static Uint8 CheckRightMove(Game* Game)
 {
 	Uint8 MoveFlag = 0;
@@ -131,37 +132,26 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, 
 			   Game *Game, Uint8 NextMode)
 {	//Создание сообщения
-	char message[MSG_LEN] = "Добро пожаловать в игру 2048!\n";
-	if (Params->Flags & FLAG_DARKMODE)
-		SDL_strlcat(message, "Включён тёмный режим\n", MSG_LEN);
-	else
-		SDL_strlcat(message, "Включён светлый режим\n", MSG_LEN);
-
-	if (Params->Flags & FLAG_MOUSEOFF)
-		SDL_strlcat(message, "Управление мышью отключено\n", MSG_LEN);
-	else
-		SDL_strlcat(message, "Включено управление мышью\n", MSG_LEN);
-
-	if (Params->Flags & FLAG_VSYNC)
-		SDL_strlcat(message, "Включен V-Sync\n", MSG_LEN);
-	else
-		SDL_strlcat(message, "V-Sync отключен\n", MSG_LEN);
-
-	if (Params->Flags & FLAG_WASDKEY)
-		SDL_strlcat(message, "Используется управление WASD\n", MSG_LEN);
-	if (Params->Flags & FLAG_VIMKEY)
-		SDL_strlcat(message, "Используется управление vi\n", MSG_LEN);
-	if (Params->Flags & FLAG_ARROWKEY)
-		SDL_strlcat(message, "Используется управление стрелками\n", MSG_LEN);
-
-	sprintf(message + SDL_strlen(message), "Используется размер поля: %u\n", Game->FieldSize);
-	SDL_strlcat(message, "Для выхода нажмите q.\nДля прододжения нажмите любую клавишу\n", MSG_LEN);
+	char *message;
+	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n",
+			"Добро пожаловать в игру 2048!",
+			"Включён ", (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим",
+			"Управление мышью ", (Params->Flags & FLAG_MOUSEOFF) ? "отключено" : "включено",
+			"V-Sync ", (Params->Flags & FLAG_VSYNC) ? "включен": "отключен",
+			"Используется управление ", (Params->Flags & FLAG_WASDKEY) ? "WASD" :
+										(Params->Flags & FLAG_VIMKEY) ? "vi" :
+										"стрелками",
+			"Используется размер поля ", Game->FieldSize,
+			"Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
+	if(!message)
+		return ERR_MALLOC;
 
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
 
 	SDL_Texture *greet = CreateMessageTexture(rend, &Params->cols[COL_FG],
 										   &Params->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
+	SDL_free(message);
 	if (!greet)
 		return ERR_SDL;
 

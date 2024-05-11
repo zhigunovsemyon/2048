@@ -21,8 +21,6 @@
 #define BG_DARK_BRIGHTNESS		0x20//Яркость тёмного цвета
 #define BG_LIGHT_BRIGHTNESS		0xdf//Яркость светлого цвета
 
-#define MSG_LEN  400	//Длинна приветственного сообщения
-
 #if WIN32
 #define FONT "..\\..\\..\\monospace"
 #else

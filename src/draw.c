@@ -9,15 +9,18 @@ SDL_Texture* GetScoreTexture(SDL_Renderer* rend, SDL_Texture* OldTexture,
 	if (OldTexture)
 		SDL_DestroyTexture(OldTexture);
 
-	char text[80];
-	sprintf(text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score, Game->MaxScore);
-	return CreateMessageTexture(rend, ColourSet + COL_BG,
+	char *text;
+	SDL_asprintf(&text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score, Game->MaxScore);
+	if(!text)
+		return NULL;
+	SDL_Texture *ret = CreateMessageTexture(rend, ColourSet + COL_BG,
 		ColourSet + COL_FG, Tile, FONT, text, SDL_FALSE);
+	SDL_free(text);
+	return ret;
 }
 
 SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game)
 {
-	char text[32];
 	Uint64 TileValue = 1;
 	SDL_Colour txt_col = { 0xFF, 0xFF, 0xFF, 0xFF };
 	SDL_Texture** set = (SDL_Texture**)SDL_malloc(TEXTURES_COUNT * sizeof(SDL_Texture*));
@@ -34,8 +37,12 @@ SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Po
 	for (Uint8 i = TEX_SQ2; i < TEXTURES_COUNT; ++i)
 	{
 		TileValue <<= 1;
-		sprintf(text, "%lu", TileValue);
+		char *text;
+		SDL_asprintf(&text, "%lu", TileValue);
+		//Проверка text на NULL осуществляется внутри CreateMessageTexture
 		set[i] = CreateMessageTexture(rend, &txt_col, ColourSet + i + 1, &Tile, FONT, text, SDL_TRUE);
+		SDL_free(text);
+		//Если хоть одну из текстур не удалось создать
 		if (!(set[i]))
 		{	//Очистка всех остальных текстур
 			SDL_DestroyTexture(set[i]);
@@ -107,6 +114,9 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 {
 	TTF_Font *font;
 	SDL_Surface *txt_surf;
+
+	if(!message)
+		return NULL;
 
 	Uint8 scaler = CountLines(message); // Отношение размера буквы к размеру окна
 	do
