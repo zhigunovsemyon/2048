@@ -3,7 +3,7 @@
  * тёмной при Col_Mode в противном случае */
 static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
 
-Uint8 DrawSingleMovingElement (SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
+Uint8 DrawSingleMovingElement (SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index, float shift)
 {
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
@@ -26,9 +26,9 @@ Uint8 DrawSingleMovingElement (SDL_Renderer *rend, Params *Params, Game *Game, S
 
 	//Сдвиг на оффсет
 	if(Game->Field[Index].mode == TILE_MOVE_X)
-		Tile.x += (int)Game->Field[Index].offset;
+		Tile.x += (int)shift; //Game->Field[Index].offset;
 	if(Game->Field[Index].mode == TILE_MOVE_Y)
-		Tile.y += (int)Game->Field[Index].offset;
+		Tile.y += (int)shift; //Game->Field[Index].offset;
 
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
@@ -43,7 +43,7 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 	if(DrawOldElements(rend, Params, Game))
 		return ERR_SDL;
 
-	Uint8 Flag;
+	Uint8 Flag = 0;
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
@@ -55,20 +55,32 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца с конца
 		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
-		{ // Если данная ячейка не пустая
+		{ // Если данная ячейка не пустая, и она движется по горизонтали
 			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
 				if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X) 
-				{	/*Если при целочисленном делении оффсета на размер ячейки, ответ равен нулю, значит*/
-					if (!SDL_fmodf(SDL_roundf(Game->Field[i * Game->FieldSize + j].offset), CellWidth))
-					{
+				{	
+					Flag++;
+					/*Если при целочисленном делении оффсета на размер ячейки, ответ равен нулю, значит
+					* тайл сдвинулся на целый блок, */
+					float shift = SDL_fmodf(SDL_roundf(Game->Field[i * Game->FieldSize + j].offset), CellWidth);
+					if (shift <= 0)
+					{	//Если у тайла закончился оффсет, ему выставляется статичный флаг,
+						//цикл переходит к следующему элементу
+						if(!SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+						{
+							Game->Field[i * Game->FieldSize + j].mode = TILE_OLD;
+							Flag--;
+							continue;
+						}
 						Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
 						Game->Field[i * Game->FieldSize + j + 1].offset -= CellWidth;
 						SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
+						DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j + 1,0);
+						continue;
 					}
 					/*else*/
-					Flag++;
-					Game->Field[i * Game->FieldSize + j].offset--;// *= CellWidth;
-					DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j);
+					Game->Field[i * Game->FieldSize + j].offset -= ANIM_SPEED * dtCount() / 1000.0f;// *= CellWidth;
+					DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j,CellWidth - shift);
 				}
 		}
 	}
