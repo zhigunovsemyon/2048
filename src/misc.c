@@ -11,9 +11,9 @@ void DoOffset(Game *Game, Params *Params)
 	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
 	for (Uint8 i = 0; i < Game->FieldSize; i++)
-	{ // Цикл перебора каждого столбца с конца
+	{ // Цикл перебора каждого столбца
 		for (Uint8 j = 0; j < Game->FieldSize; j++)
-		{ // Если данная ячейка не пустая
+		{ // Если данная ячейка не пустая, и у неё стоит флаг движения
 			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
 				if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X ||
 					Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
@@ -25,91 +25,136 @@ void DoOffset(Game *Game, Params *Params)
 	}
 }
 
-static Uint8 CheckRightMove(Game* Game)
+static Uint8 CheckRightMove(Game *Game)
 {
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка справа");
-	//Цикл перебора каждой строки
-	for(Sint8 i = 0; i < Game->FieldSize;i++)
-	{	//Цикл перебора каждого столбца с конца
-		for(Sint8 j = Game->FieldSize - 1; j >= 0; j--)
-		{	//Если данная ячейка пустая
-			if(!Game->Field[i * Game->FieldSize + j].val/* == 0 */)
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
+		{ // Если данная ячейка пустая
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{
-				//Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
+				// Всем предшествующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
-				for(Sint8 j2 = j - 1; j2 >= 0; j2--)
-				{	//Если ячейка не пустая
-					if(Game->Field[i * Game->FieldSize + j2].val/* != 0 */)
+				for (Sint8 j2 = j - 1; j2 >= 0; j2--)
+				{ // Если ячейка не пустая
+					if (Game->Field[i * Game->FieldSize + j2].val /* != 0 */)
 					{
 						NonEmptyLine++;
 						Game->Field[i * Game->FieldSize + j2].mode = TILE_MOVE_X;
-						//Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
-						Game->Field[i * Game->FieldSize + j2].offset = 1;
+						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
+						Game->Field[i * Game->FieldSize + j2].offset = +1;
 					}
 				}
-				if(NonEmptyLine)
-					MoveFlag++;//Подъём флага движения
+				if (NonEmptyLine)
+					MoveFlag++; // Подъём флага движения
 			}
 		}
 	}
 	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
 }
 
-static Uint8 CheckLeftMove(Game* Game)
+static Uint8 CheckLeftMove(Game *Game)
 {
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка слева");
-	//Цикл перебора каждой строки
-	for(Sint8 i = 0; i < Game->FieldSize;i++)
-	{	//Цикл перебора каждого столбца с конца
-		for(Sint8 j = 0; j < Game->FieldSize; j++)
-		{	//Если данная ячейка пустая
-			if(!Game->Field[i * Game->FieldSize + j].val/* == 0 */)
-			{
-				//Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца
+		for (Sint8 j = 0; j < Game->FieldSize; j++)
+		{ // Если данная ячейка пустая
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+			{	// Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
-				for(Sint8 j2 = j + 1; j2 < Game->FieldSize; j2++)
-				{	//Если ячейка не пустая
-					if(Game->Field[i * Game->FieldSize + j2].val/* != 0 */)
+				for (Sint8 j2 = j + 1; j2 < Game->FieldSize; j2++)
+				{ // Если ячейка не пустая
+					if (Game->Field[i * Game->FieldSize + j2].val /* != 0 */)
 					{
 						NonEmptyLine++;
 						Game->Field[i * Game->FieldSize + j2].mode = TILE_MOVE_X;
-						//Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
+						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
 						Game->Field[i * Game->FieldSize + j2].offset = -1;
 					}
 				}
-				if(NonEmptyLine)
-					MoveFlag++;//Подъём флага движения
+				if (NonEmptyLine)
+					MoveFlag++; // Подъём флага движения
 			}
 		}
 	}
 	return (MoveFlag) ? MODE_MOVE_LEFT : MODE_WAIT;
 }
 
-static Uint8 CheckUpMove(Game* Game)
+static Uint8 CheckUpMove(Game *Game)
 {
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка сверху");
-	return MODE_MOVE_UP;
+	//Цикл перебора каждого столбца
+	for (Sint8 j = 0; j < Game->FieldSize; j++)
+	{ // Цикл перебора каждой строки
+		for (Sint8 i = 0; i < Game->FieldSize; i++)
+		{ // Если данная ячейка пустая
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+			{	// Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
+				Uint8 NonEmptyLine = 0;
+				for (Sint8 i2 = i + 1; i2 < Game->FieldSize; i2++)
+				{ // Если ячейка не пустая
+					if (Game->Field[i2 * Game->FieldSize + j].val /* != 0 */)
+					{
+						NonEmptyLine++;
+						Game->Field[i2 * Game->FieldSize + j].mode = TILE_MOVE_Y;
+						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
+						Game->Field[i2 * Game->FieldSize + j].offset = -1;
+					}
+				}
+				if (NonEmptyLine)
+					MoveFlag++; // Подъём флага движения
+			}
+		}
+	}
+	return (MoveFlag) ? MODE_MOVE_UP : MODE_WAIT;
 }
 
-static Uint8 CheckDownMove(Game* Game)
+static Uint8 CheckDownMove(Game *Game)
 {
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка снизу");
-	return MODE_MOVE_DOWN;
+	//Цикл перебора каждого столбца
+	for (Sint8 j = 0; j < Game->FieldSize; j++)
+	{ // Цикл перебора каждой строки
+		for (Sint8 i = Game->FieldSize - 1; i >= 0; i--)
+		{ // Если данная ячейка пустая
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+			{	// Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
+				Uint8 NonEmptyLine = 0;
+				for (Sint8 i2 = i - 1; i2 >= 0; i2--)
+				{ // Если ячейка не пустая
+					if (Game->Field[i2 * Game->FieldSize + j].val /* != 0 */)
+					{
+						NonEmptyLine++;
+						Game->Field[i2 * Game->FieldSize + j].mode = TILE_MOVE_Y;
+						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
+						Game->Field[i2 * Game->FieldSize + j].offset = +1;
+					}
+				}
+				if (NonEmptyLine)
+					MoveFlag++; // Подъём флага движения
+			}
+		}
+	}
+	return (MoveFlag) ? MODE_MOVE_DOWN : MODE_WAIT;
 }
 
-SDL_Colour* CreateColourSet(Uint8 DarkModeFlag)
+SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 {
-	SDL_Colour* set = (SDL_Colour*)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour));
+	SDL_Colour *set = (SDL_Colour *)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour));
 	if (!set)
 		return NULL;
 	for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
 		set[i].a = 0xFF;
 
-	if (DarkModeFlag) //Если включена тёмная тема, в цвета фона передаются соответствующие значения
+	if (DarkModeFlag) // Если включена тёмная тема, в цвета фона передаются соответствующие значения
 	{
 		set[COL_BG].r = BG_DARK_BRIGHTNESS, set[COL_BG].g = BG_DARK_BRIGHTNESS;
 		set[COL_BG].b = BG_DARK_BRIGHTNESS, set[COL_FG].r = BG_LIGHT_BRIGHTNESS;
@@ -133,13 +178,13 @@ SDL_Colour* CreateColourSet(Uint8 DarkModeFlag)
 
 Uint8 CountLines(const char *source)
 {
-	Uint8 i = 1;//Если в тексте нет переносов, значит там одна строка
+	Uint8 i = 1; // Если в тексте нет переносов, значит там одна строка
 	/*Когда функция находит перенос, она возвращает указатель на него,
 	в противном случае -- NULL, цикл завершается */
-	while((source = SDL_strchr(source, '\n')))
+	while ((source = SDL_strchr(source, '\n')))
 	{
 		source++;
-		if(*source/*!= 0*/)
+		if (*source /*!= 0*/)
 			i++;
 	}
 	return i;
@@ -187,7 +232,7 @@ Uint8 dtCount(void)
 		ret = newtime - lasttime;
 	}
 	lasttime = newtime;
-	return  ret; //Если прошло мало времени, возврат 1
+	return ret; // Если прошло мало времени, возврат 1
 }
 
 Sint32 RandomInt(Sint32 a, Sint32 b)
@@ -202,33 +247,31 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 	return (rand() % (b - a)) + a;
 }
 
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, 
-			   Game *Game, Uint8 NextMode)
-{	//Создание сообщения
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Params, Game *Game, Uint8 NextMode)
+{ // Создание сообщения
 	char *message;
-	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n",
-			"Добро пожаловать в игру 2048!",
-			"Включён ", (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим",
-			"Управление мышью ", (Params->Flags & FLAG_MOUSEOFF) ? "отключено" : "включено",
-			"V-Sync ", (Params->Flags & FLAG_VSYNC) ? "включен": "отключен",
-			"Используется управление ", (Params->Flags & FLAG_WASDKEY) ? "WASD" :
-										(Params->Flags & FLAG_VIMKEY) ? "vi" :
-										"стрелками",
-			"Используется размер поля ", Game->FieldSize,
-			"Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
-	if(!message)
+	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", "Добро пожаловать в игру 2048!", "Включён ",
+				 (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим", "Управление мышью ",
+				 (Params->Flags & FLAG_MOUSEOFF) ? "отключено" : "включено", "V-Sync ",
+				 (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен", "Используется управление ",
+				 (Params->Flags & FLAG_WASDKEY)	 ? "WASD"
+				 : (Params->Flags & FLAG_VIMKEY) ? "vi"
+												 : "стрелками",
+				 "Используется размер поля ", Game->FieldSize,
+				 "Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
+	if (!message)
 		return ERR_MALLOC;
 
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
 
-	SDL_Texture *greet = CreateMessageTexture(rend, &Params->cols[COL_FG],
-										   &Params->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
+	SDL_Texture *greet =
+		CreateMessageTexture(rend, &Params->cols[COL_FG], &Params->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
 	SDL_free(message);
 	if (!greet)
 		return ERR_SDL;
 
-	if(SDL_RenderCopy(rend, greet, NULL, &txt_size))
+	if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
 		return ERR_SDL;
 	SDL_RenderPresent(rend);
 
@@ -244,8 +287,8 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 		{
 			SDL_DestroyTexture(greet);
 			txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
-			greet = CreateMessageTexture(rend, &Params->cols[COL_FG],
-										   &Params->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
+			greet = CreateMessageTexture(rend, &Params->cols[COL_FG], &Params->cols[COL_BG], &txt_size, FONT, message,
+										 SDL_FALSE);
 			if (!greet)
 				return ERR_SDL;
 
@@ -254,7 +297,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 				return ERR_SDL;
 			if (SDL_RenderClear(rend))
 				return ERR_SDL;
-			if(SDL_RenderCopy(rend, greet, NULL, &txt_size))
+			if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
 				return ERR_SDL;
 			SDL_RenderPresent(rend);
 		}
@@ -396,14 +439,14 @@ Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend
 
 Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game *Game, Params *Params)
 {
-	//Освобождение цветов
-	if(Params->cols)
+	// Освобождение цветов
+	if (Params->cols)
 		SDL_free(Params->cols);
 
-	//Освобождение текстур
-	if(Params->textures)
+	// Освобождение текстур
+	if (Params->textures)
 	{
-		for(Uint8 i = 0; i < TEXTURES_COUNT; ++i)
+		for (Uint8 i = 0; i < TEXTURES_COUNT; ++i)
 			SDL_DestroyTexture(Params->textures[i]);
 		SDL_free(Params->textures);
 	}
@@ -439,14 +482,14 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 		return ERR_TTF; // Завершение работы, если не удалось вызвать TTF
 
 	// Создание окна
-	if(!(*win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WinSize->x, WinSize->y,
-							SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)))
+	if (!(*win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WinSize->x, WinSize->y,
+								  SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)))
 		return ERR_SDL;
 
 	// Создание рисовальщика
-	if(!(*rend =
-		SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | 
-					 ((Flag & FLAG_VSYNC) ? SDL_RENDERER_PRESENTVSYNC : 0))))//Флаг вкл/выкл v-sync
+	if (!(*rend = SDL_CreateRenderer(*win, -1,
+									 SDL_RENDERER_ACCELERATED | ((Flag & FLAG_VSYNC) ? SDL_RENDERER_PRESENTVSYNC
+																					 : 0)))) // Флаг вкл/выкл v-sync
 		return ERR_SDL;
 
 	// Возврат кода штатной работы
@@ -589,8 +632,8 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev, Uint16 win_
 	return SDL_TRUE;
 }
 
-static Uint8(*int_CheckMove[])(Game*) = { CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove };
+static Uint8 (*int_CheckMove[])(Game *) = {CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
-Uint8(**CheckMove)(Game*) = int_CheckMove - MODE_CHECK_RIGHT;
+Uint8 (**CheckMove)(Game *) = int_CheckMove - MODE_CHECK_RIGHT;

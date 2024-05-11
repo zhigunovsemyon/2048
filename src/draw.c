@@ -17,7 +17,6 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
-	SDL_Log("change = %f", change);
 
 	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
@@ -67,7 +66,6 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
-	SDL_Log("change = %f", change);
 
 	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
@@ -102,6 +100,103 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		}
 	}
 	Params->Mode = (Flag) ? MODE_MOVE_LEFT : MODE_CHECK_LEFT;
+	return ERR_NO;
+}
+
+Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
+{
+	if (DrawOldElements(rend, Params, Game))
+		return ERR_SDL;
+
+	Uint8 Flag = 0;
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+	float change = (ANIM_SPEED * dtCount() / 1000.0f);
+
+	/*Умножение всех оффсетов на ширину ячейки */
+	// Цикл перебора каждой строки
+	for (Sint8 j = 0; j < Game->FieldSize; j++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Sint8 i = 0; i < Game->FieldSize; i++)
+		{ // Если данная ячейка не пустая, и она движется по горизонтали
+			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
+				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
+			{
+				if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+				{
+					if (DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j))
+						return ERR_SDL;
+
+					Flag++;
+					Game->Field[i * Game->FieldSize + j].offset += change;
+				}
+				else
+				{
+					// Копирование текущего элемента в следующий
+					Game->Field[(i - 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
+					Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_OLD;
+					Game->Field[(i - 1) * Game->FieldSize + j].offset = 0;
+
+					// Зануление прошлого элемента
+					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
+					if (DrawSingleMovingElement(rend, Params, Game, (i - 1) * Game->FieldSize + j))
+						return ERR_SDL;
+				}
+			}
+		}
+	}
+	Params->Mode = (Flag) ? MODE_MOVE_UP : MODE_CHECK_UP;
+	return ERR_NO;
+}
+
+Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
+{
+	if (DrawOldElements(rend, Params, Game))
+		return ERR_SDL;
+
+	Uint8 Flag = 0;
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+	float change = (ANIM_SPEED * dtCount() / 1000.0f);
+	
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
+		{ // Если данная ячейка не пустая, и она движется по горизонтали
+			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
+				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
+			{
+				if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+				{
+					if (DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j))
+						return ERR_SDL;
+
+					Flag++;
+					Game->Field[i * Game->FieldSize + j].offset -= change;
+				}
+				else
+				{
+					// Копирование текущего элемента в следующий
+					Game->Field[(i + 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
+					Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_OLD;
+					Game->Field[(i + 1) * Game->FieldSize + j].offset = 0;
+
+					// Зануление прошлого элемента
+					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
+					if (DrawSingleMovingElement(rend, Params, Game, (i + 1) * Game->FieldSize + j))
+						return ERR_SDL;
+				}
+			}
+		}
+	}
+	Params->Mode = (Flag) ? MODE_MOVE_DOWN : MODE_CHECK_DOWN;
 	return ERR_NO;
 }
 
@@ -443,3 +538,8 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Game->Field[Index].size = 0; // Сброс параметра размера
 	return ERR_NO;
 }
+
+static Uint8 (*int_DoMove[])(SDL_Renderer*, Game *, Params *) = {DoRightMove, DoLeftMove, DoDownMove, DoUpMove};
+/*Набор функций отрисовки сдвигов тайлов поля Game.
+используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
+Uint8 (**DoMove)(SDL_Renderer*, Game *, Params *) = int_DoMove - MODE_MOVE_RIGHT;

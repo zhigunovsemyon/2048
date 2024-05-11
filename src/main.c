@@ -79,19 +79,13 @@ int main(int argc, const char **args)
 			continue;
 			
 		case MODE_MOVE_RIGHT:
-			if((DoRightMove(rend, &Game, &Params)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
-			SDL_RenderPresent(rend);
-			break;
 		case MODE_MOVE_LEFT:
-			if((DoLeftMove(rend, &Game, &Params)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
-			SDL_RenderPresent(rend);
-			break;
 		case MODE_MOVE_UP:
 		case MODE_MOVE_DOWN:
-			Params.Mode = MODE_ADD;
-			continue;
+			if((errCode = DoMove[Params.Mode](rend, &Game, &Params)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			SDL_RenderPresent(rend);
+			break;
 
 		case MODE_DRAW_NEW:
 			if (NewElementIndex >= 0)
