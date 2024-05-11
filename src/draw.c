@@ -1,35 +1,106 @@
 #include "draw.h"
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
-static Uint8 DrawBackground(SDL_Renderer* rend, Uint8 TileCount, Params* Params);
+static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
 
-SDL_Texture* GetScoreTexture(SDL_Renderer* rend, SDL_Texture* OldTexture,
-	SDL_Colour* ColourSet, SDL_Rect* Tile, Game* Game)
+Uint8 DrawSingleMovingElement (SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
+{
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	SDL_Rect Tile;
+	SDL_Texture *tile_texture = GetTextureForTile(Game->Field[Index].val, Params->textures);
+
+	// Размер одной ячейки хранится в h
+	Tile.h = FieldSize / Game->FieldSize;
+	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
+
+	// Положение угла поля в координатах
+	Tile.x = (Params->WinSize.x - FieldSize) * 0.5;
+	Tile.y = (Params->WinSize.y - FieldSize) * 0.5;
+
+	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
+	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+
+	//Сдвиг на оффсет
+	if(Game->Field[Index].mode == TILE_MOVE_X)
+		Tile.x += (int)Game->Field[Index].offset;
+	if(Game->Field[Index].mode == TILE_MOVE_Y)
+		Tile.y += (int)Game->Field[Index].offset;
+
+	Tile.h = Tile.w; // Запись корректной высоты плитки
+
+	// Отрисовка конечного тайла
+	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
+		return ERR_SDL;
+	return ERR_NO;
+}
+
+Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
+{
+	if(DrawOldElements(rend, Params, Game))
+		return ERR_SDL;
+
+	Uint8 Flag;
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+	
+	float CellWidth = FieldSize / Game->FieldSize;
+
+	/*Умножение всех оффсетов на ширину ячейки */
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
+		{ // Если данная ячейка не пустая
+			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
+				if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X) 
+				{	/*Если при целочисленном делении оффсета на размер ячейки, ответ равен нулю, значит*/
+					if (!SDL_fmodf(SDL_roundf(Game->Field[i * Game->FieldSize + j].offset), CellWidth))
+					{
+						Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
+						Game->Field[i * Game->FieldSize + j + 1].offset -= CellWidth;
+						SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
+					}
+					/*else*/
+					Flag++;
+					Game->Field[i * Game->FieldSize + j].offset--;// *= CellWidth;
+					DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j);
+				}
+		}
+	}
+	Params->Mode = (Flag) ? MODE_MOVE_RIGHT : MODE_ADD;
+	return ERR_NO;
+}
+SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture, SDL_Colour *ColourSet, SDL_Rect *Tile,
+							 Game *Game)
 {
 	if (OldTexture)
 		SDL_DestroyTexture(OldTexture);
 
 	char *text;
 	SDL_asprintf(&text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score, Game->MaxScore);
-	if(!text)
+	if (!text)
 		return NULL;
-	SDL_Texture *ret = CreateMessageTexture(rend, ColourSet + COL_BG,
-		ColourSet + COL_FG, Tile, FONT, text, SDL_FALSE);
+	SDL_Texture *ret = CreateMessageTexture(rend, ColourSet + COL_BG, ColourSet + COL_FG, Tile, FONT, text, SDL_FALSE);
 	SDL_free(text);
 	return ret;
 }
 
-SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game)
+SDL_Texture **CreateTextureSet(SDL_Renderer *rend, SDL_Colour *ColourSet, SDL_Point *WinSize, Game *Game)
 {
 	Uint64 TileValue = 1;
-	SDL_Colour txt_col = { 0xFF, 0xFF, 0xFF, 0xFF };
-	SDL_Texture** set = (SDL_Texture**)SDL_malloc(TEXTURES_COUNT * sizeof(SDL_Texture*));
+	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
+	SDL_Texture **set = (SDL_Texture **)SDL_malloc(TEXTURES_COUNT * sizeof(SDL_Texture *));
 	if (!set)
 		return NULL;
 
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-		MinOfTwo(WinSize->x, WinSize->y); // Меньший и размеров окон
+					  MinOfTwo(WinSize->x, WinSize->y); // Меньший и размеров окон
 
 	SDL_Rect Tile;
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
@@ -39,12 +110,12 @@ SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Po
 		TileValue <<= 1;
 		char *text;
 		SDL_asprintf(&text, "%lu", TileValue);
-		//Проверка text на NULL осуществляется внутри CreateMessageTexture
+		// Проверка text на NULL осуществляется внутри CreateMessageTexture
 		set[i] = CreateMessageTexture(rend, &txt_col, ColourSet + i + 1, &Tile, FONT, text, SDL_TRUE);
 		SDL_free(text);
-		//Если хоть одну из текстур не удалось создать
+		// Если хоть одну из текстур не удалось создать
 		if (!(set[i]))
-		{	//Очистка всех остальных текстур
+		{ // Очистка всех остальных текстур
 			SDL_DestroyTexture(set[i]);
 			for (; i; i--)
 				SDL_DestroyTexture(set[i - 1]);
@@ -53,10 +124,10 @@ SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Po
 		}
 	}
 
-	//Создание текстуры числа очков
+	// Создание текстуры числа очков
 	Tile.w *= 2;
 	if (!(set[TEX_SCORE] = GetScoreTexture(rend, NULL, ColourSet, &Tile, Game)))
-	{	//Очистка всех остальных текстур
+	{ // Очистка всех остальных текстур
 		for (Uint8 i = TEX_SCORE; i; i--)
 			SDL_DestroyTexture(set[i - 1]);
 		SDL_free(set);
@@ -65,16 +136,16 @@ SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Po
 	return set;
 }
 
-SDL_Texture** UpdateTextureSet(SDL_Renderer* rend, SDL_Texture** OldSet,
-	SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game)
+SDL_Texture **UpdateTextureSet(SDL_Renderer *rend, SDL_Texture **OldSet, SDL_Colour *ColourSet, SDL_Point *WinSize,
+							   Game *Game)
 {
 	/*Освобождение всех текстур*/
 	for (Uint8 i = 0; i < TEXTURES_COUNT; ++i)
 		SDL_DestroyTexture(OldSet[i]);
 
-	//Освобождать сам массив из памяти на данном этапе не нужно,
-	//так как он заменится новыми текстурами.
-	//Его освобождение должно происходить только на выходе из программы
+	// Освобождать сам массив из памяти на данном этапе не нужно,
+	// так как он заменится новыми текстурами.
+	// Его освобождение должно происходить только на выходе из программы
 	return CreateTextureSet(rend, ColourSet, WinSize, Game);
 }
 
@@ -115,7 +186,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	TTF_Font *font;
 	SDL_Surface *txt_surf;
 
-	if(!message)
+	if (!message)
 		return NULL;
 
 	Uint8 scaler = CountLines(message); // Отношение размера буквы к размеру окна
@@ -269,17 +340,17 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
 	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-		
+
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
 	/*Если размер плитки ещё слишком мал*/
 	if (Game->Field[Index].size / TILE_SIZE_COEFFICIENT < (FieldSize / Game->FieldSize))
-	{	//Отрисовка промежуточного значения. Если SDL_RenderCopy упал, возврат кода ошибки
+	{ // Отрисовка промежуточного значения. Если SDL_RenderCopy упал, возврат кода ошибки
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
 		return ERR_NO;
 	}
-		
+
 	// Отрисовка окончательного положения квадрата
 	Tile.h = FieldSize / Game->FieldSize;
 	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
@@ -289,10 +360,10 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
-	//Отрисовка конечного тайла
+	// Отрисовка конечного тайла
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
-	Game->Field[Index].mode = TILE_OLD;	//Установка флага, что теперь эта ячейка отрисована
-	Game->Field[Index].size = 0;		//Сброс параметра размера
+	Game->Field[Index].mode = TILE_OLD; // Установка флага, что теперь эта ячейка отрисована
+	Game->Field[Index].size = 0; // Сброс параметра размера
 	return ERR_NO;
 }

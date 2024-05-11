@@ -1,10 +1,69 @@
 #include "misc.h"
 
+void DoOffset(Game *Game, Params *Params)
+{
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
+	/*Умножение всех оффсетов на ширину ячейки */
+	// Цикл перебора каждой строки
+	for (Uint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Uint8 j = 0; j < Game->FieldSize; j++)
+		{ // Если данная ячейка не пустая
+			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
+				if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X ||
+					Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
+				{
+					if (Game->Field[i * Game->FieldSize + j].offset < CellWidth)
+						Game->Field[i * Game->FieldSize + j].offset *= CellWidth;
+				}
+		}
+	}
+	for (Uint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Uint8 j = 0; j < Game->FieldSize; j++)
+		{ // Если данная ячейка не пустая
+			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
+				if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X ||
+					Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
+				{
+					if (Game->Field[i * Game->FieldSize + j].offset)
+						Game->Field[i * Game->FieldSize + j].offset--;// *= CellWidth;
+				}
+		}
+	}
+}
+
 static Uint8 CheckRightMove(Game* Game)
 {
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка справа");
-	return MODE_MOVE_RIGHT;
+	//Цикл перебора каждой строки
+	for(Sint8 i = 0; i < Game->FieldSize;i++)
+	{	//Цикл перебора каждого столбца с конца
+		for(Sint8 j = Game->FieldSize - 1; j >= 0; j--)
+		{	//Если данная ячейка пустая
+			if(!Game->Field[i * Game->FieldSize + j].val/* == 0 */)
+			{
+				MoveFlag++;//Подъём флага движения
+				//Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
+				for(Sint8 offset_val = 1, j2 = j - 1; j2 >= 0; j2--)
+				{	//Если ячейка не пустая
+					if(Game->Field[i * Game->FieldSize + j2].val/* != 0 */)
+					{
+						Game->Field[i * Game->FieldSize + j2].mode = TILE_MOVE_X;
+						//Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
+						Game->Field[i * Game->FieldSize + j2].offset++;
+					}
+				}
+			}
+		}
+	}
+	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
 }
 
 static Uint8 CheckLeftMove(Game* Game)

@@ -74,9 +74,14 @@ int main(int argc, const char **args)
 		case MODE_CHECK_DOWN:
 		case MODE_CHECK_UP:
 			Params.Mode = CheckMove[Params.Mode](&Game);
+			DoOffset(&Game,&Params);
 			continue;
 			
 		case MODE_MOVE_RIGHT:
+			if((DoRightMove(rend, &Game, &Params)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			SDL_RenderPresent(rend);
+			break;
 		case MODE_MOVE_LEFT:
 		case MODE_MOVE_UP:
 		case MODE_MOVE_DOWN:
@@ -88,10 +93,10 @@ int main(int argc, const char **args)
 			{
 				// Рисование поля со старыми элементами
 				if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
-					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+					return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 
 				if ((errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex)))
-					PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+					return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 				SDL_RenderPresent(rend);
 				/*Если размер был сброшен, значит цикл отрисовки пора прервать,
 					выставив соответстветствующие флаги */
