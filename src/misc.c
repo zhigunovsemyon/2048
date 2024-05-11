@@ -155,7 +155,8 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 	if (!greet)
 		return ERR_SDL;
 
-	SDL_RenderCopy(rend, greet, NULL, &txt_size);
+	if(SDL_RenderCopy(rend, greet, NULL, &txt_size))
+		return ERR_SDL;
 	SDL_RenderPresent(rend);
 
 	while (SDL_TRUE)
@@ -180,7 +181,8 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Params *Pa
 				return ERR_SDL;
 			if (SDL_RenderClear(rend))
 				return ERR_SDL;
-			SDL_RenderCopy(rend, greet, NULL, &txt_size);
+			if(SDL_RenderCopy(rend, greet, NULL, &txt_size))
+				return ERR_SDL;
 			SDL_RenderPresent(rend);
 		}
 
@@ -364,20 +366,15 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 		return ERR_TTF; // Завершение работы, если не удалось вызвать TTF
 
 	// Создание окна
-	*win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WinSize->x, WinSize->y,
-							SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-	if (!(*win))
-	{
+	if(!(*win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WinSize->x, WinSize->y,
+							SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)))
 		return ERR_SDL;
-	}
 
 	// Создание рисовальщика
-	*rend =
-		SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | ((Flag & FLAG_VSYNC) ? SDL_RENDERER_PRESENTVSYNC : 0));
-	if (!(*rend))
-	{
+	if(!(*rend =
+		SDL_CreateRenderer(*win, -1, SDL_RENDERER_ACCELERATED | 
+					 ((Flag & FLAG_VSYNC) ? SDL_RENDERER_PRESENTVSYNC : 0))))//Флаг вкл/выкл v-sync
 		return ERR_SDL;
-	}
 
 	// Возврат кода штатной работы
 	return ERR_NO;
