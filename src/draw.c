@@ -1,5 +1,5 @@
 #include "draw.h"
-#include "defines.h"
+#include "misc.h"
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
 static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
@@ -16,6 +16,8 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
 	float CellWidth = FieldSize / Game->FieldSize;
+	float change = (ANIM_SPEED * dtCount() / 1000.0f);
+	SDL_Log("change = %f", change);
 
 	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
@@ -26,13 +28,13 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
 				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X)
 			{
-				if (SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+				if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 				{
-					Flag++;
-					Game->Field[i * Game->FieldSize + j].offset -= 1;
-
 					if (DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j))
 						return ERR_SDL;
+
+					Flag++;
+					Game->Field[i * Game->FieldSize + j].offset -= change;
 				}
 				else
 				{
@@ -64,6 +66,8 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
 
 	float CellWidth = FieldSize / Game->FieldSize;
+	float change = (ANIM_SPEED * dtCount() / 1000.0f);
+	SDL_Log("change = %f", change);
 
 	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
@@ -74,13 +78,13 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
 				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X)
 			{
-				if (SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+				if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 				{
-					Flag++;
-					Game->Field[i * Game->FieldSize + j].offset += 1;
-
 					if (DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j))
 						return ERR_SDL;
+
+					Flag++;
+					Game->Field[i * Game->FieldSize + j].offset += change;
 				}
 				else
 				{
@@ -400,7 +404,7 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	SDL_Texture *tile_texture = GetTextureForTile(Game->Field[Index].val, Params->textures);
 
 	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер плитки*/
-	Tile.w = (int)(Game->Field[Index].size += ANIM_SPEED * dtCount() / 1000.0f);
+	Tile.w = (int)(Game->Field[Index].size += (ANIM_SPEED * dtCount() / 1000.0f));
 
 	// Размер одной ячейки хранится в h
 	Tile.h = FieldSize / Game->FieldSize;
