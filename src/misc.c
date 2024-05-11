@@ -49,23 +49,26 @@ static Uint8 CheckRightMove(Game* Game)
 		{	//Если данная ячейка пустая
 			if(!Game->Field[i * Game->FieldSize + j].val/* == 0 */)
 			{
-				MoveFlag++;//Подъём флага движения
 				//Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
-				for(Sint8 offset_val = 1, j2 = j - 1; j2 >= 0; j2--)
+				Uint8 NonEmptyLine = 0;
+				for(Sint8 j2 = j - 1; j2 >= 0; j2--)
 				{	//Если ячейка не пустая
 					if(Game->Field[i * Game->FieldSize + j2].val/* != 0 */)
 					{
+						NonEmptyLine++;
 						Game->Field[i * Game->FieldSize + j2].mode = TILE_MOVE_X;
 						//Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
-						Game->Field[i * Game->FieldSize + j2].offset++;
+						Game->Field[i * Game->FieldSize + j2].offset = 1;
 					}
 				}
+				if(NonEmptyLine)
+					MoveFlag++;//Подъём флага движения
 			}
 		}
 	}
 	//!!! вернуть MODE_WAIT потом !!!
-	// return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
-	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_ADD;
+	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
+	// return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_ADD;
 }
 
 static Uint8 CheckLeftMove(Game* Game)

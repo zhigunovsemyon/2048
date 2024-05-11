@@ -1,5 +1,4 @@
 #include "draw.h"
-#include "defines.h"
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
 static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
@@ -63,7 +62,7 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				/*Если при целочисленном делении оффсета на размер ячейки, ответ равен нулю, значит
 				 * тайл сдвинулся на целый блок, */
 				float shift = SDL_fmodf(SDL_roundf(Game->Field[i * Game->FieldSize + j].offset), CellWidth);
-				if (shift == 0)
+				if (shift <= 0)
 				{
 					// Flag--;//Сброс флага движения
 					//Копирование текущего элемента в следующий
@@ -98,7 +97,7 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 			}
 		}
 	}
-	Params->Mode = (Flag) ? MODE_MOVE_RIGHT : MODE_ADD;
+	Params->Mode = (Flag) ? MODE_MOVE_RIGHT : MODE_CHECK_RIGHT;
 	return ERR_NO;
 }
 SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture, SDL_Colour *ColourSet, SDL_Rect *Tile,
