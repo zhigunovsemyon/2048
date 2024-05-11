@@ -223,7 +223,7 @@ SDL_Texture *GetTextureForTile(Uint64 TileValue, SDL_Texture **textures)
 {
 	switch (TileValue)
 	{
-	case 0: // ноль не должен быть значением рисуемой клетки
+  case 0://Ноль не может быть действительным значением тайла
 		return NULL;
 	case 2:
 		return textures[TEX_SQ2];
