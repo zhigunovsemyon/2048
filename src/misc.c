@@ -23,19 +23,6 @@ void DoOffset(Game *Game, Params *Params)
 				}
 		}
 	}
-	// for (Uint8 i = 0; i < Game->FieldSize; i++)
-	// { // Цикл перебора каждого столбца с конца
-	// 	for (Uint8 j = 0; j < Game->FieldSize; j++)
-	// 	{ // Если данная ячейка не пустая
-	// 		if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
-	// 			if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X ||
-	// 				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
-	// 			{
-	// 				if (Game->Field[i * Game->FieldSize + j].offset)
-	// 					Game->Field[i * Game->FieldSize + j].offset--;// *= CellWidth;
-	// 			}
-	// 	}
-	// }
 }
 
 static Uint8 CheckRightMove(Game* Game)
@@ -66,16 +53,38 @@ static Uint8 CheckRightMove(Game* Game)
 			}
 		}
 	}
-	//!!! вернуть MODE_WAIT потом !!!
 	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
-	// return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_ADD;
 }
 
 static Uint8 CheckLeftMove(Game* Game)
 {
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка слева");
-	return MODE_MOVE_LEFT;
+	//Цикл перебора каждой строки
+	for(Sint8 i = 0; i < Game->FieldSize;i++)
+	{	//Цикл перебора каждого столбца с конца
+		for(Sint8 j = 0; j < Game->FieldSize; j++)
+		{	//Если данная ячейка пустая
+			if(!Game->Field[i * Game->FieldSize + j].val/* == 0 */)
+			{
+				//Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
+				Uint8 NonEmptyLine = 0;
+				for(Sint8 j2 = j + 1; j2 < Game->FieldSize; j2++)
+				{	//Если ячейка не пустая
+					if(Game->Field[i * Game->FieldSize + j2].val/* != 0 */)
+					{
+						NonEmptyLine++;
+						Game->Field[i * Game->FieldSize + j2].mode = TILE_MOVE_X;
+						//Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
+						Game->Field[i * Game->FieldSize + j2].offset = -1;
+					}
+				}
+				if(NonEmptyLine)
+					MoveFlag++;//Подъём флага движения
+			}
+		}
+	}
+	return (MoveFlag) ? MODE_MOVE_LEFT : MODE_WAIT;
 }
 
 static Uint8 CheckUpMove(Game* Game)

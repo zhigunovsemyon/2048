@@ -2,6 +2,7 @@
 #define DRAW_H
 #include "main.h"
 
+Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params);
 Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params);
 
 /*Отрисовка статичных элементов из Game и фона рисовальщиком rend, 

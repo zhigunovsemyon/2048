@@ -83,6 +83,10 @@ int main(int argc, const char **args)
 			SDL_RenderPresent(rend);
 			break;
 		case MODE_MOVE_LEFT:
+			if((DoLeftMove(rend, &Game, &Params)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			SDL_RenderPresent(rend);
+			break;
 		case MODE_MOVE_UP:
 		case MODE_MOVE_DOWN:
 			Params.Mode = MODE_ADD;

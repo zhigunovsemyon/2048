@@ -1,4 +1,5 @@
 #include "draw.h"
+#include "defines.h"
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
 static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
@@ -33,11 +34,12 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 					if (DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j))
 						return ERR_SDL;
 				}
-				else 
+				else
 				{
 					// Копирование текущего элемента в следующий
 					Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
 					Game->Field[i * Game->FieldSize + j + 1].mode = TILE_OLD;
+					Game->Field[i * Game->FieldSize + j + 1].offset = 0;
 
 					// Зануление прошлого элемента
 					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
@@ -48,6 +50,54 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		}
 	}
 	Params->Mode = (Flag) ? MODE_MOVE_RIGHT : MODE_CHECK_RIGHT;
+	return ERR_NO;
+}
+
+Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
+{
+	if (DrawOldElements(rend, Params, Game))
+		return ERR_SDL;
+
+	Uint8 Flag = 0;
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
+	/*Умножение всех оффсетов на ширину ячейки */
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Sint8 j = 0; j < Game->FieldSize; j++)
+		{ // Если данная ячейка не пустая, и она движется по горизонтали
+			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
+				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X)
+			{
+				if (SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+				{
+					Flag++;
+					Game->Field[i * Game->FieldSize + j].offset += 1;
+
+					if (DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j))
+						return ERR_SDL;
+				}
+				else
+				{
+					// Копирование текущего элемента в следующий
+					Game->Field[i * Game->FieldSize + j - 1] = Game->Field[i * Game->FieldSize + j];
+					Game->Field[i * Game->FieldSize + j - 1].mode = TILE_OLD;
+					Game->Field[i * Game->FieldSize + j - 1].offset = 0;
+
+					// Зануление прошлого элемента
+					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0, sizeof(Tile));
+					if (DrawSingleMovingElement(rend, Params, Game, i * Game->FieldSize + j - 1))
+						return ERR_SDL;
+				}
+			}
+		}
+	}
+	Params->Mode = (Flag) ? MODE_MOVE_LEFT : MODE_CHECK_LEFT;
 	return ERR_NO;
 }
 
@@ -72,9 +122,19 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game, Si
 
 	// Сдвиг на оффсет
 	if (Game->Field[Index].mode == TILE_MOVE_X)
-		Tile.x += Tile.h - (int)Game->Field[Index].offset;
+	{
+		if (Game->Field[Index].offset > 0)
+			Tile.x += Tile.h - (int)Game->Field[Index].offset;
+		else
+			Tile.x -= Tile.h + (int)Game->Field[Index].offset;
+	}
 	if (Game->Field[Index].mode == TILE_MOVE_Y)
-		Tile.y += Tile.h - (int)Game->Field[Index].offset;
+	{
+		if (Game->Field[Index].offset > 0)
+			Tile.y += Tile.h - (int)Game->Field[Index].offset;
+		else
+			Tile.y -= Tile.h + (int)Game->Field[Index].offset;
+	}
 
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
