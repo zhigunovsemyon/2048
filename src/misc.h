@@ -11,6 +11,10 @@ enum SetFlags
 	VSYNC_UNSET = 0x10
 };
 
+/*Создаёт оффсет всем тайлам, которым он был проставлен в единицах
+ * проверяльщиком на движение*/
+void DoOffset(Game *Game, Params *Params);
+
 //Считает число переносов строки 
 Uint8 CountLines(const char *source);
 

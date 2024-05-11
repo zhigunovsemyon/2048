@@ -2,6 +2,9 @@
 #define DRAW_H
 #include "main.h"
 
+Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params);
+Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params);
+
 /*Отрисовка статичных элементов из Game и фона рисовальщиком rend, 
 с учётом параметров Params. Возврат кода ошибки ERR_SDL либо 0*/
 Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game);
