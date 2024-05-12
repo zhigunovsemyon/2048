@@ -181,9 +181,9 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 	
-	// Цикл перебора каждой строки
-	for (Sint8 i = 0; i < Game->FieldSize; i++)
-	{ // Цикл перебора каждого столбца с конца
+	// Цикл перебора каждого столбца
+	for (Sint8 i = Game->FieldSize - 1; i >= 0; i--)
+	{ // Цикл перебора каждой строки
 		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
 		{ // Если данная ячейка не пустая, и она движется по горизонтали
 			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
