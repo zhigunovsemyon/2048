@@ -1,5 +1,6 @@
 #include "draw.h"
 #include "defines.h"
+#include "main.h"
 #include "misc.h"
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
@@ -53,11 +54,22 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_RIGHT; 
+		Params->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 	}
-	Params->Mode = (MODE_MOVE_RIGHT == CheckRightMove(Game, Params)) ? MODE_MOVE_RIGHT : MODE_ADD;
-	return ERR_NO;
+	// Params->Mode = (MODE_MOVE_RIGHT == CheckRightMove(Game, Params)) ? MODE_MOVE_RIGHT : MODE_ADD;
+	switch (CheckRightMove(Game, Params))
+	{
+	case MODE_MOVE_RIGHT:
+		Params->Mode = MODE_MOVE_RIGHT;
+		return ERR_NO;
+	case MODE_QUIT:
+		Params->Mode = MODE_QUIT;
+		return ERR_NO;
+	default:
+		Params->Mode = MODE_ADD;
+		return ERR_NO;
+	}
 }
 
 Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
@@ -107,11 +119,22 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_LEFT; 
+		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
-	Params->Mode = (MODE_MOVE_LEFT == CheckLeftMove(Game, Params)) ? MODE_MOVE_LEFT : MODE_ADD;
-	return ERR_NO;
+	// Params->Mode = (MODE_MOVE_LEFT == CheckLeftMove(Game, Params)) ? MODE_MOVE_LEFT : MODE_ADD;
+	switch (CheckLeftMove(Game, Params))
+	{
+	case MODE_MOVE_LEFT:
+		Params->Mode = MODE_MOVE_LEFT;
+		return ERR_NO;
+	case MODE_QUIT:
+		Params->Mode = MODE_QUIT;
+		return ERR_NO;
+	default:
+		Params->Mode = MODE_ADD;
+		return ERR_NO;
+	}
 }
 
 Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
@@ -161,10 +184,22 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_UP; 
+		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
-	Params->Mode = (MODE_MOVE_UP == CheckUpMove(Game, Params)) ? MODE_MOVE_UP : MODE_ADD;
+	// Params->Mode = (MODE_MOVE_UP == CheckUpMove(Game, Params)) ? MODE_MOVE_UP : MODE_ADD;
+	switch (CheckUpMove(Game, Params))
+	{
+	case MODE_MOVE_UP:
+		Params->Mode = MODE_MOVE_UP;
+		return ERR_NO;
+	case MODE_QUIT:
+		Params->Mode = MODE_QUIT;
+		return ERR_NO;
+	default:
+		Params->Mode = MODE_ADD;
+		return ERR_NO;
+	}
 	return ERR_NO;
 }
 
@@ -180,7 +215,7 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
-	
+
 	// Цикл перебора каждого столбца
 	for (Sint8 i = Game->FieldSize - 1; i >= 0; i--)
 	{ // Цикл перебора каждой строки
@@ -214,11 +249,21 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_DOWN; 
+		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
-	Params->Mode = (MODE_MOVE_DOWN == CheckDownMove(Game, Params)) ? MODE_MOVE_DOWN : MODE_ADD;
-	return ERR_NO;
+	switch (CheckDownMove(Game, Params))
+	{
+	case MODE_MOVE_DOWN:
+		Params->Mode = MODE_MOVE_DOWN;
+		return ERR_NO;
+	case MODE_QUIT:
+		Params->Mode = MODE_QUIT;
+		return ERR_NO;
+	default:
+		Params->Mode = MODE_ADD;
+		return ERR_NO;
+	}
 }
 
 Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
@@ -343,7 +388,7 @@ SDL_Texture *GetTextureForTile(Uint64 TileValue, SDL_Texture **textures)
 {
 	switch (TileValue)
 	{
-  case 0://Ноль не может быть действительным значением тайла
+	case 0: // Ноль не может быть действительным значением тайла
 		return NULL;
 	case 2:
 		return textures[TEX_SQ2];
@@ -560,7 +605,7 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	return ERR_NO;
 }
 
-static Uint8 (*int_DoMove[])(SDL_Renderer*, Game *, Params *) = {DoRightMove, DoLeftMove, DoDownMove, DoUpMove};
+static Uint8 (*int_DoMove[])(SDL_Renderer *, Game *, Params *) = {DoRightMove, DoLeftMove, DoDownMove, DoUpMove};
 /*Набор функций отрисовки сдвигов тайлов поля Game.
 используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
-Uint8 (**DoMove)(SDL_Renderer*, Game *, Params *) = int_DoMove - MODE_MOVE_RIGHT;
+Uint8 (**DoMove)(SDL_Renderer *, Game *, Params *) = int_DoMove - MODE_MOVE_RIGHT;

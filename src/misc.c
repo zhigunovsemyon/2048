@@ -8,7 +8,7 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0;
+	Uint8 QuitFlag = 1, MoveFlag = 0;
 	SDL_Log("Проверка справа");
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
@@ -17,6 +17,7 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{
+				QuitFlag = 0;
 				// Всем предшествующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
 				for (Sint8 j2 = j - 1; j2 >= 0; j2--)
@@ -34,7 +35,7 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_RIGHT : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 Uint8 CheckLeftMove(Game *Game, Params *Params)
@@ -45,7 +46,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0;
+	Uint8 MoveFlag = 0, QuitFlag = 1;
 	SDL_Log("Проверка слева");
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
@@ -55,6 +56,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{	// Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
+				QuitFlag = 0;
 				for (Sint8 j2 = j + 1; j2 < Game->FieldSize; j2++)
 				{ // Если ячейка не пустая
 					if (Game->Field[i * Game->FieldSize + j2].val /* != 0 */)
@@ -70,7 +72,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_LEFT : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_LEFT : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 Uint8 CheckUpMove(Game *Game, Params *Params)
@@ -81,7 +83,7 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0;
+	Uint8 MoveFlag = 0, QuitFlag = 1;
 	SDL_Log("Проверка сверху");
 	//Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
@@ -91,6 +93,7 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{	// Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
+				QuitFlag = 0;
 				for (Sint8 i2 = i + 1; i2 < Game->FieldSize; i2++)
 				{ // Если ячейка не пустая
 					if (Game->Field[i2 * Game->FieldSize + j].val /* != 0 */)
@@ -106,7 +109,7 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_UP : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_UP : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 Uint8 CheckDownMove(Game *Game, Params *Params)
@@ -117,6 +120,7 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
+	Uint8 QuitFlag = 1;
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка снизу");
 	//Цикл перебора каждого столбца
@@ -127,6 +131,7 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{	// Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
+				QuitFlag = 0;
 				for (Sint8 i2 = i - 1; i2 >= 0; i2--)
 				{ // Если ячейка не пустая
 					if (Game->Field[i2 * Game->FieldSize + j].val /* != 0 */)
@@ -142,7 +147,7 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_DOWN : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_DOWN : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
