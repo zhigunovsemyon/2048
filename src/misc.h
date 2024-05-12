@@ -10,10 +10,10 @@ enum SetFlags
 	SIZE_UNSET	= 8,
 	VSYNC_UNSET = 0x10
 };
-
-/*Создаёт оффсет всем тайлам, которым он был проставлен в единицах
- * проверяльщиком на движение*/
-void DoOffset(Game *Game, Params *Params);
+Uint8 CheckRightMove(Game *Game, Params *Params);
+Uint8 CheckLeftMove(Game *Game, Params *Params);
+Uint8 CheckUpMove(Game *Game, Params *Params);
+Uint8 CheckDownMove(Game *Game, Params *Params);
 
 //Считает число переносов строки 
 Uint8 CountLines(const char *source);

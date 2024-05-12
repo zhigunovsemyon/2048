@@ -73,8 +73,7 @@ int main(int argc, const char **args)
 		case MODE_CHECK_LEFT:
 		case MODE_CHECK_DOWN:
 		case MODE_CHECK_UP:
-			Params.Mode = CheckMove[Params.Mode](&Game);
-			DoOffset(&Game,&Params);
+			Params.Mode = CheckMove[Params.Mode](&Game, &Params);
 			dtCount();
 			continue;
 			

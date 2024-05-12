@@ -50,7 +50,7 @@ Params;
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
-extern Uint8(**CheckMove)(Game*);
+extern Uint8(**CheckMove)(Game*, Params*);
 
 /*Набор функций отрисовки сдвигов тайлов поля Game.
 используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/

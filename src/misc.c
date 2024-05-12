@@ -1,6 +1,6 @@
 #include "misc.h"
 
-void DoOffset(Game *Game, Params *Params)
+Uint8 CheckRightMove(Game *Game, Params *Params)
 {
 	// Размер поля
 	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
@@ -8,25 +8,6 @@ void DoOffset(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	/*Умножение всех оффсетов на ширину ячейки */
-	// Цикл перебора каждой строки
-	for (Uint8 i = 0; i < Game->FieldSize; i++)
-	{ // Цикл перебора каждого столбца
-		for (Uint8 j = 0; j < Game->FieldSize; j++)
-		{ // Если данная ячейка не пустая, и у неё стоит флаг движения
-			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */)
-				if (Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X ||
-					Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
-				{
-					if (Game->Field[i * Game->FieldSize + j].offset < CellWidth)
-						Game->Field[i * Game->FieldSize + j].offset *= CellWidth;
-				}
-		}
-	}
-}
-
-static Uint8 CheckRightMove(Game *Game)
-{
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка справа");
 	// Цикл перебора каждой строки
@@ -45,7 +26,7 @@ static Uint8 CheckRightMove(Game *Game)
 						NonEmptyLine++;
 						Game->Field[i * Game->FieldSize + j2].mode = TILE_MOVE_X;
 						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
-						Game->Field[i * Game->FieldSize + j2].offset = +1;
+						Game->Field[i * Game->FieldSize + j2].offset = CellWidth;
 					}
 				}
 				if (NonEmptyLine)
@@ -56,8 +37,14 @@ static Uint8 CheckRightMove(Game *Game)
 	return (MoveFlag) ? MODE_MOVE_RIGHT : MODE_WAIT;
 }
 
-static Uint8 CheckLeftMove(Game *Game)
+Uint8 CheckLeftMove(Game *Game, Params *Params)
 {
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка слева");
 	// Цикл перебора каждой строки
@@ -75,7 +62,7 @@ static Uint8 CheckLeftMove(Game *Game)
 						NonEmptyLine++;
 						Game->Field[i * Game->FieldSize + j2].mode = TILE_MOVE_X;
 						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
-						Game->Field[i * Game->FieldSize + j2].offset = -1;
+						Game->Field[i * Game->FieldSize + j2].offset = -1 * CellWidth;
 					}
 				}
 				if (NonEmptyLine)
@@ -86,8 +73,14 @@ static Uint8 CheckLeftMove(Game *Game)
 	return (MoveFlag) ? MODE_MOVE_LEFT : MODE_WAIT;
 }
 
-static Uint8 CheckUpMove(Game *Game)
+Uint8 CheckUpMove(Game *Game, Params *Params)
 {
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка сверху");
 	//Цикл перебора каждого столбца
@@ -105,7 +98,7 @@ static Uint8 CheckUpMove(Game *Game)
 						NonEmptyLine++;
 						Game->Field[i2 * Game->FieldSize + j].mode = TILE_MOVE_Y;
 						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
-						Game->Field[i2 * Game->FieldSize + j].offset = -1;
+						Game->Field[i2 * Game->FieldSize + j].offset = -1 * CellWidth;
 					}
 				}
 				if (NonEmptyLine)
@@ -116,8 +109,14 @@ static Uint8 CheckUpMove(Game *Game)
 	return (MoveFlag) ? MODE_MOVE_UP : MODE_WAIT;
 }
 
-static Uint8 CheckDownMove(Game *Game)
+Uint8 CheckDownMove(Game *Game, Params *Params)
 {
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
 	Uint8 MoveFlag = 0;
 	SDL_Log("Проверка снизу");
 	//Цикл перебора каждого столбца
@@ -135,7 +134,7 @@ static Uint8 CheckDownMove(Game *Game)
 						NonEmptyLine++;
 						Game->Field[i2 * Game->FieldSize + j].mode = TILE_MOVE_Y;
 						// Оффсет выставляется в единицах. При отрисовке он будет умножен на размер ячейки
-						Game->Field[i2 * Game->FieldSize + j].offset = +1;
+						Game->Field[i2 * Game->FieldSize + j].offset = CellWidth;
 					}
 				}
 				if (NonEmptyLine)
@@ -632,8 +631,8 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev, Uint16 win_
 	return SDL_TRUE;
 }
 
-static Uint8 (*int_CheckMove[])(Game *) = {CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
+static Uint8 (*int_CheckMove[])(Game *, Params*) = {CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
-Uint8 (**CheckMove)(Game *) = int_CheckMove - MODE_CHECK_RIGHT;
+Uint8 (**CheckMove)(Game *, Params *) = int_CheckMove - MODE_CHECK_RIGHT;

@@ -1,4 +1,5 @@
 #include "draw.h"
+#include "defines.h"
 #include "misc.h"
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
@@ -50,7 +51,12 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 			}
 		}
 	}
-	Params->Mode = (Flag) ? MODE_MOVE_RIGHT : MODE_CHECK_RIGHT;
+	if (Flag)
+	{
+		Params->Mode = MODE_MOVE_RIGHT; 
+		return ERR_NO;
+	}
+	Params->Mode = (MODE_MOVE_RIGHT == CheckRightMove(Game, Params)) ? MODE_MOVE_RIGHT : MODE_ADD;
 	return ERR_NO;
 }
 
@@ -99,7 +105,12 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 			}
 		}
 	}
-	Params->Mode = (Flag) ? MODE_MOVE_LEFT : MODE_CHECK_LEFT;
+	if (Flag)
+	{
+		Params->Mode = MODE_MOVE_LEFT; 
+		return ERR_NO;
+	}
+	Params->Mode = (MODE_MOVE_LEFT == CheckLeftMove(Game, Params)) ? MODE_MOVE_LEFT : MODE_ADD;
 	return ERR_NO;
 }
 
@@ -148,7 +159,12 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 			}
 		}
 	}
-	Params->Mode = (Flag) ? MODE_MOVE_UP : MODE_CHECK_UP;
+	if (Flag)
+	{
+		Params->Mode = MODE_MOVE_UP; 
+		return ERR_NO;
+	}
+	Params->Mode = (MODE_MOVE_UP == CheckUpMove(Game, Params)) ? MODE_MOVE_UP : MODE_ADD;
 	return ERR_NO;
 }
 
@@ -196,7 +212,12 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 			}
 		}
 	}
-	Params->Mode = (Flag) ? MODE_MOVE_DOWN : MODE_CHECK_DOWN;
+	if (Flag)
+	{
+		Params->Mode = MODE_MOVE_DOWN; 
+		return ERR_NO;
+	}
+	Params->Mode = (MODE_MOVE_DOWN == CheckDownMove(Game, Params)) ? MODE_MOVE_DOWN : MODE_ADD;
 	return ERR_NO;
 }
 
