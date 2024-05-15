@@ -1,4 +1,5 @@
 #include "draw.h"
+#include "defines.h"
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
@@ -38,12 +39,16 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				else//Если элемент сдвинулся на целую ячейку
 				{
 					if(Game->Field[i * Game->FieldSize + j + 1].mode != TILE_COMBINED)
+					{
 						// Копирование текущего элемента в следующий
 						Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
+						Game->Field[i * Game->FieldSize + j + 1].mode = TILE_OLD;
+					}
 					else
+					{
+						Game->Field[i * Game->FieldSize + j + 1].mode = TILE_JUSTCOMBINED;
 						Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
-					
-					Game->Field[i * Game->FieldSize + j + 1].mode = TILE_OLD;
+					}
 					Game->Field[i * Game->FieldSize + j + 1].offset = 0;
 
 					// Зануление прошлого элемента
@@ -113,12 +118,17 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				else
 				{
 					if(Game->Field[i * Game->FieldSize + j - 1].mode != TILE_COMBINED)
+					{
 						// Копирование текущего элемента в следующий
 						Game->Field[i * Game->FieldSize + j - 1] = Game->Field[i * Game->FieldSize + j];
+						Game->Field[i * Game->FieldSize + j - 1].mode = TILE_OLD;
+					}
 					else
+					{
+						Game->Field[i * Game->FieldSize + j - 1].mode = TILE_JUSTCOMBINED;
 						Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
+					}
 					// Копирование текущего элемента в следующий
-					Game->Field[i * Game->FieldSize + j - 1].mode = TILE_OLD;
 					Game->Field[i * Game->FieldSize + j - 1].offset = 0;
 
 					// Зануление прошлого элемента
@@ -188,12 +198,17 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				else
 				{
 					if(Game->Field[(i - 1) * Game->FieldSize + j].mode != TILE_COMBINED)
+					{
 						// Копирование текущего элемента в следующий
 						Game->Field[(i - 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
+						Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_OLD;
+					}
 					else
+					{
+						Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_JUSTCOMBINED;
 						Game->Field[(i - 1) * Game->FieldSize + j].val <<= 1;
+					}
 
-					Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_OLD;
 					Game->Field[(i - 1) * Game->FieldSize + j].offset = 0;
 
 					// Зануление прошлого элемента
@@ -262,12 +277,17 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				else
 				{
 					if(Game->Field[(i + 1) * Game->FieldSize + j].mode != TILE_COMBINED)
+					{
 						// Копирование текущего элемента в следующий
 						Game->Field[(i + 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
+						Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_OLD;
+					}
 					else
+					{
+						Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_JUSTCOMBINED;
 						Game->Field[(i + 1) * Game->FieldSize + j].val <<= 1;
+					}
 					// Копирование текущего элемента в следующий
-					Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_OLD;
 					Game->Field[(i + 1) * Game->FieldSize + j].offset = 0;
 
 					// Зануление прошлого элемента
@@ -580,7 +600,9 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
 	{
-		if (!(Game->Field[i].mode == TILE_OLD || Game->Field[i].mode == TILE_COMBINED))
+		if (!(Game->Field[i].mode == TILE_OLD || 
+			Game->Field[i].mode == TILE_COMBINED ||
+			Game->Field[i].mode == TILE_JUSTCOMBINED))
 			continue;
 		// Положение угла поля в координатах +
 		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки

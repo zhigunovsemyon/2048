@@ -62,6 +62,7 @@ int main(int argc, const char **args)
 			continue;
 
 		case MODE_ADD:
+			ChangeCombinedToOld(&Game);
 			NewElementIndex = AddElement(&Game);
 			Game.Field[NewElementIndex].size = 0;
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.

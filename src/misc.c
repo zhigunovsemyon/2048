@@ -1,5 +1,16 @@
 #include "misc.h"
 
+void ChangeCombinedToOld(Game *Game)
+{
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
+			if(Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED)
+				Game->Field[i * Game->FieldSize + j].mode = TILE_OLD;
+	}
+}
+
 Uint8 CheckRightCombo(Game *Game, Params *Params)
 {
 	// Размер поля
@@ -18,8 +29,9 @@ Uint8 CheckRightCombo(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
 			//Если же соседние элементы равны, но не равны нулю
-			else if (Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[i * Game->FieldSize + j - 1].val )
+			else if (Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
+					(Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j - 1].val))
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[i * Game->FieldSize + j - 1].mode = TILE_MOVE_X;
@@ -50,8 +62,9 @@ Uint8 CheckLeftCombo(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
 			//Если же соседние элементы равны, но не равны нулю
-			else if (Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[i * Game->FieldSize + j + 1].val )
+			else if ((Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
+					Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j + 1].val ))
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[i * Game->FieldSize + j + 1].mode = TILE_MOVE_X;
@@ -81,8 +94,9 @@ Uint8 CheckDownCombo(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
 			//Если же соседние элементы равны, но не равны нулю
-			else if (Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[(i - 1) * Game->FieldSize + j].val )
+			else if ((Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
+					Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i - 1) * Game->FieldSize + j].val ))
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;
@@ -112,8 +126,9 @@ Uint8 CheckUpCombo(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
 			//Если же соседние элементы равны, но не равны нулю
-			else if (Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[(i + 1) * Game->FieldSize + j].val )
+			else if ((Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
+					Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i + 1) * Game->FieldSize + j].val))
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;

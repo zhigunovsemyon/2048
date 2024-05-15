@@ -20,6 +20,8 @@ Uint8 CheckLeftCombo(Game *Game, Params *Params);
 Uint8 CheckUpCombo(Game *Game, Params *Params);
 Uint8 CheckDownCombo(Game *Game, Params *Params);
 
+void ChangeCombinedToOld(Game *Game);
+
 //Считает число переносов строки 
 Uint8 CountLines(const char *source);
 
