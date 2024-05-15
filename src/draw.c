@@ -1,4 +1,5 @@
 #include "draw.h"
+
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
 static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
@@ -111,8 +112,12 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				}
 				else
 				{
+					if(Game->Field[i * Game->FieldSize + j - 1].mode != TILE_COMBINED)
+						// Копирование текущего элемента в следующий
+						Game->Field[i * Game->FieldSize + j - 1] = Game->Field[i * Game->FieldSize + j];
+					else
+						Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
 					// Копирование текущего элемента в следующий
-					Game->Field[i * Game->FieldSize + j - 1] = Game->Field[i * Game->FieldSize + j];
 					Game->Field[i * Game->FieldSize + j - 1].mode = TILE_OLD;
 					Game->Field[i * Game->FieldSize + j - 1].offset = 0;
 
@@ -129,21 +134,25 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
-	/* Если CheckMove вернул флаг возможности движения, он записывается в глобальный параметр режима
+	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	 * он записывается в глобальный параметр режима
 		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
 		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
-	switch (CheckLeftMove(Game, Params))
+	if (CheckLeftMove(Game, Params) == MODE_MOVE_LEFT)
 	{
-	case MODE_MOVE_LEFT:
 		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
-	case MODE_QUIT:
-		Params->Mode = MODE_QUIT;
-		return ERR_NO;
-	default:
-		Params->Mode = MODE_ADD;
+	}
+
+	//Если возможно сложение вправо
+	if (CheckLeftCombo(Game, Params))
+	{
+		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
+	//Если же нет, осуществляется проверка на добавление нового элемента
+	Params->Mode = MODE_ADD;
+	return ERR_NO;
 }
 
 Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
@@ -178,8 +187,12 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				}
 				else
 				{
-					// Копирование текущего элемента в следующий
-					Game->Field[(i - 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
+					if(Game->Field[(i - 1) * Game->FieldSize + j].mode != TILE_COMBINED)
+						// Копирование текущего элемента в следующий
+						Game->Field[(i - 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
+					else
+						Game->Field[(i - 1) * Game->FieldSize + j].val <<= 1;
+
 					Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_OLD;
 					Game->Field[(i - 1) * Game->FieldSize + j].offset = 0;
 
@@ -196,21 +209,24 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
-	/* Если CheckMove вернул флаг возможности движения, он записывается в глобальный параметр режима
+	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	 * он записывается в глобальный параметр режима
 		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
 		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
-	switch (CheckUpMove(Game, Params))
+	if (CheckUpMove(Game, Params) == MODE_MOVE_UP)
 	{
-	case MODE_MOVE_UP:
 		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
-	case MODE_QUIT:
-		Params->Mode = MODE_QUIT;
-		return ERR_NO;
-	default:
-		Params->Mode = MODE_ADD;
+	}
+
+	//Если возможно сложение вправо
+	if (CheckUpCombo(Game, Params))
+	{
+		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
+	//Если же нет, осуществляется проверка на добавление нового элемента
+	Params->Mode = MODE_ADD;
 	return ERR_NO;
 }
 
@@ -245,8 +261,12 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				}
 				else
 				{
+					if(Game->Field[(i + 1) * Game->FieldSize + j].mode != TILE_COMBINED)
+						// Копирование текущего элемента в следующий
+						Game->Field[(i + 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
+					else
+						Game->Field[(i + 1) * Game->FieldSize + j].val <<= 1;
 					// Копирование текущего элемента в следующий
-					Game->Field[(i + 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
 					Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_OLD;
 					Game->Field[(i + 1) * Game->FieldSize + j].offset = 0;
 
@@ -263,21 +283,25 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
-	/* Если CheckMove вернул флаг возможности движения, он записывается в глобальный параметр режима
+	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	 * он записывается в глобальный параметр режима
 		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
 		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
-	switch (CheckDownMove(Game, Params))
+	if (CheckDownMove(Game, Params) == MODE_MOVE_DOWN)
 	{
-	case MODE_MOVE_DOWN:
 		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
-	case MODE_QUIT:
-		Params->Mode = MODE_QUIT;
-		return ERR_NO;
-	default:
-		Params->Mode = MODE_ADD;
+	}
+
+	//Если возможно сложение вправо
+	if (CheckDownCombo(Game, Params))
+	{
+		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
+	//Если же нет, осуществляется проверка на добавление нового элемента
+	Params->Mode = MODE_ADD;
+	return ERR_NO;
 }
 
 Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
@@ -556,7 +580,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
 	{
-		if (Game->Field[i].mode != TILE_OLD && Game->Field[i].mode != TILE_COMBINED)
+		if (!(Game->Field[i].mode == TILE_OLD || Game->Field[i].mode == TILE_COMBINED))
 			continue;
 		// Положение угла поля в координатах +
 		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки

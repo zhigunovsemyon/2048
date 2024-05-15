@@ -74,12 +74,19 @@ int main(int argc, const char **args)
 		case MODE_CHECK_LEFT:
 		case MODE_CHECK_DOWN:
 		case MODE_CHECK_UP:
-			Params.Mode = CheckMove[Params.Mode](&Game, &Params);
+		{
+			Uint8 tmpMode = CheckMove[Params.Mode](&Game, &Params);
 			dtCount();
-			if(Params.Mode == MODE_WAIT)
-				Params.Mode = (CheckRightCombo(&Game, &Params)) ?
-					MODE_MOVE_RIGHT : MODE_WAIT;
-			continue;
+			if(tmpMode == MODE_WAIT)
+			{
+				Params.Mode = (CheckCombo[Params.Mode](&Game, &Params)) ?
+					Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT) : MODE_WAIT;
+					// MODE_MOVE_RIGHT : MODE_WAIT;
+			}
+			else
+				Params.Mode = tmpMode;
+			break;
+		}
 			
 		case MODE_MOVE_RIGHT:
 		case MODE_MOVE_LEFT:

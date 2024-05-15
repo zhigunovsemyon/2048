@@ -14,7 +14,11 @@ Uint8 CheckRightMove(Game *Game, Params *Params);
 Uint8 CheckLeftMove(Game *Game, Params *Params);
 Uint8 CheckUpMove(Game *Game, Params *Params);
 Uint8 CheckDownMove(Game *Game, Params *Params);
+
 Uint8 CheckRightCombo(Game *Game, Params *Params);
+Uint8 CheckLeftCombo(Game *Game, Params *Params);
+Uint8 CheckUpCombo(Game *Game, Params *Params);
+Uint8 CheckDownCombo(Game *Game, Params *Params);
 
 //Считает число переносов строки 
 Uint8 CountLines(const char *source);

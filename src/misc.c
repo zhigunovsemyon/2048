@@ -30,9 +30,101 @@ Uint8 CheckRightCombo(Game *Game, Params *Params)
 		}
 	}
 	return MoveFlag;
-
 }
 
+Uint8 CheckLeftCombo(Game *Game, Params *Params)
+{
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
+	Uint8 MoveFlag = 0;
+
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с начала
+		for (Sint8 j = 0; j < Game->FieldSize - 1; j++)
+		{ // Если данная ячейка пустая, можно пропускать
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			//Если же соседние элементы равны, но не равны нулю
+			else if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j + 1].val )
+			{
+				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+				Game->Field[i * Game->FieldSize + j + 1].mode = TILE_MOVE_X;
+				Game->Field[i * Game->FieldSize + j + 1].offset = -1 * CellWidth;
+				j++; //Проверка через один элемент, а не следующего
+				MoveFlag++; // Подъём флага движения
+			}
+		}
+	}
+	return MoveFlag;
+}
+
+Uint8 CheckDownCombo(Game *Game, Params *Params)
+{
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
+	Uint8 MoveFlag = 0;
+	//Цикл перебора каждого столбца
+	for (Sint8 j = 0; j < Game->FieldSize; j++)
+	{ // Цикл перебора каждой строки
+		for (Sint8 i = Game->FieldSize - 1; i >= 0; i--)
+		{ // Если данная ячейка пустая
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			//Если же соседние элементы равны, но не равны нулю
+			else if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i - 1) * Game->FieldSize + j].val )
+			{
+				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+				Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;
+				Game->Field[(i - 1) * Game->FieldSize + j].offset = CellWidth;
+				i--; //Проверка через один элемент, а не следующего
+				MoveFlag++; // Подъём флага движения
+			}
+		}
+	}
+	return MoveFlag;
+}
+
+Uint8 CheckUpCombo(Game *Game, Params *Params)
+{
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
+	Uint8 MoveFlag = 0;
+	//Цикл перебора каждого столбца
+	for (Sint8 j = 0; j < Game->FieldSize; j++)
+	{ // Цикл перебора каждой строки
+		for (Sint8 i = 0; i < Game->FieldSize; i++)
+		{ // Если данная ячейка пустая
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			//Если же соседние элементы равны, но не равны нулю
+			else if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i + 1) * Game->FieldSize + j].val )
+			{
+				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+				Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;
+				Game->Field[(i + 1) * Game->FieldSize + j].offset = -1 * CellWidth;
+				i++; //Проверка через один элемент, а не следующего
+				MoveFlag++; // Подъём флага движения
+			}
+		}
+	}
+	return MoveFlag;
+}
 Uint8 CheckRightMove(Game *Game, Params *Params)
 {
 	// Размер поля
@@ -669,8 +761,10 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev, Uint16 win_
 	return SDL_TRUE;
 }
 
-static Uint8 (*int_CheckMove[])(Game *, Params*) = {CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
+static Uint8 (*int_CheckMove[])(Game*, Params*) = {CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
 
+static Uint8 (*int_CheckCombo[])(Game*, Params*) = {CheckRightCombo, CheckLeftCombo, CheckDownCombo, CheckUpCombo};
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
 Uint8 (**CheckMove)(Game *, Params *) = int_CheckMove - MODE_CHECK_RIGHT;
+Uint8 (**CheckCombo)(Game *, Params *) = int_CheckCombo - MODE_CHECK_RIGHT;

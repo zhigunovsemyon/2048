@@ -55,5 +55,6 @@ extern Uint8(**CheckMove)(Game*, Params*);
 /*Набор функций отрисовки сдвигов тайлов поля Game.
 используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
 extern Uint8 (**DoMove)(SDL_Renderer*, Game *, Params *);
+extern Uint8 (**CheckCombo)(Game *, Params *);
 
 #endif // !_MAIN_H_
