@@ -1,5 +1,38 @@
 #include "misc.h"
 
+Uint8 CheckRightCombo(Game *Game, Params *Params)
+{
+	// Размер поля
+	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	float CellWidth = FieldSize / Game->FieldSize;
+
+	Uint8 MoveFlag = 0;
+
+	// Цикл перебора каждой строки
+	for (Sint8 i = 0; i < Game->FieldSize; i++)
+	{ // Цикл перебора каждого столбца с конца
+		for (Sint8 j = Game->FieldSize - 1; j > 0; j--)
+		{ // Если данная ячейка пустая, можно пропускать
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			//Если же соседние элементы равны, но не равны нулю
+			else if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j - 1].val )
+			{
+				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+				Game->Field[i * Game->FieldSize + j - 1].mode = TILE_MOVE_X;
+				Game->Field[i * Game->FieldSize + j - 1].offset = CellWidth;
+				j--; //Проверка через один элемент, а не следующего
+				MoveFlag++; // Подъём флага движения
+			}
+		}
+	}
+	return MoveFlag;
+
+}
+
 Uint8 CheckRightMove(Game *Game, Params *Params)
 {
 	// Размер поля

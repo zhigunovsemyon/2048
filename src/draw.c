@@ -1,7 +1,4 @@
 #include "draw.h"
-#include "defines.h"
-#include "main.h"
-#include "misc.h"
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
 static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params);
@@ -37,10 +34,14 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 					Flag++;
 					Game->Field[i * Game->FieldSize + j].offset -= change;
 				}
-				else
+				else//Если элемент сдвинулся на целую ячейку
 				{
-					// Копирование текущего элемента в следующий
-					Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
+					if(Game->Field[i * Game->FieldSize + j + 1].mode != TILE_COMBINED)
+						// Копирование текущего элемента в следующий
+						Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
+					else
+						Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
+					
 					Game->Field[i * Game->FieldSize + j + 1].mode = TILE_OLD;
 					Game->Field[i * Game->FieldSize + j + 1].offset = 0;
 
@@ -57,19 +58,25 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 	}
-	// Params->Mode = (MODE_MOVE_RIGHT == CheckRightMove(Game, Params)) ? MODE_MOVE_RIGHT : MODE_ADD;
-	switch (CheckRightMove(Game, Params))
+	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	 * он записывается в глобальный параметр режима
+		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
+	if (CheckRightMove(Game, Params) == MODE_MOVE_RIGHT)
 	{
-	case MODE_MOVE_RIGHT:
 		Params->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
-	case MODE_QUIT:
-		Params->Mode = MODE_QUIT;
-		return ERR_NO;
-	default:
-		Params->Mode = MODE_ADD;
+	}
+
+	//Если возможно сложение вправо
+	if (CheckRightCombo(Game, Params))
+	{
+		Params->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 	}
+	//Если же нет, осуществляется проверка на добавление нового элемента
+	Params->Mode = MODE_ADD;
+	return ERR_NO;
 }
 
 Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
@@ -122,7 +129,9 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
-	// Params->Mode = (MODE_MOVE_LEFT == CheckLeftMove(Game, Params)) ? MODE_MOVE_LEFT : MODE_ADD;
+	/* Если CheckMove вернул флаг возможности движения, он записывается в глобальный параметр режима
+		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
 	switch (CheckLeftMove(Game, Params))
 	{
 	case MODE_MOVE_LEFT:
@@ -187,7 +196,9 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
-	// Params->Mode = (MODE_MOVE_UP == CheckUpMove(Game, Params)) ? MODE_MOVE_UP : MODE_ADD;
+	/* Если CheckMove вернул флаг возможности движения, он записывается в глобальный параметр режима
+		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
 	switch (CheckUpMove(Game, Params))
 	{
 	case MODE_MOVE_UP:
@@ -252,6 +263,9 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
+	/* Если CheckMove вернул флаг возможности движения, он записывается в глобальный параметр режима
+		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
 	switch (CheckDownMove(Game, Params))
 	{
 	case MODE_MOVE_DOWN:
