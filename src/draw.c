@@ -556,7 +556,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
 	{
-		if (Game->Field[i].mode != TILE_OLD)
+		if (Game->Field[i].mode != TILE_OLD && Game->Field[i].mode != TILE_COMBINED)
 			continue;
 		// Положение угла поля в координатах +
 		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки

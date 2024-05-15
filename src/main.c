@@ -1,4 +1,5 @@
 #include "main.h"
+#include "misc.h"
 int main(int argc, const char **args)
 {
 	srand(time(NULL));
@@ -75,6 +76,9 @@ int main(int argc, const char **args)
 		case MODE_CHECK_UP:
 			Params.Mode = CheckMove[Params.Mode](&Game, &Params);
 			dtCount();
+			if(Params.Mode == MODE_WAIT)
+				Params.Mode = (CheckRightCombo(&Game, &Params)) ?
+					MODE_MOVE_RIGHT : MODE_WAIT;
 			continue;
 			
 		case MODE_MOVE_RIGHT:
