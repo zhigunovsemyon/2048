@@ -6,10 +6,11 @@ int main(int argc, const char **args)
 	Sint8 NewElementIndex = -1;
 	Game Game;
 	Params Params;
+	Assets Assets;
 	SDL_Event Events;
 	Params.WinSize.x = WIN_WIDTH;
 	Params.WinSize.y = WIN_HEIGHT;
-	Params.textures = NULL;
+	Assets.textures = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
 	// Забил очки максимальными числами для проверки строк с ними
@@ -24,22 +25,22 @@ int main(int argc, const char **args)
 		return ERR_MALLOC;
 
 	/*Создание набора цветов*/
-	if (!(Params.cols = CreateColourSet(FLAG_DARKMODE & Params.Flags)))
+	if (!(Assets.cols = CreateColourSet(FLAG_DARKMODE & Params.Flags)))
 		return ERR_MALLOC;
 
 	// Создание окна и рисовальщика
 	if ((errCode = CreateWorkspace(&window, &rend, "Добро пожаловать", &Params.WinSize, Params.Flags)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Вывод приветствия
-	if ((errCode = Greeting(window, rend, &Events, &Params, &Game, MODE_ADD)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
-	
-	//Подсчёт размера поля и каждой ячейки поля
+	if ((errCode = Greeting(window, rend, &Events, &Assets, &Params, &Game, MODE_ADD)))
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+
+	// Подсчёт размера поля и каждой ячейки поля
 	GetFieldAndTileSize(&Game, &Params);
 
-	if (!(Params.textures = CreateTextureSet(rend, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params);
+	if (!(Assets.textures = CreateTextureSet(rend, Assets.cols, &Params, &Game)))
+		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
 
 	// Игровой цикл
 	while (SDL_TRUE)
@@ -48,17 +49,17 @@ int main(int argc, const char **args)
 		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 		{
 			GetFieldAndTileSize(&Game, &Params);
-			Params.textures = UpdateTextureSet(rend, &Params, &Game);
+			Assets.textures = UpdateTextureSet(rend, &Params, &Game, &Assets);
 			// Рисование поля со старыми элементами
-			if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
-				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			if ((errCode = DrawOldElements(rend, &Params, &Game, &Assets) /*== ERR_SDL*/))
+				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 			SDL_RenderPresent(rend);
 		}
 
 		switch (Params.Mode)
 		{
 		case MODE_QUIT: // 0
-			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params);
+			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 		case MODE_WAIT: // 10
 			continue;
@@ -86,7 +87,7 @@ int main(int argc, const char **args)
 								  ? Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
 								  : tmpMode == MODE_WAIT;
 			}
-			else// if == MODE_MOVE...
+			else // if == MODE_MOVE...
 				Params.Mode = tmpMode;
 			break;
 		}
@@ -95,18 +96,18 @@ int main(int argc, const char **args)
 		case MODE_MOVE_LEFT:  // 3
 		case MODE_MOVE_DOWN:  // 4
 		case MODE_MOVE_UP:	  // 5
-			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params, &Assets)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 			SDL_RenderPresent(rend);
 			break;
 
 		case MODE_DRAW_NEW: // 1
 			// Рисование поля со старыми элементами
-			if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			if ((errCode = DrawOldElements(rend, &Params, &Game, &Assets) /*== ERR_SDL*/))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
-			if ((errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			if ((errCode = DrawNewElement(rend, &Params, &Game, &Assets, NewElementIndex)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 			SDL_RenderPresent(rend);
 
 			/*Если размер был сброшен, значит цикл отрисовки пора прервать,
@@ -120,6 +121,92 @@ int main(int argc, const char **args)
 
 		default:
 			break;
+		}
+	}
+}
+
+/*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
+ * параметров игры Params, настроек игры Game. Возврат нуля при отсутствии ошибок, либо SDL_ERR*/
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *Assets, Params *Params, Game *Game,
+			   Uint8 NextMode)
+{ // Создание сообщения
+	char *message;
+	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", "Добро пожаловать в игру 2048!", "Включён ",
+				 (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим", "Управление мышью ",
+				 (Params->Flags & FLAG_MOUSEOFF) ? "отключено" : "включено", "V-Sync ",
+				 (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен", "Используется управление ",
+				 (Params->Flags & FLAG_WASDKEY)	 ? "WASD"
+				 : (Params->Flags & FLAG_VIMKEY) ? "vi"
+												 : "стрелками",
+				 "Используется размер поля ", Game->FieldSize,
+				 "Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
+	if (!message)
+		return ERR_MALLOC;
+
+	SDL_Rect txt_size;
+	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
+
+	SDL_Texture *greet =
+		CreateMessageTexture(rend, &Assets->cols[COL_FG], &Assets->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
+	SDL_free(message);
+	if (!greet)
+		return ERR_SDL;
+
+	if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
+		return ERR_SDL;
+	SDL_RenderPresent(rend);
+
+	while (SDL_TRUE)
+	{
+		while (!SDL_PollEvent(ev))
+		{ // Если событий не было, сразу осуществляется выход, режим не меняется
+			continue;
+		}
+
+		/*Если, на экране приветствия, изменился размер окна, надпись отрисовывается по новой*/
+		if (CheckForResize(window, Params, ev, WIN_MIN))
+		{
+			SDL_DestroyTexture(greet);
+			txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
+			greet = CreateMessageTexture(rend, &Assets->cols[COL_FG], &Assets->cols[COL_BG], &txt_size, FONT, message,
+										 SDL_FALSE);
+			if (!greet)
+				return ERR_SDL;
+
+			// Заливка фона
+			if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_BG])))
+				return ERR_SDL;
+			if (SDL_RenderClear(rend))
+				return ERR_SDL;
+			if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
+				return ERR_SDL;
+			SDL_RenderPresent(rend);
+		}
+
+		switch (ev->type)
+		{
+		default:
+			continue;
+
+		// Если был запрошен выход из программы
+		case SDL_QUIT:
+			SDL_DestroyTexture(greet);
+			Params->Mode = MODE_QUIT;
+			return ERR_NO;
+
+		case SDL_MOUSEBUTTONUP:
+			if (Params->Flags & FLAG_MOUSEOFF)
+				continue;
+			SDL_DestroyTexture(greet);
+			Params->Mode = NextMode;
+			SDL_SetWindowTitle(window, "2048 | Очков: 0");
+			return ERR_NO;
+
+		case SDL_KEYUP: // Если была нажата клавиша
+			SDL_DestroyTexture(greet);
+			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
+			SDL_SetWindowTitle(window, "2048 | Очков: 0");
+			return ERR_NO;
 		}
 	}
 }

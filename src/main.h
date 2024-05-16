@@ -13,6 +13,7 @@
 #include <SDL2/SDL_ttf.h>
 #endif // !SDL_h_
 
+//Структура, описывающая один тайл
 typedef struct
 {
 	Uint64 val;//Значение ячейки
@@ -25,6 +26,7 @@ typedef struct
 }
 Tile;
 
+//Структура с полем и очками
 typedef struct
 {
 	Tile* Field;	//Поле ячеек
@@ -34,21 +36,32 @@ typedef struct
 }
 Game;
 
+//Параметры игры
 typedef struct 
 {
 	Uint8 Flags;
 	Uint8 Mode;
 	SDL_Point WinSize;
-	SDL_Texture **textures;
-	SDL_Colour *cols;
 	float CellWidth;
 	float FieldSize;
 }
 Params;
 
+//Ассеты игры
+typedef struct
+{
+	SDL_Texture **textures;
+	SDL_Colour *cols;
+}
+Assets;
+
 #include "defines.h"
 #include "misc.h"
 #include "draw.h"
+
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *AAssets,
+			   Params *Params, Game *Game, Uint8 NextMode);
+
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
@@ -56,7 +69,7 @@ extern Uint8(**CheckMove)(Game*, Params*);
 
 /*Набор функций отрисовки сдвигов тайлов поля Game.
 используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
-extern Uint8 (**DoMove)(SDL_Renderer*, Game *, Params *);
+extern Uint8 (**DoMove)(SDL_Renderer*, Game *, Params *, Assets *);
 extern Uint8 (**CheckCombo)(Game *, Params *);
 
 #endif // !_MAIN_H_
