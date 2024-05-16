@@ -1,5 +1,4 @@
 #include "draw.h"
-#include "defines.h"
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
@@ -13,10 +12,6 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 
 	Uint8 Flag = 0;
 	// Размер поля
-	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-
-	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
 	/*Умножение всех оффсетов на ширину ячейки */
@@ -36,9 +31,9 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 					Flag++;
 					Game->Field[i * Game->FieldSize + j].offset -= change;
 				}
-				else//Если элемент сдвинулся на целую ячейку
+				else // Если элемент сдвинулся на целую ячейку
 				{
-					if(Game->Field[i * Game->FieldSize + j + 1].mode != TILE_COMBINED)
+					if (Game->Field[i * Game->FieldSize + j + 1].mode != TILE_COMBINED)
 					{
 						// Копирование текущего элемента в следующий
 						Game->Field[i * Game->FieldSize + j + 1] = Game->Field[i * Game->FieldSize + j];
@@ -64,9 +59,9 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 	}
-	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	/* Если CheckMove вернул флаг возможности смещения элемента,
 	 * он записывается в глобальный параметр режима
-		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		Если поле заполнено, будет включен режим выхода, если движение невозможно,
 		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
 	if (CheckRightMove(Game, Params) == MODE_MOVE_RIGHT)
 	{
@@ -74,13 +69,13 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		return ERR_NO;
 	}
 
-	//Если возможно сложение вправо
+	// Если возможно сложение вправо
 	if (CheckRightCombo(Game, Params))
 	{
 		Params->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 	}
-	//Если же нет, осуществляется проверка на добавление нового элемента
+	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;
 	return ERR_NO;
 }
@@ -92,10 +87,6 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 
 	Uint8 Flag = 0;
 	// Размер поля
-	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-
-	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
 	/*Умножение всех оффсетов на ширину ячейки */
@@ -117,7 +108,7 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				}
 				else
 				{
-					if(Game->Field[i * Game->FieldSize + j - 1].mode != TILE_COMBINED)
+					if (Game->Field[i * Game->FieldSize + j - 1].mode != TILE_COMBINED)
 					{
 						// Копирование текущего элемента в следующий
 						Game->Field[i * Game->FieldSize + j - 1] = Game->Field[i * Game->FieldSize + j];
@@ -144,9 +135,9 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
-	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	/* Если CheckMove вернул флаг возможности смещения элемента,
 	 * он записывается в глобальный параметр режима
-		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		Если поле заполнено, будет включен режим выхода, если движение невозможно,
 		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
 	if (CheckLeftMove(Game, Params) == MODE_MOVE_LEFT)
 	{
@@ -154,13 +145,13 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		return ERR_NO;
 	}
 
-	//Если возможно сложение вправо
+	// Если возможно сложение вправо
 	if (CheckLeftCombo(Game, Params))
 	{
 		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
-	//Если же нет, осуществляется проверка на добавление нового элемента
+	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;
 	return ERR_NO;
 }
@@ -172,10 +163,6 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 
 	Uint8 Flag = 0;
 	// Размер поля
-	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-
-	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
 	/*Умножение всех оффсетов на ширину ячейки */
@@ -197,7 +184,7 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				}
 				else
 				{
-					if(Game->Field[(i - 1) * Game->FieldSize + j].mode != TILE_COMBINED)
+					if (Game->Field[(i - 1) * Game->FieldSize + j].mode != TILE_COMBINED)
 					{
 						// Копирование текущего элемента в следующий
 						Game->Field[(i - 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
@@ -224,9 +211,9 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
-	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	/* Если CheckMove вернул флаг возможности смещения элемента,
 	 * он записывается в глобальный параметр режима
-		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		Если поле заполнено, будет включен режим выхода, если движение невозможно,
 		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
 	if (CheckUpMove(Game, Params) == MODE_MOVE_UP)
 	{
@@ -234,13 +221,13 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		return ERR_NO;
 	}
 
-	//Если возможно сложение вправо
+	// Если возможно сложение вправо
 	if (CheckUpCombo(Game, Params))
 	{
 		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
-	//Если же нет, осуществляется проверка на добавление нового элемента
+	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;
 	return ERR_NO;
 }
@@ -252,10 +239,6 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 
 	Uint8 Flag = 0;
 	// Размер поля
-	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-
-	float CellWidth = FieldSize / Game->FieldSize;
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
 	// Цикл перебора каждого столбца
@@ -276,7 +259,7 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 				}
 				else
 				{
-					if(Game->Field[(i + 1) * Game->FieldSize + j].mode != TILE_COMBINED)
+					if (Game->Field[(i + 1) * Game->FieldSize + j].mode != TILE_COMBINED)
 					{
 						// Копирование текущего элемента в следующий
 						Game->Field[(i + 1) * Game->FieldSize + j] = Game->Field[i * Game->FieldSize + j];
@@ -303,9 +286,9 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
-	/* Если CheckMove вернул флаг возможности смещения элемента, 
+	/* Если CheckMove вернул флаг возможности смещения элемента,
 	 * он записывается в глобальный параметр режима
-		Если поле заполнено, будет включен режим выхода, если движение невозможно, 
+		Если поле заполнено, будет включен режим выхода, если движение невозможно,
 		но поле содержит пустые ячейки, будет включен режим добавления нового элемента*/
 	if (CheckDownMove(Game, Params) == MODE_MOVE_DOWN)
 	{
@@ -313,13 +296,13 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params)
 		return ERR_NO;
 	}
 
-	//Если возможно сложение вправо
+	// Если возможно сложение вправо
 	if (CheckDownCombo(Game, Params))
 	{
 		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
-	//Если же нет, осуществляется проверка на добавление нового элемента
+	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;
 	return ERR_NO;
 }
@@ -383,7 +366,7 @@ SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture, SDL_Co
 	return ret;
 }
 
-SDL_Texture **CreateTextureSet(SDL_Renderer *rend, SDL_Colour *ColourSet, SDL_Point *WinSize, Game *Game)
+SDL_Texture **CreateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game)
 {
 	Uint64 TileValue = 1;
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -391,12 +374,8 @@ SDL_Texture **CreateTextureSet(SDL_Renderer *rend, SDL_Colour *ColourSet, SDL_Po
 	if (!set)
 		return NULL;
 
-	// Размер поля
-	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-					  MinOfTwo(WinSize->x, WinSize->y); // Меньший и размеров окон
-
 	SDL_Rect Tile;
-	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * FieldSize / Game->FieldSize;
+	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
 	for (Uint8 i = TEX_SQ2; i < TEXTURES_COUNT; ++i)
 	{
@@ -404,7 +383,7 @@ SDL_Texture **CreateTextureSet(SDL_Renderer *rend, SDL_Colour *ColourSet, SDL_Po
 		char *text;
 		SDL_asprintf(&text, "%lu", TileValue);
 		// Проверка text на NULL осуществляется внутри CreateMessageTexture
-		set[i] = CreateMessageTexture(rend, &txt_col, ColourSet + i + 1, &Tile, FONT, text, SDL_TRUE);
+		set[i] = CreateMessageTexture(rend, &txt_col, Params->cols + i + 1, &Tile, FONT, text, SDL_TRUE);
 		SDL_free(text);
 		// Если хоть одну из текстур не удалось создать
 		if (!(set[i]))
@@ -419,7 +398,7 @@ SDL_Texture **CreateTextureSet(SDL_Renderer *rend, SDL_Colour *ColourSet, SDL_Po
 
 	// Создание текстуры числа очков
 	Tile.w *= 2;
-	if (!(set[TEX_SCORE] = GetScoreTexture(rend, NULL, ColourSet, &Tile, Game)))
+	if (!(set[TEX_SCORE] = GetScoreTexture(rend, NULL, Params->cols, &Tile, Game)))
 	{ // Очистка всех остальных текстур
 		for (Uint8 i = TEX_SCORE; i; i--)
 			SDL_DestroyTexture(set[i - 1]);
@@ -429,17 +408,16 @@ SDL_Texture **CreateTextureSet(SDL_Renderer *rend, SDL_Colour *ColourSet, SDL_Po
 	return set;
 }
 
-SDL_Texture **UpdateTextureSet(SDL_Renderer *rend, SDL_Texture **OldSet, SDL_Colour *ColourSet, SDL_Point *WinSize,
-							   Game *Game)
+SDL_Texture **UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game)
 {
 	/*Освобождение всех текстур*/
 	for (Uint8 i = 0; i < TEXTURES_COUNT; ++i)
-		SDL_DestroyTexture(OldSet[i]);
+		SDL_DestroyTexture(Params->textures[i]);
 
 	// Освобождать сам массив из памяти на данном этапе не нужно,
 	// так как он заменится новыми текстурами.
 	// Его освобождение должно происходить только на выходе из программы
-	return CreateTextureSet(rend, ColourSet, WinSize, Game);
+	return CreateTextureSet(rend, Params, Game);
 }
 
 SDL_Texture *GetTextureForTile(Uint64 TileValue, SDL_Texture **textures)
@@ -586,13 +564,8 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params)
 
 Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 {
-	// Размер поля
-	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-
 	SDL_Rect Tile;
-	Uint16 CellWidth = FieldSize / Game->FieldSize;
-	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * CellWidth;
+	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
 	// Рисование поля
 	if (DrawBackground(rend, Game->FieldSize, Params) /*== ERR_SDL*/)
@@ -600,14 +573,15 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
 	{
-		if (!(Game->Field[i].mode == TILE_OLD || 
-			Game->Field[i].mode == TILE_COMBINED ||
-			Game->Field[i].mode == TILE_JUSTCOMBINED))
+		if (!(Game->Field[i].mode == TILE_OLD || Game->Field[i].mode == TILE_COMBINED ||
+			  Game->Field[i].mode == TILE_JUSTCOMBINED))
 			continue;
 		// Положение угла поля в координатах +
 		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
-		Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5 + CellWidth * (i % Game->FieldSize);
-		Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (CellWidth - Tile.w) * 0.5 + CellWidth * (i / Game->FieldSize);
+		Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5 + (Params->CellWidth - Tile.w) * 0.5 +
+				 Params->CellWidth * (i % Game->FieldSize);
+		Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 + (Params->CellWidth - Tile.w) * 0.5 +
+				 Params->CellWidth * (i / Game->FieldSize);
 		SDL_Texture *tile_texture = GetTextureForTile(Game->Field[i].val, Params->textures);
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
@@ -617,10 +591,6 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game)
 
 Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index)
 {
-	// Размер поля
-	float FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
-
 	SDL_Rect Tile;
 	SDL_Texture *tile_texture = GetTextureForTile(Game->Field[Index].val, Params->textures);
 
@@ -628,11 +598,11 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Tile.w = (int)(Game->Field[Index].size += (ANIM_SPEED * dtCount() / 1000.0f));
 
 	// Размер одной ячейки хранится в h
-	Tile.h = FieldSize / Game->FieldSize;
+	Tile.h = Params->FieldSize / Game->FieldSize;
 
 	// Положение угла поля в координатах
-	Tile.x = (Params->WinSize.x - FieldSize) * 0.5;
-	Tile.y = (Params->WinSize.y - FieldSize) * 0.5;
+	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
+	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5;
 
 	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
 	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
@@ -641,7 +611,7 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
 	/*Если размер плитки ещё слишком мал*/
-	if (Game->Field[Index].size / TILE_SIZE_COEFFICIENT < (FieldSize / Game->FieldSize))
+	if (Game->Field[Index].size / TILE_SIZE_COEFFICIENT < Params->CellWidth)
 	{ // Отрисовка промежуточного значения. Если SDL_RenderCopy упал, возврат кода ошибки
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
@@ -649,12 +619,14 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Sint8 Index
 	}
 
 	// Отрисовка окончательного положения квадрата
-	Tile.h = FieldSize / Game->FieldSize;
+	Tile.h = Params->FieldSize / Game->FieldSize;
 	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
 	// Положение угла поля в координатах
 	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу размеров плитки и ячейки
-	Tile.x = (Params->WinSize.x - FieldSize) * 0.5 + (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-	Tile.y = (Params->WinSize.y - FieldSize) * 0.5 + (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.x =
+		(Params->WinSize.x - Params->FieldSize) * 0.5 + (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.y =
+		(Params->WinSize.y - Params->FieldSize) * 0.5 + (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
 	// Отрисовка конечного тайла

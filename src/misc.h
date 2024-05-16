@@ -44,6 +44,9 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev,
  *  если нет свободного места, возврат -1*/
 Sint8 AddElement(Game *Game);
 
+//Создание размеров поля и тайла
+void GetFieldAndTileSize(Game *Game, Params *Params);
+
 /* На основе параметров запуска игры argv, в количестве argc, подбирается схема управления
  * и размер игрового поля. По умолчанию используются стрелки с мышью, поле имеет  размер 4x4*/
 Uint8 LaunchOptions(int argc, const char **argv, Params *Settings);

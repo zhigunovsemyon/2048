@@ -17,12 +17,11 @@ SDL_Texture* GetScoreTexture(SDL_Renderer* rend, SDL_Texture* OldTexture,
 
 /*Создание рисовальщиком rend набора текстур, используемая игрой, из набора цветов ColourSet,
 с учётом размера экрана WinSize, размеров поля и очков игры из Game*/
-SDL_Texture** CreateTextureSet(SDL_Renderer* rend, SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game);
+SDL_Texture** CreateTextureSet(SDL_Renderer* rend, Params* Params, Game* Game);
 
-/*Обновление рисовальщиком rend набора текстур OldSet, используемая игрой, из набора цветов ColourSet,
-с учётом размера экрана WinSize, размеров поля и очков игры из Game*/
-SDL_Texture** UpdateTextureSet(SDL_Renderer* rend, SDL_Texture** OldSet,
-	SDL_Colour* ColourSet, SDL_Point* WinSize, Game* Game);
+/*Обновление рисовальщиком rend набора текстур, используемых игрой,
+с учётом размера экрана, размеров поля и очков игры из Game*/
+SDL_Texture** UpdateTextureSet(SDL_Renderer* rend, Params* Params, Game* Game);
 
 //Подбор текстуры из набора textures для ячейки размерности TileValue
 SDL_Texture* GetTextureForTile(Uint64 TileValue, SDL_Texture **textures);

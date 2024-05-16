@@ -350,6 +350,14 @@ Uint8 CountLines(const char *source)
 	return i;
 }
 
+void GetFieldAndTileSize(Game *Game, Params *Params)
+{
+	Params->FieldSize = FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
+					  MinOfTwo(Params->WinSize.x, Params->WinSize.y); // Меньший и размеров окон
+
+	Params->CellWidth = Params->FieldSize / Game->FieldSize;
+}
+
 Sint8 AddElement(Game *Game)
 {
 	Sint8 pos;

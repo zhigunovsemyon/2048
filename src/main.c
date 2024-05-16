@@ -1,5 +1,4 @@
 #include "main.h"
-#include "defines.h"
 int main(int argc, const char **args)
 {
 	srand(time(NULL));
@@ -35,8 +34,11 @@ int main(int argc, const char **args)
 	// Вывод приветствия
 	if ((errCode = Greeting(window, rend, &Events, &Params, &Game, MODE_ADD)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+	
+	//Подсчёт размера поля и каждой ячейки поля
+	GetFieldAndTileSize(&Game, &Params);
 
-	if (!(Params.textures = CreateTextureSet(rend, Params.cols, &Params.WinSize, &Game)))
+	if (!(Params.textures = CreateTextureSet(rend, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params);
 
 	// Игровой цикл
@@ -45,7 +47,8 @@ int main(int argc, const char **args)
 		SetMode(&Events, &Params); // Выбор режима работы в данный момент
 		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 		{
-			Params.textures = UpdateTextureSet(rend, Params.textures, Params.cols, &Params.WinSize, &Game);
+			GetFieldAndTileSize(&Game, &Params);
+			Params.textures = UpdateTextureSet(rend, &Params, &Game);
 			// Рисование поля со старыми элементами
 			if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
 				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
@@ -81,10 +84,9 @@ int main(int argc, const char **args)
 			{
 				Params.Mode = (CheckCombo[Params.Mode](&Game, &Params))
 								  ? Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
-							  : (tmpMode == MODE_WAIT) ? MODE_WAIT
-													   : MODE_QUIT;
+								  : tmpMode == MODE_WAIT;
 			}
-			else
+			else// if == MODE_MOVE...
 				Params.Mode = tmpMode;
 			break;
 		}
@@ -99,22 +101,20 @@ int main(int argc, const char **args)
 			break;
 
 		case MODE_DRAW_NEW: // 1
-			if (NewElementIndex >= 0)
-			{
-				// Рисование поля со старыми элементами
-				if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
-					return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			// Рисование поля со старыми элементами
+			if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 
-				if ((errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex)))
-					return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
-				SDL_RenderPresent(rend);
-				/*Если размер был сброшен, значит цикл отрисовки пора прервать,
-					выставив соответстветствующие флаги */
-				if (!Game.Field[NewElementIndex].size)
-				{
-					NewElementIndex = -1;
-					Params.Mode = MODE_WAIT;
-				}
+			if ((errCode = DrawNewElement(rend, &Params, &Game, NewElementIndex)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
+			SDL_RenderPresent(rend);
+
+			/*Если размер был сброшен, значит цикл отрисовки пора прервать,
+				выставив соответстветствующие флаги */
+			if (!Game.Field[NewElementIndex].size)
+			{
+				NewElementIndex = -1;
+				Params.Mode = MODE_WAIT;
 			}
 			break;
 

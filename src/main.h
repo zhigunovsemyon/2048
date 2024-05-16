@@ -41,6 +41,8 @@ typedef struct
 	SDL_Point WinSize;
 	SDL_Texture **textures;
 	SDL_Colour *cols;
+	float CellWidth;
+	float FieldSize;
 }
 Params;
 
