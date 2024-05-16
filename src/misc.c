@@ -19,7 +19,7 @@ Uint8 CheckRightCombo(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0, QuitFlag = 1;
+	Uint8 MoveFlag = 0;
 
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
@@ -27,10 +27,7 @@ Uint8 CheckRightCombo(Game *Game, Params *Params)
 		for (Sint8 j = Game->FieldSize - 1; j > 0; j--)
 		{ // Если данная ячейка пустая, можно пропускать
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-			{
-				QuitFlag = 0;
 				continue;
-			}
 
 			// Если элементы были только созданы, их можно пропускать
 			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
@@ -48,8 +45,6 @@ Uint8 CheckRightCombo(Game *Game, Params *Params)
 			}
 		}
 	}
-	if (MoveFlag/* != 0 */)
-		QuitFlag = 0;
 	return MoveFlag;
 }
 
@@ -61,7 +56,7 @@ Uint8 CheckLeftCombo(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0, QuitFlag = 1;
+	Uint8 MoveFlag = 0;
 
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
@@ -69,10 +64,7 @@ Uint8 CheckLeftCombo(Game *Game, Params *Params)
 		for (Sint8 j = 0; j < Game->FieldSize - 1; j++)
 		{ // Если данная ячейка пустая, можно пропускать
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-			{
-				QuitFlag = 0;
 				continue;
-			}
 
 			// Если элементы были только созданы, их можно пропускать
 			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
@@ -90,8 +82,6 @@ Uint8 CheckLeftCombo(Game *Game, Params *Params)
 			}
 		}
 	}
-	if (MoveFlag/* != 0 */)
-		QuitFlag = 0;
 	return MoveFlag;
 }
 
@@ -103,17 +93,14 @@ Uint8 CheckDownCombo(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0, QuitFlag = 1;
+	Uint8 MoveFlag = 0;
 	// Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждой строки
 		for (Sint8 i = Game->FieldSize - 1; i >= 0; i--)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-			{
-				QuitFlag = 0;
 				continue;
-			}
 
 			// Если элементы были только созданы, их можно пропускать
 			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
@@ -131,8 +118,6 @@ Uint8 CheckDownCombo(Game *Game, Params *Params)
 			}
 		}
 	}
-	if (MoveFlag/* != 0 */)
-		QuitFlag = 0;
 	return MoveFlag;
 }
 
@@ -144,17 +129,14 @@ Uint8 CheckUpCombo(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0, QuitFlag = 1;
+	Uint8 MoveFlag = 0;
 	// Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждой строки
 		for (Sint8 i = 0; i < Game->FieldSize; i++)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-			{
-				QuitFlag = 0;
 				continue;
-			}
 
 			// Если элементы были только созданы, их можно пропускать
 			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
@@ -172,8 +154,6 @@ Uint8 CheckUpCombo(Game *Game, Params *Params)
 			}
 		}
 	}
-	if (MoveFlag/* != 0 */)
-		QuitFlag = 0;
 	return MoveFlag;
 }
 Uint8 CheckRightMove(Game *Game, Params *Params)
@@ -211,7 +191,7 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_RIGHT : /* (QuitFlag) ? MODE_QUIT : */ MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_RIGHT : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 Uint8 CheckLeftMove(Game *Game, Params *Params)
@@ -222,7 +202,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 
 	float CellWidth = FieldSize / Game->FieldSize;
 
-	Uint8 MoveFlag = 0;//, QuitFlag = 1;
+	Uint8 MoveFlag = 0, QuitFlag = 1;
 	SDL_Log("Проверка слева");
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
@@ -232,7 +212,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{ // Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
-				// QuitFlag = 0;
+				QuitFlag = 0;
 				for (Sint8 j2 = j + 1; j2 < Game->FieldSize; j2++)
 				{ // Если ячейка не пустая
 					if (Game->Field[i * Game->FieldSize + j2].val /* != 0 */)
@@ -248,7 +228,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_LEFT : /* (QuitFlag) ? MODE_QUIT : */ MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_LEFT : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 Uint8 CheckUpMove(Game *Game, Params *Params)
@@ -285,7 +265,7 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_UP : /* (QuitFlag) ? MODE_QUIT : */ MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_UP : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 Uint8 CheckDownMove(Game *Game, Params *Params)
@@ -323,7 +303,7 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_DOWN : /* (QuitFlag) ? MODE_QUIT : */ MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_DOWN : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
 SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)

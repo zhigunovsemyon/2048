@@ -1,4 +1,5 @@
 #include "main.h"
+#include "defines.h"
 int main(int argc, const char **args)
 {
 	srand(time(NULL));
@@ -53,13 +54,13 @@ int main(int argc, const char **args)
 
 		switch (Params.Mode)
 		{
-		case MODE_QUIT://0
+		case MODE_QUIT: // 0
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params);
 
-		case MODE_WAIT://10
+		case MODE_WAIT: // 10
 			continue;
 
-		case MODE_ADD://11
+		case MODE_ADD: // 11
 			ChangeCombinedToOld(&Game);
 			NewElementIndex = AddElement(&Game);
 			Game.Field[NewElementIndex].size = 0;
@@ -69,34 +70,35 @@ int main(int argc, const char **args)
 			dtCount(); // Сброс счётчика времени кадра перед отрисовкой
 			break;
 
-		case MODE_CHECK_RIGHT://6
-		case MODE_CHECK_LEFT://7
-		case MODE_CHECK_DOWN://8
-		case MODE_CHECK_UP: {//9
-			//Может вернуть move, quit или wait
+		case MODE_CHECK_RIGHT: // 6
+		case MODE_CHECK_LEFT:  // 7
+		case MODE_CHECK_DOWN:  // 8
+		case MODE_CHECK_UP: {  // 9
+			// Может вернуть move, quit или wait
 			Uint8 tmpMode = CheckMove[Params.Mode](&Game, &Params);
 			dtCount();
 			if (tmpMode == MODE_WAIT || tmpMode == MODE_QUIT)
 			{
 				Params.Mode = (CheckCombo[Params.Mode](&Game, &Params))
 								  ? Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
-								  : MODE_WAIT;
+							  : (tmpMode == MODE_WAIT) ? MODE_WAIT
+													   : MODE_QUIT;
 			}
 			else
 				Params.Mode = tmpMode;
 			break;
 		}
 
-		case MODE_MOVE_RIGHT://2
-		case MODE_MOVE_LEFT://3
-		case MODE_MOVE_DOWN://4
-		case MODE_MOVE_UP://5
+		case MODE_MOVE_RIGHT: // 2
+		case MODE_MOVE_LEFT:  // 3
+		case MODE_MOVE_DOWN:  // 4
+		case MODE_MOVE_UP:	  // 5
 			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 			SDL_RenderPresent(rend);
 			break;
 
-		case MODE_DRAW_NEW://1
+		case MODE_DRAW_NEW: // 1
 			if (NewElementIndex >= 0)
 			{
 				// Рисование поля со старыми элементами
