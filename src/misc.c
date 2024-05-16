@@ -28,10 +28,15 @@ Uint8 CheckRightCombo(Game *Game, Params *Params)
 		{ // Если данная ячейка пустая, можно пропускать
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
+
+			//Если элементы были только созданы, их можно пропускать
+			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+			Game->Field[i * Game->FieldSize + j - 1].mode == TILE_JUSTCOMBINED)
+				continue;
+
 			//Если же соседние элементы равны, но не равны нулю
-			else if (Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
-					(Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[i * Game->FieldSize + j - 1].val))
+			if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j - 1].val)
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[i * Game->FieldSize + j - 1].mode = TILE_MOVE_X;
@@ -61,10 +66,15 @@ Uint8 CheckLeftCombo(Game *Game, Params *Params)
 		{ // Если данная ячейка пустая, можно пропускать
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
+			
+			//Если элементы были только созданы, их можно пропускать
+			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+			Game->Field[i * Game->FieldSize + j + 1].mode == TILE_JUSTCOMBINED)
+				continue;
+
 			//Если же соседние элементы равны, но не равны нулю
-			else if ((Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
-					Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[i * Game->FieldSize + j + 1].val ))
+			if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j + 1].val)
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[i * Game->FieldSize + j + 1].mode = TILE_MOVE_X;
@@ -93,10 +103,15 @@ Uint8 CheckDownCombo(Game *Game, Params *Params)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
+			
+			//Если элементы были только созданы, их можно пропускать
+			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+			Game->Field[(i - 1) * Game->FieldSize + j].mode == TILE_JUSTCOMBINED)
+				continue;
+
 			//Если же соседние элементы равны, но не равны нулю
-			else if ((Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
-					Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[(i - 1) * Game->FieldSize + j].val ))
+			if(Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i - 1) * Game->FieldSize + j].val)
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;
@@ -125,10 +140,15 @@ Uint8 CheckUpCombo(Game *Game, Params *Params)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
+			
+			//Если элементы были только созданы, их можно пропускать
+			if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+			Game->Field[(i + 1) * Game->FieldSize + j].mode == TILE_JUSTCOMBINED)
+				continue;
+
 			//Если же соседние элементы равны, но не равны нулю
-			else if ((Game->Field[i * Game->FieldSize + j].mode != TILE_JUSTCOMBINED &&
-					Game->Field[i * Game->FieldSize + j].val ==
-					Game->Field[(i + 1) * Game->FieldSize + j].val))
+			if(Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i + 1) * Game->FieldSize + j].val)
 			{
 				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
 				Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;
