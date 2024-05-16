@@ -1,5 +1,4 @@
 #include "main.h"
-#include "misc.h"
 int main(int argc, const char **args)
 {
 	srand(time(NULL));
@@ -13,7 +12,7 @@ int main(int argc, const char **args)
 	Params.textures = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
-	//Забил очки максимальными числами для проверки строк с ними
+	// Забил очки максимальными числами для проверки строк с ними
 	Game.Score = UINT64_MAX;
 	Game.Score = UINT64_MAX;
 
@@ -36,7 +35,7 @@ int main(int argc, const char **args)
 	if ((errCode = Greeting(window, rend, &Events, &Params, &Game, MODE_ADD)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 
-	if(!(Params.textures = CreateTextureSet(rend, Params.cols, &Params.WinSize, &Game)))
+	if (!(Params.textures = CreateTextureSet(rend, Params.cols, &Params.WinSize, &Game)))
 		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params);
 
 	// Игровой цикл
@@ -45,8 +44,7 @@ int main(int argc, const char **args)
 		SetMode(&Events, &Params); // Выбор режима работы в данный момент
 		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 		{
-			Params.textures = UpdateTextureSet(rend, Params.textures,
-				Params.cols, &Params.WinSize, &Game);
+			Params.textures = UpdateTextureSet(rend, Params.textures, Params.cols, &Params.WinSize, &Game);
 			// Рисование поля со старыми элементами
 			if ((errCode = DrawOldElements(rend, &Params, &Game) /*== ERR_SDL*/))
 				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
@@ -55,50 +53,50 @@ int main(int argc, const char **args)
 
 		switch (Params.Mode)
 		{
-		case MODE_QUIT:
+		case MODE_QUIT://0
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params);
 
-		case MODE_WAIT:
+		case MODE_WAIT://10
 			continue;
 
-		case MODE_ADD:
+		case MODE_ADD://11
 			ChangeCombinedToOld(&Game);
 			NewElementIndex = AddElement(&Game);
 			Game.Field[NewElementIndex].size = 0;
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
 			В противном случае там -1, что приведёт к выходу из программы*/
 			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
-			dtCount();	//Сброс счётчика времени кадра перед отрисовкой
+			dtCount(); // Сброс счётчика времени кадра перед отрисовкой
 			break;
 
-		case MODE_CHECK_RIGHT:
-		case MODE_CHECK_LEFT:
-		case MODE_CHECK_DOWN:
-		case MODE_CHECK_UP:
-		{
+		case MODE_CHECK_RIGHT://6
+		case MODE_CHECK_LEFT://7
+		case MODE_CHECK_DOWN://8
+		case MODE_CHECK_UP: {//9
+			//Может вернуть move, quit или wait
 			Uint8 tmpMode = CheckMove[Params.Mode](&Game, &Params);
 			dtCount();
-			if(tmpMode == MODE_WAIT)
+			if (tmpMode == MODE_WAIT || tmpMode == MODE_QUIT)
 			{
-				Params.Mode = (CheckCombo[Params.Mode](&Game, &Params)) ?
-					Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT) : MODE_WAIT;
-					// MODE_MOVE_RIGHT : MODE_WAIT;
+				Params.Mode = (CheckCombo[Params.Mode](&Game, &Params))
+								  ? Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
+								  : MODE_WAIT;
 			}
 			else
 				Params.Mode = tmpMode;
 			break;
 		}
-			
-		case MODE_MOVE_RIGHT:
-		case MODE_MOVE_LEFT:
-		case MODE_MOVE_UP:
-		case MODE_MOVE_DOWN:
-			if((errCode = DoMove[Params.Mode](rend, &Game, &Params)))
+
+		case MODE_MOVE_RIGHT://2
+		case MODE_MOVE_LEFT://3
+		case MODE_MOVE_DOWN://4
+		case MODE_MOVE_UP://5
+			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params);
 			SDL_RenderPresent(rend);
 			break;
 
-		case MODE_DRAW_NEW:
+		case MODE_DRAW_NEW://1
 			if (NewElementIndex >= 0)
 			{
 				// Рисование поля со старыми элементами
@@ -110,11 +108,11 @@ int main(int argc, const char **args)
 				SDL_RenderPresent(rend);
 				/*Если размер был сброшен, значит цикл отрисовки пора прервать,
 					выставив соответстветствующие флаги */
-				if (!Game.Field[NewElementIndex].size) 
+				if (!Game.Field[NewElementIndex].size)
 				{
 					NewElementIndex = -1;
 					Params.Mode = MODE_WAIT;
-				}				
+				}
 			}
 			break;
 
