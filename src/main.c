@@ -41,6 +41,7 @@ int main(int argc, const char **args)
 
 	if (!(Assets.textures = CreateTextureSet(rend, Assets.cols, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
+	Assets.textures_count = 3;
 
 	// Игровой цикл
 	while (SDL_TRUE)

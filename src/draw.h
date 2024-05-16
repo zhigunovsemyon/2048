@@ -17,14 +17,14 @@ SDL_Texture* GetScoreTexture(SDL_Renderer* , SDL_Texture* OldTexture,
 
 /*Создание рисовальщиком rend набора текстур, используемая игрой, из набора цветов ColourSet,
 с учётом размера экрана WinSize, размеров поля и очков игры из Game*/
-SDL_Texture** CreateTextureSet(SDL_Renderer*, SDL_Colour *cols,  Params* , Game* );
+TileTexture *CreateTextureSet(SDL_Renderer*, SDL_Colour *cols,  Params* , Game* );
 
 /*Обновление рисовальщиком rend набора текстур, используемых игрой,
 с учётом размера экрана, размеров поля и очков игры из Game*/
-SDL_Texture** UpdateTextureSet(SDL_Renderer* , Params* , Game* , Assets *Assets);
+TileTexture *UpdateTextureSet(SDL_Renderer* , Params* , Game* , Assets *Assets);
 
 //Подбор текстуры из набора textures для ячейки размерности TileValue
-SDL_Texture* GetTextureForTile(Uint64 TileValue, SDL_Texture **textures);
+SDL_Texture* GetTextureForTile(Uint64 TileValue, Assets *);
 
 /*Рисование приветственного сообщения message рисовальщиком rend шрифтом font_name
  * на основе пареметров Params, c записью размеров текстуры в txt_size, */

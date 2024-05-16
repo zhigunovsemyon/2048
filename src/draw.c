@@ -1,4 +1,19 @@
 #include "draw.h"
+#include "main.h"
+	// if(!needed)
+	// {
+	// 	TileTexture *tmp = (TileTexture*)SDL_realloc(Assets->textures, Assets->textures_count + 1);
+	// 	if(!tmp)
+	// 		return NULL;
+	//
+	// 	tmp[Assets->textures_count].val = TileValue;
+	// 	SDL_Colour txt_col = { 0xFF, 0xFF, 0xFF, 0xFF};
+	// 	char *stringForTex;
+	// 	SDL_asprintf(&stringForTex, "%lu", TileValue);
+	// 	tmp[Assets->textures_count].tex = CreateMessageTexture(rend, &txt_col, Assets->cols + COL_SQ2,
+	// 													 *txt_size, const char *font_name, const char *message, Uint8 IsCentred)
+	//
+	// }
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
@@ -362,53 +377,54 @@ SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture, SDL_Co
 	return ret;
 }
 
-SDL_Texture **CreateTextureSet(SDL_Renderer *rend, SDL_Colour *cols, Params *Params, Game *Game)
+
+
+TileTexture *CreateTextureSet(SDL_Renderer *rend, SDL_Colour *cols, Params *Params, Game *Game)
 {
 	Uint64 TileValue = 1;
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
-	SDL_Texture **set = (SDL_Texture **)SDL_malloc(TEXTURES_COUNT * sizeof(SDL_Texture *));
+	TileTexture *set = (TileTexture *)SDL_malloc(3 * sizeof(TileTexture));
 	if (!set)
 		return NULL;
 
 	SDL_Rect Tile;
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
-	for (Uint8 i = TEX_SQ2; i < TEXTURES_COUNT; ++i)
+	set[1].val = 2;
+	if (!(set[TEX_SQ2].tex = CreateMessageTexture(rend, &txt_col, cols + COL_SQ2, &Tile, FONT, "2", SDL_TRUE)))
 	{
-		TileValue <<= 1;
-		char *text;
-		SDL_asprintf(&text, "%lu", TileValue);
-		// Проверка text на NULL осуществляется внутри CreateMessageTexture
-		set[i] = CreateMessageTexture(rend, &txt_col, cols + i + 1, &Tile, FONT, text, SDL_TRUE);
-		SDL_free(text);
-		// Если хоть одну из текстур не удалось создать
-		if (!(set[i]))
-		{ // Очистка всех остальных текстур
-			SDL_DestroyTexture(set[i]);
-			for (; i; i--)
-				SDL_DestroyTexture(set[i - 1]);
-			SDL_free(set);
-			return NULL;
-		}
-	}
-
-	// Создание текстуры числа очков
-	Tile.w *= 2;
-	if (!(set[TEX_SCORE] = GetScoreTexture(rend, NULL, cols, &Tile, Game)))
-	{ // Очистка всех остальных текстур
-		for (Uint8 i = TEX_SCORE; i; i--)
-			SDL_DestroyTexture(set[i - 1]);
 		SDL_free(set);
 		return NULL;
 	}
+	set[2].val = 4;
+	if (!(set[TEX_SQ4].tex = CreateMessageTexture(rend, &txt_col, cols + COL_SQ4, &Tile, FONT, "4", SDL_TRUE)))
+	{
+		SDL_DestroyTexture(set[TEX_SQ2].tex);
+		SDL_free(set);
+		return NULL;
+	};
+
+	Tile.w = (uint16_t)Params->FieldSize;
+	Tile.h = (uint16_t)Params->CellWidth;
+
+	set[TEX_SCORE].val = TEX_SCORE;
+	if (!(set[TEX_SCORE].tex =
+			  CreateMessageTexture(rend, &txt_col, cols + COL_BG, &Tile, FONT, "Очков : 0 | Рекорд: 0", SDL_FALSE)))
+	{
+		SDL_DestroyTexture(set[TEX_SQ2].tex);
+		SDL_DestroyTexture(set[TEX_SQ4].tex);
+		SDL_free(set);
+		return NULL;
+	}
+
 	return set;
 }
 
-SDL_Texture **UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game, Assets *Assets)
+TileTexture *UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game, Assets *Assets)
 {
 	/*Освобождение всех текстур*/
-	for (Uint8 i = 0; i < TEXTURES_COUNT; ++i)
-		SDL_DestroyTexture(Assets->textures[i]);
+	for (Uint8 i = 0; i < Assets->textures_count; ++i)
+		SDL_DestroyTexture(Assets->textures[i].tex);
 
 	// Освобождать сам массив из памяти на данном этапе не нужно,
 	// так как он заменится новыми текстурами.
@@ -416,38 +432,23 @@ SDL_Texture **UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game, A
 	return CreateTextureSet(rend, Assets->cols, Params, Game);
 }
 
-SDL_Texture *GetTextureForTile(Uint64 TileValue, SDL_Texture **textures)
+Sint32 FindTexture(void const *l, void const *r)
 {
-	switch (TileValue)
-	{
-	case 0: // Ноль не может быть действительным значением тайла
-		return NULL;
-	case 2:
-		return textures[TEX_SQ2];
-	case 4:
-		return textures[TEX_SQ4];
-	case 8:
-		return textures[TEX_SQ8];
-	case 16:
-		return textures[TEX_SQ16];
-	case 32:
-		return textures[TEX_SQ32];
-	case 64:
-		return textures[TEX_SQ64];
-	case 128:
-		return textures[TEX_SQ128];
-	case 256:
-		return textures[TEX_SQ256];
-	case 512:
-		return textures[TEX_SQ512];
-	case 1024:
-		return textures[TEX_SQ1024];
-	case 2048:
-		return textures[TEX_SQ2048];
-	default: //>2048
-		return textures[TEX_MAX];
-	}
+	TileTexture const *int_l = l;
+	TileTexture const *int_r = r;
+	return int_l->val - int_r->val;
 }
+
+SDL_Texture *GetTextureForTile(Uint64 TileValue, Assets *Assets)
+{
+	TileTexture key = {.val = TileValue};
+	TileTexture *needed =
+		SDL_bsearch(&key, Assets->textures + 1, Assets->textures_count - 1, sizeof(TileTexture), FindTexture);
+	if(needed)
+		return needed->tex;
+	/*else */return NULL;
+}
+
 
 SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col, SDL_Colour *bg_col, SDL_Rect *txt_size,
 								  const char *font_name, const char *message, Uint8 IsCentred)
@@ -535,8 +536,8 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 		return ERR_SDL;
 
 	// Размер плитки
-	float TileSize = Params->FieldSize / TileCount;							  // Размер одного тайла
-	SDL_Point Corner =												  // Координаты угла поля
+	float TileSize = Params->FieldSize / TileCount; // Размер одного тайла
+	SDL_Point Corner =								// Координаты угла поля
 		{(Params->WinSize.x - Params->FieldSize) * 0.5, (Params->WinSize.y - Params->FieldSize) * 0.5};
 
 	// Задание цвета фона
@@ -631,7 +632,8 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game, Assets *Ass
 	return ERR_NO;
 }
 
-static Uint8 (*int_DoMove[])(SDL_Renderer *, Game *, Params *, Assets *) = {DoRightMove, DoLeftMove, DoDownMove, DoUpMove};
+static Uint8 (*int_DoMove[])(SDL_Renderer *, Game *, Params *, Assets *) = {DoRightMove, DoLeftMove, DoDownMove,
+																			DoUpMove};
 /*Набор функций отрисовки сдвигов тайлов поля Game.
 используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
 Uint8 (**DoMove)(SDL_Renderer *, Game *, Params *, Assets *) = int_DoMove - MODE_MOVE_RIGHT;

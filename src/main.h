@@ -13,6 +13,14 @@
 #include <SDL2/SDL_ttf.h>
 #endif // !SDL_h_
 
+//Текстура некоторого тайла
+typedef struct
+{
+	uint64_t val;//Значение тайла, для которого используется текстура
+	SDL_Texture *tex;//Сама текстура
+}
+TileTexture;
+
 //Структура, описывающая один тайл
 typedef struct
 {
@@ -50,7 +58,8 @@ Params;
 //Ассеты игры
 typedef struct
 {
-	SDL_Texture **textures;
+	TileTexture *textures;
+	uint8_t textures_count;
 	SDL_Colour *cols;
 }
 Assets;
