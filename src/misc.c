@@ -481,7 +481,7 @@ Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend, Game 
 	// Освобождение текстур
 	if (Assets->textures)
 	{
-		for (Uint8 i = 0; i < TEXTURES_COUNT; ++i)
+		for (Uint8 i = 0; i < Assets->textures_count; ++i)
 			SDL_DestroyTexture(Assets->textures[i].tex);
 		SDL_free(Assets->textures);
 	}
