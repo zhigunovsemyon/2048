@@ -39,7 +39,7 @@ int main(int argc, const char **args)
 	// Подсчёт размера поля и каждой ячейки поля
 	GetFieldAndTileSize(&Game, &Params);
 
-	if (!(Assets.textures = CreateTextureSet(rend, Assets.cols, &Params, &Game)))
+	if (!(Assets.textures = InitTextureSet(rend, Assets.cols, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
 	Assets.textures_count = 3;
 

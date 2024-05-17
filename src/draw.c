@@ -399,7 +399,7 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 
 	// Отрисовка конечного тайла
 	SDL_Texture *tile_texture =
-		GetTextureForTile(Game->Field[Index].val, Assets->textures);
+		GetTextureForTile(Game->Field[Index].val, Assets);
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
 	return ERR_NO;
@@ -481,7 +481,8 @@ TileTexture *UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 	// return CreateTextureSet(rend, Assets->cols, Params, Game);
 }
 
-Sint32 FindTexture(void const *l, void const *r)
+/*Функция поиска текстуры для bsearch*/
+static Sint32 FindTexture(void const *l, void const *r)
 {
 	TileTexture const *int_l = l;
 	TileTexture const *int_r = r;
@@ -494,6 +495,7 @@ SDL_Texture *GetTextureForTile(Uint64 TileValue, Assets *Assets)
 	TileTexture *needed =
 		SDL_bsearch(&key, Assets->textures + 1, Assets->textures_count - 1,
 					sizeof(TileTexture), FindTexture);
+	//Если текстура нашлась, она возвращается, в противном случае возврат NULL
 	if (needed)
 		return needed->tex;
 	/*else */ return NULL;
@@ -646,7 +648,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 				 (Params->CellWidth - Tile.w) * 0.5 +
 				 Params->CellWidth * (i / Game->FieldSize);
 		SDL_Texture *tile_texture =
-			GetTextureForTile(Game->Field[i].val, Assets->textures);
+			GetTextureForTile(Game->Field[i].val, Assets);
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
 	}
@@ -658,7 +660,7 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 {
 	SDL_Rect Tile;
 	SDL_Texture *tile_texture =
-		GetTextureForTile(Game->Field[Index].val, Assets->textures);
+		GetTextureForTile(Game->Field[Index].val, Assets);
 
 	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер
 	 * плитки*/
