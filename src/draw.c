@@ -668,6 +668,9 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 					 Assets *Assets, Sint8 Index)
 {
+	if (Index == -1)//Если был передан -1, значит нового элемента нет
+		return ERR_NO;
+
 	SDL_Rect Tile;
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
