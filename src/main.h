@@ -59,7 +59,7 @@ Params;
 typedef struct
 {
 	TileTexture *textures;
-	uint8_t textures_count;
+	Uint8 textures_count;
 	SDL_Colour *cols;
 }
 Assets;

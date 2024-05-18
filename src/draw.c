@@ -6,7 +6,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	if(!TileValue /* == 0*/)
 		return NULL;
 	TileTexture *tmp = (TileTexture *)SDL_realloc(Assets->textures,
-												  (Assets->textures_count) + 1);
+												  sizeof(Uint8) * ((Assets->textures_count) + 1));
 	if (!tmp)
 		return NULL;
 
