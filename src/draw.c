@@ -1,12 +1,30 @@
 #include "draw.h"
 
+static void *Bad_realloc(void *mem, Uint64 amount, Uint64 oldAmount)
+{
+	void *new = SDL_realloc(mem, amount);
+	if (new)
+		return new;
+	/*else*/
+	new = SDL_malloc(amount);
+	if (!new)
+	{
+		SDL_Log("malloc упал");
+		return NULL;
+	}
+	/*else*/
+	SDL_memcpy(new, mem, oldAmount);
+	return new;
+}
+
 SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 							   Assets *Assets, float CellWidth)
 {
 	if(!TileValue /* == 0*/)
 		return NULL;
-	TileTexture *tmp = (TileTexture *)SDL_realloc(Assets->textures,
-												  sizeof(Uint8) * ((Assets->textures_count) + 1));
+	TileTexture *tmp = (TileTexture *)Bad_realloc(Assets->textures,
+												  sizeof(Uint8) * ((Assets->textures_count) + 1), 
+												  sizeof(Uint8) * (Assets->textures_count));
 	if (!tmp)
 		return NULL;
 
