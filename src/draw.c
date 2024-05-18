@@ -446,13 +446,13 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
 	Assets->textures[TEX_SCORE].val = TEX_SCORE;
-	if (!(Assets->textures[TEX_SCORE].tex =
+	/*if (!(Assets->textures[TEX_SCORE].tex =
 			  CreateMessageTexture(rend, &txt_col, Assets->cols + COL_BG, &Tile, FONT,
 								   "Очков : 0 | Рекорд: 0", SDL_FALSE)))
 	{
 		SDL_free(Assets->textures);
 		return ERR_SDL;
-	}
+	}*/
 	Assets->textures_count = 1;
 
 	if (!(Assets->textures[TEX_SQ2].tex = CreateTileTexture(rend, 2, Assets, Params->CellWidth)))
@@ -468,9 +468,6 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
 		return ERR_SDL;
 	}
 	Assets->textures[2].val = 4;
-
-	Tile.w = (uint16_t)Params->FieldSize;
-	Tile.h = (uint16_t)Params->CellWidth;
 
 	return ERR_NO;
 }
