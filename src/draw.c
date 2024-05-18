@@ -26,20 +26,6 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	Assets->textures_count++;
 	return Assets->textures[Assets->textures_count - 1].tex;
 }
-// TileTexture CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
-// 							  SDL_Colour *cols, float CellWidth)
-// {
-// 	TileTexture new;
-// 	new.val = TileValue;
-// 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
-// 	SDL_Rect txt_size;
-// 	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
-// 	char *stringForTex;
-// 	SDL_asprintf(&stringForTex, "%lu", TileValue);
-// 	new.tex = CreateMessageTexture(rend, &txt_col, cols + COL_SQ2, &txt_size,
-// 								   FONT, stringForTex, SDL_TRUE);
-// 	return new;
-// }
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
@@ -453,7 +439,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
 							Params *Params, Game *Game)
 {
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
-	if(!(Assets->textures = (TileTexture *)SDL_malloc(1 * sizeof(TileTexture))))
+	if(!(Assets->textures = (TileTexture *)SDL_malloc(3 * sizeof(TileTexture))))
 		return ERR_MALLOC;
 
 	SDL_Rect Tile;
@@ -471,19 +457,16 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
 
 	if (!(Assets->textures[TEX_SQ2].tex = CreateTileTexture(rend, 2, Assets, Params->CellWidth)))
 	{
-		SDL_DestroyTexture(Assets->textures[TEX_SCORE].tex);
-		SDL_free(Assets->textures);
+		/*В случае ошибки память будет освобождена на выходе*/
 		return ERR_SDL;
 	}
 	Assets->textures[1].val = 2;
 
 	if (!(Assets->textures[TEX_SQ4].tex = CreateTileTexture(rend, 4, Assets, Params->CellWidth)))
 	{
-		SDL_DestroyTexture(Assets->textures[TEX_SQ2].tex);
-		SDL_DestroyTexture(Assets->textures[TEX_SCORE].tex);
-		SDL_free(Assets->textures);
+		/*В случае ошибки память будет освобождена на выходе*/
 		return ERR_SDL;
-	};
+	}
 	Assets->textures[2].val = 4;
 
 	Tile.w = (uint16_t)Params->FieldSize;
@@ -508,9 +491,7 @@ TileTexture *UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 /*Функция поиска текстуры для bsearch*/
 static Sint32 FindTexture(void const *l, void const *r)
 {
-	TileTexture const *int_l = l;
-	TileTexture const *int_r = r;
-	return int_l->val - int_r->val;
+	return ((TileTexture const *)l)->val - ((TileTexture const *)r)->val;
 }
 
 SDL_Texture *GetTextureForTile(Uint64 TileValue, Assets *Assets)
