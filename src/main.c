@@ -131,15 +131,14 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			   Uint8 NextMode)
 { // Создание сообщения
 	char *message;
-	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", "Добро пожаловать в игру 2048!", "Включён ",
-				 (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим", "Управление мышью ",
-				 (Params->Flags & FLAG_MOUSEOFF) ? "отключено" : "включено", "V-Sync ",
-				 (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен", "Используется управление ",
-				 (Params->Flags & FLAG_WASDKEY)	 ? "WASD"
-				 : (Params->Flags & FLAG_VIMKEY) ? "vi"
-												 : "стрелками",
-				 "Используется размер поля ", Game->FieldSize,
-				 "Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
+	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", "Добро пожаловать в игру 2048!", //Заголовок
+				"Включён ", (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим",	//Цветовой режим
+				"Управление мышью ",(Params->Flags & FLAG_MOUSEOFF) ? "отключено" : "включено", //Управление мышью
+				"V-Sync ", (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен",	//v-sync
+				"Используется управление ",(Params->Flags & FLAG_WASDKEY) ? "WASD" //схема управления wasd
+				: (Params->Flags & FLAG_VIMKEY) ? "vi" : "стрелками",			// либо vi, либо стрелки
+				"Используется размер поля ", Game->FieldSize, //Информация о размерах поля
+				"Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
 	if (!message)
 		return ERR_MALLOC;
 

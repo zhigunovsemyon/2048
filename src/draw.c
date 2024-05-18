@@ -383,8 +383,8 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 
 	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
 	// размеров плитки и ячейки
-	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
+	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
 
 	// Сдвиг на оффсет
 	if (Game->Field[Index].mode == TILE_MOVE_X)
