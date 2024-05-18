@@ -39,9 +39,8 @@ int main(int argc, const char **args)
 	// Подсчёт размера поля и каждой ячейки поля
 	GetFieldAndTileSize(&Game, &Params);
 
-	if (!(Assets.textures = InitTextureSet(rend, Assets.cols, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
-	Assets.textures_count = 3;
+	if ((errCode =  InitTextureSet(rend, &Assets, &Params, &Game)))
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Игровой цикл
 	while (SDL_TRUE)

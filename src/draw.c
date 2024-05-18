@@ -1,24 +1,45 @@
 #include "draw.h"
 
-// if(!needed)
-// {
-// 	TileTexture *tmp = (TileTexture*)SDL_realloc(Assets->textures,
-// Assets->textures_count + 1); 	if(!tmp) 		return NULL;
-
-TileTexture CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
-							  SDL_Colour *cols, float CellWidth)
+SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
+							   Assets *Assets, float CellWidth)
 {
-	TileTexture new;
-	new.val = TileValue;
+	if(!TileValue /* == 0*/)
+		return NULL;
+	TileTexture *tmp = (TileTexture *)SDL_realloc(Assets->textures,
+												  (Assets->textures_count) + 1);
+	if (!tmp)
+		return NULL;
+
+	tmp[Assets->textures_count].val = TileValue;
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
 	SDL_Rect txt_size;
 	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
 	char *stringForTex;
 	SDL_asprintf(&stringForTex, "%lu", TileValue);
-	new.tex = CreateMessageTexture(rend, &txt_col, cols + COL_SQ2, &txt_size,
-								   FONT, stringForTex, SDL_TRUE);
-	return new;
+	if(!(tmp[Assets->textures_count].tex = CreateMessageTexture(rend, &txt_col, Assets->cols + COL_SQ2,
+								   &txt_size, FONT, stringForTex, SDL_TRUE)))
+	{
+		SDL_free(tmp);
+		return NULL;
+	}
+	Assets->textures = tmp;
+	Assets->textures_count++;
+	return Assets->textures[Assets->textures_count - 1].tex;
 }
+// TileTexture CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
+// 							  SDL_Colour *cols, float CellWidth)
+// {
+// 	TileTexture new;
+// 	new.val = TileValue;
+// 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
+// 	SDL_Rect txt_size;
+// 	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
+// 	char *stringForTex;
+// 	SDL_asprintf(&stringForTex, "%lu", TileValue);
+// 	new.tex = CreateMessageTexture(rend, &txt_col, cols + COL_SQ2, &txt_size,
+// 								   FONT, stringForTex, SDL_TRUE);
+// 	return new;
+// }
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
@@ -400,6 +421,11 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	// Отрисовка конечного тайла
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
+	if(!tile_texture)
+		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets, Params->CellWidth);
+	if(!tile_texture)
+		return ERR_SDL;
+
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
 	return ERR_NO;
@@ -423,49 +449,47 @@ SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture,
 	return ret;
 }
 
-TileTexture *InitTextureSet(SDL_Renderer *rend, SDL_Colour *cols,
+Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
 							Params *Params, Game *Game)
 {
-	Uint64 TileValue = 1;
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
-	TileTexture *set = (TileTexture *)SDL_malloc(3 * sizeof(TileTexture));
-	if (!set)
-		return NULL;
+	if(!(Assets->textures = (TileTexture *)SDL_malloc(1 * sizeof(TileTexture))))
+		return ERR_MALLOC;
 
 	SDL_Rect Tile;
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
-	set[1].val = 2;
-	if (!(set[TEX_SQ2].tex = CreateMessageTexture(
-			  rend, &txt_col, cols + COL_SQ2, &Tile, FONT, "2", SDL_TRUE)))
+	Assets->textures[TEX_SCORE].val = TEX_SCORE;
+	if (!(Assets->textures[TEX_SCORE].tex =
+			  CreateMessageTexture(rend, &txt_col, Assets->cols + COL_BG, &Tile, FONT,
+								   "Очков : 0 | Рекорд: 0", SDL_FALSE)))
 	{
-		SDL_free(set);
-		return NULL;
+		SDL_free(Assets->textures);
+		return ERR_SDL;
 	}
-	set[2].val = 4;
-	if (!(set[TEX_SQ4].tex = CreateMessageTexture(
-			  rend, &txt_col, cols + COL_SQ4, &Tile, FONT, "4", SDL_TRUE)))
+	Assets->textures_count = 1;
+
+	if (!(Assets->textures[TEX_SQ2].tex = CreateTileTexture(rend, 2, Assets, Params->CellWidth)))
 	{
-		SDL_DestroyTexture(set[TEX_SQ2].tex);
-		SDL_free(set);
-		return NULL;
+		SDL_DestroyTexture(Assets->textures[TEX_SCORE].tex);
+		SDL_free(Assets->textures);
+		return ERR_SDL;
+	}
+	Assets->textures[1].val = 2;
+
+	if (!(Assets->textures[TEX_SQ4].tex = CreateTileTexture(rend, 4, Assets, Params->CellWidth)))
+	{
+		SDL_DestroyTexture(Assets->textures[TEX_SQ2].tex);
+		SDL_DestroyTexture(Assets->textures[TEX_SCORE].tex);
+		SDL_free(Assets->textures);
+		return ERR_SDL;
 	};
+	Assets->textures[2].val = 4;
 
 	Tile.w = (uint16_t)Params->FieldSize;
 	Tile.h = (uint16_t)Params->CellWidth;
 
-	set[TEX_SCORE].val = TEX_SCORE;
-	if (!(set[TEX_SCORE].tex =
-			  CreateMessageTexture(rend, &txt_col, cols + COL_BG, &Tile, FONT,
-								   "Очков : 0 | Рекорд: 0", SDL_FALSE)))
-	{
-		SDL_DestroyTexture(set[TEX_SQ2].tex);
-		SDL_DestroyTexture(set[TEX_SQ4].tex);
-		SDL_free(set);
-		return NULL;
-	}
-
-	return set;
+	return ERR_NO;
 }
 
 TileTexture *UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
@@ -495,7 +519,7 @@ SDL_Texture *GetTextureForTile(Uint64 TileValue, Assets *Assets)
 	TileTexture *needed =
 		SDL_bsearch(&key, Assets->textures + 1, Assets->textures_count - 1,
 					sizeof(TileTexture), FindTexture);
-	//Если текстура нашлась, она возвращается, в противном случае возврат NULL
+	// Если текстура нашлась, она возвращается, в противном случае возврат NULL
 	if (needed)
 		return needed->tex;
 	/*else */ return NULL;
@@ -649,6 +673,11 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 				 Params->CellWidth * (i / Game->FieldSize);
 		SDL_Texture *tile_texture =
 			GetTextureForTile(Game->Field[i].val, Assets);
+		if(!tile_texture)
+			tile_texture = CreateTileTexture(rend, Game->Field[i].val, Assets, Params->CellWidth);
+		if(!tile_texture)
+			return ERR_SDL;
+
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
 	}
@@ -661,6 +690,11 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	SDL_Rect Tile;
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
+	if(!tile_texture)
+		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets, Params->CellWidth);
+	if(!tile_texture)
+		return ERR_SDL;
+
 
 	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер
 	 * плитки*/

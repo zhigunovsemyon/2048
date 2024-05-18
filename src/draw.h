@@ -20,12 +20,12 @@ SDL_Texture *GetScoreTexture(SDL_Renderer *, SDL_Texture *OldTexture,
 /*Создание рисовальщиком rend набора текстур для тайлов 2, 4, и очков,
  * используемая игрой, из набора цветов ColourSet,
 с учётом размера экрана WinSize, размеров поля и очков игры из Game*/
-TileTexture *InitTextureSet(SDL_Renderer *, SDL_Colour *cols, Params *, Game *);
+Uint8 InitTextureSet(SDL_Renderer *, Assets *, Params *, Game *);
 
 /*Создание текстуры тайла со значением TileValue, размера CellWidth,
  * рисовальщиком rend, из набора цветов cols*/
-TileTexture CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
-							  SDL_Colour *cols, float CellWidth);
+SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
+							   Assets *Assets, float CellWidth);
 
 /*Обновление рисовальщиком rend набора текстур, используемых игрой,
 с учётом размера экрана, размеров поля и очков игры из Game*/
