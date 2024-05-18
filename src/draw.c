@@ -5,7 +5,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 {
 	if(!TileValue /* == 0*/)
 		return NULL;
-	TileTexture *tmp = (TileTexture *)SDL_realloc(Assets->textures, 80);
+	TileTexture *tmp = (TileTexture *)SDL_realloc(Assets->textures, sizeof(TileTexture) * (Assets->textures_count + 1));
 	if (!tmp)
 		return NULL;
 
@@ -438,7 +438,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
 							Params *Params, Game *Game)
 {
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
-	if(!(Assets->textures = (TileTexture *)SDL_malloc(3 * sizeof(TileTexture))))
+	if(!(Assets->textures = (TileTexture *)SDL_malloc(1 * sizeof(TileTexture))))
 		return ERR_MALLOC;
 
 	SDL_Rect Tile;
