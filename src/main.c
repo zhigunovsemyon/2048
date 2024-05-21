@@ -130,7 +130,7 @@ int main(int argc, const char **args)
 
 /*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
  * параметров игры Params, настроек игры Game. Возврат нуля при отсутствии ошибок, либо SDL_ERR*/
-static Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *Assets, Params *Params, Game *Game,
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *Assets, Params *Params, Game *Game,
 			   Uint8 NextMode)
 { // Создание сообщения
 	char *message;

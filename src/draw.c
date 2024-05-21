@@ -484,7 +484,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	return ERR_NO;
 }
 
-TileTexture *UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
+Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 							  Assets *Assets)
 {
 	/*Освобождение всех текстур*/

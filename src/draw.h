@@ -29,7 +29,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 
 /*Обновление рисовальщиком rend набора текстур, используемых игрой,
 с учётом размера экрана, размеров поля и очков игры из Game*/
-TileTexture *UpdateTextureSet(SDL_Renderer *, Params *, Game *, Assets *Assets);
+Uint8 UpdateTextureSet(SDL_Renderer *, Params *, Game *, Assets *Assets);
 
 // Подбор текстуры из набора textures для ячейки размерности TileValue
 SDL_Texture *GetTextureForTile(Uint64 TileValue, Assets *);
