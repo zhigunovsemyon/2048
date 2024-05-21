@@ -17,9 +17,9 @@
 #define ANIM_SPEED 500.0f			//Скорость анимации
 #define MIN_FRAMETIME 1				//Минимальное время кадра (1 = 1000FPS, 16 = 60 FPS)
 #define CHANCE_OF_FOUR 10			//Шанс выпадения 4ки
-
-#define BG_DARK_BRIGHTNESS		0x20//Яркость тёмного цвета
-#define BG_LIGHT_BRIGHTNESS		0xdf//Яркость светлого цвета
+//
+//#define BG_DARK_BRIGHTNESS		0x20//Яркость тёмного цвета
+//#define BG_LIGHT_BRIGHTNESS		0xdf//Яркость светлого цвета
 
 //Используемый шрифт
 #if WIN32
