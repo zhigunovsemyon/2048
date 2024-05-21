@@ -37,8 +37,23 @@
 #define DARK_SCHEME "assets/dark"
 #endif
 
-enum TileMode
-{
+//Ожидаемые цвета
+#define COLOURS_LIST {	"background", \
+						"foreground", \
+						"square2", \
+						"square4",\
+						"square8",\
+						"square16",\
+						"square32",\
+						"square64",\
+						"square128",\
+						"square256",\
+						"square512",\
+						"square1024",\
+						"square2048",\
+						"square_max"	}
+enum TileMode		  		
+{					  		
 	TILE_NEW,	//Новый тайл
 	TILE_OLD,	//Статичный тайл
 	TILE_MOVE_X,//Тайл, движимый по горизонтали
