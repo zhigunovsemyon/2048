@@ -54,44 +54,45 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{ // Цикл перебора каждого столбца с конца
 		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
 		{ // Если данная ячейка не пустая, и она движется по горизонтали
-			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
-				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X)
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			if(Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
+				continue;
+
+			if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 			{
-				if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
-				{
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												i * Game->FieldSize + j))
-						return ERR_SDL;
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											i * Game->FieldSize + j))
+					return ERR_SDL;
 
-					Flag++;
-					Game->Field[i * Game->FieldSize + j].offset -= change;
-				}
-				else // Если элемент сдвинулся на целую ячейку
+				Flag++;
+				Game->Field[i * Game->FieldSize + j].offset -= change;
+			}
+			else // Если элемент сдвинулся на целую ячейку
+			{
+				if (Game->Field[i * Game->FieldSize + j + 1].mode !=
+					TILE_COMBINED)
 				{
-					if (Game->Field[i * Game->FieldSize + j + 1].mode !=
-						TILE_COMBINED)
-					{
-						// Копирование текущего элемента в следующий
-						Game->Field[i * Game->FieldSize + j + 1] =
-							Game->Field[i * Game->FieldSize + j];
-						Game->Field[i * Game->FieldSize + j + 1].mode =
-							TILE_OLD;
-					}
-					else
-					{
-						Game->Field[i * Game->FieldSize + j + 1].mode =
-							TILE_JUSTCOMBINED;
-						Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
-					}
-					Game->Field[i * Game->FieldSize + j + 1].offset = 0;
-
-					// Зануление прошлого элемента
-					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							   sizeof(Tile));
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												i * Game->FieldSize + j + 1))
-						return ERR_SDL;
+					// Копирование текущего элемента в следующий
+					Game->Field[i * Game->FieldSize + j + 1] =
+						Game->Field[i * Game->FieldSize + j];
+					Game->Field[i * Game->FieldSize + j + 1].mode =
+						TILE_OLD;
 				}
+				else
+				{
+					Game->Field[i * Game->FieldSize + j + 1].mode =
+						TILE_JUSTCOMBINED;
+					Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
+				}
+				Game->Field[i * Game->FieldSize + j + 1].offset = 0;
+
+				// Зануление прошлого элемента
+				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
+							sizeof(Tile));
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											i * Game->FieldSize + j + 1))
+					return ERR_SDL;
 			}
 		}
 	}
@@ -136,46 +137,47 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца с конца
 		for (Sint8 j = 0; j < Game->FieldSize; j++)
-		{ // Если данная ячейка не пустая, и она движется по горизонтали
-			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
-				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_X)
-			{
-				if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
-				{
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												i * Game->FieldSize + j))
-						return ERR_SDL;
+		{ // Если данная ячейка пустая, или она не движется по горизонтали
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			if(Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
+				continue;
 
-					Flag++;
-					Game->Field[i * Game->FieldSize + j].offset += change;
+			if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+			{
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											i * Game->FieldSize + j))
+					return ERR_SDL;
+
+				Flag++;
+				Game->Field[i * Game->FieldSize + j].offset += change;
+			}
+			else
+			{
+				if (Game->Field[i * Game->FieldSize + j - 1].mode !=
+					TILE_COMBINED)
+				{
+					// Копирование текущего элемента в следующий
+					Game->Field[i * Game->FieldSize + j - 1] =
+						Game->Field[i * Game->FieldSize + j];
+					Game->Field[i * Game->FieldSize + j - 1].mode =
+						TILE_OLD;
 				}
 				else
 				{
-					if (Game->Field[i * Game->FieldSize + j - 1].mode !=
-						TILE_COMBINED)
-					{
-						// Копирование текущего элемента в следующий
-						Game->Field[i * Game->FieldSize + j - 1] =
-							Game->Field[i * Game->FieldSize + j];
-						Game->Field[i * Game->FieldSize + j - 1].mode =
-							TILE_OLD;
-					}
-					else
-					{
-						Game->Field[i * Game->FieldSize + j - 1].mode =
-							TILE_JUSTCOMBINED;
-						Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
-					}
-					// Копирование текущего элемента в следующий
-					Game->Field[i * Game->FieldSize + j - 1].offset = 0;
-
-					// Зануление прошлого элемента
-					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							   sizeof(Tile));
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												i * Game->FieldSize + j - 1))
-						return ERR_SDL;
+					Game->Field[i * Game->FieldSize + j - 1].mode =
+						TILE_JUSTCOMBINED;
+					Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
 				}
+				// Копирование текущего элемента в следующий
+				Game->Field[i * Game->FieldSize + j - 1].offset = 0;
+
+				// Зануление прошлого элемента
+				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
+							sizeof(Tile));
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											i * Game->FieldSize + j - 1))
+					return ERR_SDL;
 			}
 		}
 	}
@@ -220,46 +222,47 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждого столбца с конца
 		for (Sint8 i = 0; i < Game->FieldSize; i++)
-		{ // Если данная ячейка не пустая, и она движется по горизонтали
-			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
-				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
-			{
-				if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
-				{
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												i * Game->FieldSize + j))
-						return ERR_SDL;
+		{ // Если данная ячейка пустая, и она движется не по горизонтали, пропуск
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			if (Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_Y)
+				continue;
 
-					Flag++;
-					Game->Field[i * Game->FieldSize + j].offset += change;
+			if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+			{
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											i * Game->FieldSize + j))
+					return ERR_SDL;
+
+				Flag++;
+				Game->Field[i * Game->FieldSize + j].offset += change;
+			}
+			else
+			{
+				if (Game->Field[(i - 1) * Game->FieldSize + j].mode !=
+					TILE_COMBINED)
+				{
+					// Копирование текущего элемента в следующий
+					Game->Field[(i - 1) * Game->FieldSize + j] =
+						Game->Field[i * Game->FieldSize + j];
+					Game->Field[(i - 1) * Game->FieldSize + j].mode =
+						TILE_OLD;
 				}
 				else
 				{
-					if (Game->Field[(i - 1) * Game->FieldSize + j].mode !=
-						TILE_COMBINED)
-					{
-						// Копирование текущего элемента в следующий
-						Game->Field[(i - 1) * Game->FieldSize + j] =
-							Game->Field[i * Game->FieldSize + j];
-						Game->Field[(i - 1) * Game->FieldSize + j].mode =
-							TILE_OLD;
-					}
-					else
-					{
-						Game->Field[(i - 1) * Game->FieldSize + j].mode =
-							TILE_JUSTCOMBINED;
-						Game->Field[(i - 1) * Game->FieldSize + j].val <<= 1;
-					}
-
-					Game->Field[(i - 1) * Game->FieldSize + j].offset = 0;
-
-					// Зануление прошлого элемента
-					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							   sizeof(Tile));
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												(i - 1) * Game->FieldSize + j))
-						return ERR_SDL;
+					Game->Field[(i - 1) * Game->FieldSize + j].mode =
+						TILE_JUSTCOMBINED;
+					Game->Field[(i - 1) * Game->FieldSize + j].val <<= 1;
 				}
+
+				Game->Field[(i - 1) * Game->FieldSize + j].offset = 0;
+
+				// Зануление прошлого элемента
+				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
+							sizeof(Tile));
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											(i - 1) * Game->FieldSize + j))
+					return ERR_SDL;
 			}
 		}
 	}
@@ -303,46 +306,47 @@ Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 	for (Sint8 i = Game->FieldSize - 1; i >= 0; i--)
 	{ // Цикл перебора каждой строки
 		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
-		{ // Если данная ячейка не пустая, и она движется по горизонтали
-			if (Game->Field[i * Game->FieldSize + j].val /* != 0 */ &&
-				Game->Field[i * Game->FieldSize + j].mode == TILE_MOVE_Y)
-			{
-				if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
-				{
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												i * Game->FieldSize + j))
-						return ERR_SDL;
+		{ // Если данная ячейка пустая, или она не движется по горизонтали
+			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
+				continue;
+			if(Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_Y)
+				continue;
 
-					Flag++;
-					Game->Field[i * Game->FieldSize + j].offset -= change;
+			if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
+			{
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											i * Game->FieldSize + j))
+					return ERR_SDL;
+
+				Flag++;
+				Game->Field[i * Game->FieldSize + j].offset -= change;
+			}
+			else
+			{
+				if (Game->Field[(i + 1) * Game->FieldSize + j].mode !=
+					TILE_COMBINED)
+				{
+					// Копирование текущего элемента в следующий
+					Game->Field[(i + 1) * Game->FieldSize + j] =
+						Game->Field[i * Game->FieldSize + j];
+					Game->Field[(i + 1) * Game->FieldSize + j].mode =
+						TILE_OLD;
 				}
 				else
 				{
-					if (Game->Field[(i + 1) * Game->FieldSize + j].mode !=
-						TILE_COMBINED)
-					{
-						// Копирование текущего элемента в следующий
-						Game->Field[(i + 1) * Game->FieldSize + j] =
-							Game->Field[i * Game->FieldSize + j];
-						Game->Field[(i + 1) * Game->FieldSize + j].mode =
-							TILE_OLD;
-					}
-					else
-					{
-						Game->Field[(i + 1) * Game->FieldSize + j].mode =
-							TILE_JUSTCOMBINED;
-						Game->Field[(i + 1) * Game->FieldSize + j].val <<= 1;
-					}
-					// Копирование текущего элемента в следующий
-					Game->Field[(i + 1) * Game->FieldSize + j].offset = 0;
-
-					// Зануление прошлого элемента
-					SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							   sizeof(Tile));
-					if (DrawSingleMovingElement(rend, Params, Game, Assets,
-												(i + 1) * Game->FieldSize + j))
-						return ERR_SDL;
+					Game->Field[(i + 1) * Game->FieldSize + j].mode =
+						TILE_JUSTCOMBINED;
+					Game->Field[(i + 1) * Game->FieldSize + j].val <<= 1;
 				}
+				// Копирование текущего элемента в следующий
+				Game->Field[(i + 1) * Game->FieldSize + j].offset = 0;
+
+				// Зануление прошлого элемента
+				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
+							sizeof(Tile));
+				if (DrawSingleMovingElement(rend, Params, Game, Assets,
+											(i + 1) * Game->FieldSize + j))
+					return ERR_SDL;
 			}
 		}
 	}
