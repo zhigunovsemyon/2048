@@ -19,8 +19,8 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	if (!stringForTex)
 		return NULL;
 
-	if (!(tmp[Assets->textures_count].tex =
-			  CreateMessageTexture(rend, &txt_col, Assets->cols + COL_SQ2,
+	if (!(tmp[Assets->textures_count].tex = CreateMessageTexture(
+			  rend, &txt_col, 1 + Assets->cols + Assets->textures_count,
 								   &txt_size, FONT, stringForTex, SDL_TRUE)))
 	{
 		SDL_free(tmp);

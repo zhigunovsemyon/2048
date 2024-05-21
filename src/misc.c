@@ -302,10 +302,6 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	 if (!set) 
 		return NULL; 
 
-	//Задание всем цветам непрозрачности
-	 for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
-		set[i].a = 0xFF;
-
 	//Открытие файла, из которого будет осуществлятся чтение цветов
 	SDL_RWops *ColFile = SDL_RWFromFile((DarkModeFlag) 
 		? DARK_SCHEME : LIGHT_SCHEME, "rb");
@@ -344,7 +340,10 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 		if(!(text = SDL_strstr(text, ColNameList[cur])))
 			break;
 		//Если строка нашлась -- чтение значений
-		SDL_sscanf("%x %x %x", &set[cur].r, &set[cur].g, &set[cur].b);
+		SDL_sscanf(text + SDL_strlen(ColNameList[cur]), "%X %X %X", &set[cur].r,
+				   &set[cur].g, &set[cur].b);
+		// Задание всем цветам непрозрачности
+		set[cur].a = 0xFF;
 	}
 
 	/* Если цикл был прерван из - за недостатка цветов в файле, 
