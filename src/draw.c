@@ -38,7 +38,7 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 							  Assets *Assets, Sint8 Index);
 
-Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
+static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 				  Assets *Assets)
 {
 	if (DrawOldElements(rend, Params, Game, Assets))
@@ -53,7 +53,7 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца с конца
 		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
-		{ // Если данная ячейка не пустая, и она движется по горизонтали
+		{ // Если данная ячейка пустая, или она не движется по горизонтали
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
 			if(Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
@@ -123,7 +123,7 @@ Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	return ERR_NO;
 }
 
-Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
+static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 {
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
@@ -208,7 +208,8 @@ Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 	return ERR_NO;
 }
 
-Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
+static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
+					  Assets *Assets)
 {
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
@@ -293,7 +294,8 @@ Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 	return ERR_NO;
 }
 
-Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
+static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
+						Assets *Assets)
 {
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;

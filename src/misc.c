@@ -267,33 +267,6 @@ static Uint32 FileLen(SDL_RWops *f)
 
 SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 {
-	//SDL_Colour *set = (SDL_Colour *)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour));
-	//if (!set)
-	//	return NULL;
-	//for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
-	//	set[i].a = 0xFF;
-
-	//if (DarkModeFlag) // Если включена тёмная тема, в цвета фона передаются соответствующие значения
-	//{
-	//	set[COL_BG].r = BG_DARK_BRIGHTNESS, set[COL_BG].g = BG_DARK_BRIGHTNESS;
-	//	set[COL_BG].b = BG_DARK_BRIGHTNESS, set[COL_FG].r = BG_LIGHT_BRIGHTNESS;
-	//	set[COL_FG].g = BG_LIGHT_BRIGHTNESS, set[COL_FG].b = BG_LIGHT_BRIGHTNESS;
-	//}
-	//else
-	//{
-	//	set[COL_BG].r = BG_LIGHT_BRIGHTNESS, set[COL_BG].g = BG_LIGHT_BRIGHTNESS;
-	//	set[COL_BG].b = BG_LIGHT_BRIGHTNESS, set[COL_FG].r = BG_DARK_BRIGHTNESS;
-	//	set[COL_FG].g = BG_DARK_BRIGHTNESS, set[COL_FG].b = BG_DARK_BRIGHTNESS;
-	//}
-	//for (Uint8 i = 2; i < COLOURS_COUNT; ++i)
-	//{
-	//	set[i].r = 0xFF;
-	//	set[i].g = 0;
-	//	set[i].b = 0;
-	//}
-	//set[COL_SQ4].g = 0xFF;
-	//return set;
-	
 	//Список названий цветов в файле
 	const char *ColNameList[] = COLOURS_LIST;
 
@@ -607,12 +580,12 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 	return ERR_NO;
 }
 
-Sint32 MinOfTwo(Sint32 a, Sint32 b)
+static Sint32 MinOfTwo(Sint32 a, Sint32 b)
 {
 	return (a > b) ? b : a;
 }
 
-Sint32 MaxOfTwo(Sint32 a, Sint32 b)
+static Sint32 MaxOfTwo(Sint32 a, Sint32 b)
 {
 	return (a < b) ? b : a;
 }
