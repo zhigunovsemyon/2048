@@ -49,7 +49,10 @@ int main(int argc, const char **args)
 		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 		{
 			GetFieldAndTileSize(&Game, &Params);
-			Assets.textures = UpdateTextureSet(rend, &Params, &Game, &Assets);
+			if(errCode = UpdateTextureSet(rend, &Params, &Game, &Assets))
+				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game,
+										   &Params, &Assets);
+
 			// Рисование поля со старыми элементами
 			if ((errCode = DrawOldElements(rend, &Params, &Game, &Assets) /*== ERR_SDL*/))
 				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);

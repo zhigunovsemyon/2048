@@ -488,12 +488,21 @@ TileTexture *UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 							  Assets *Assets)
 {
 	/*Освобождение всех текстур*/
-	for (Uint8 i = 0; i < Assets->textures_count; ++i)
+	for (Uint8 i = 1; i < Assets->textures_count; ++i)
 		SDL_DestroyTexture(Assets->textures[i].tex);
 
+	Uint8 oldCount = Assets->textures_count;
+	Assets->textures_count = 1;
+	for (Uint8 i = 1; i < oldCount; ++i)
+	{
+		if(!(Assets->textures[i].tex = CreateTileTexture(
+			rend, Assets->textures[i].val, Assets, Params->CellWidth)))
+			return ERR_SDL;
+	}
 	// Освобождать сам массив из памяти на данном этапе не нужно,
 	// так как он заменится новыми текстурами.
 	// Его освобождение должно происходить только на выходе из программы
+	return ERR_NO;
 }
 
 /*Функция поиска текстуры для bsearch*/
