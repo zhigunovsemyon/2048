@@ -445,9 +445,9 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
 	Assets->textures[TEX_SCORE].val = TEX_SCORE;
+	Assets->textures_count = 0;
 	if (!(Assets->textures[TEX_SCORE].tex = CreateTileTexture(rend, 2, Assets, Params->CellWidth)))
 	{
-		// SDL_free(Assets->textures);
 		return ERR_SDL;
 	}
 	Assets->textures_count = 1;
