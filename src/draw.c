@@ -3,9 +3,10 @@
 SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 							   Assets *Assets, float CellWidth)
 {
-	if(!TileValue /* == 0*/)
+	if (!TileValue /* == 0*/)
 		return NULL;
-	TileTexture *tmp = (TileTexture *)SDL_realloc(Assets->textures, sizeof(TileTexture) * (Assets->textures_count + 1));
+	TileTexture *tmp = (TileTexture *)SDL_realloc(
+		Assets->textures, sizeof(TileTexture) * (Assets->textures_count + 1));
 	if (!tmp)
 		return NULL;
 
@@ -15,7 +16,11 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
 	char *stringForTex;
 	SDL_asprintf(&stringForTex, "%lu", TileValue);
-	if(!(tmp[Assets->textures_count].tex = CreateMessageTexture(rend, &txt_col, Assets->cols + COL_SQ2,
+	if (!stringForTex)
+		return NULL;
+
+	if (!(tmp[Assets->textures_count].tex =
+			  CreateMessageTexture(rend, &txt_col, Assets->cols + COL_SQ2,
 								   &txt_size, FONT, stringForTex, SDL_TRUE)))
 	{
 		SDL_free(tmp);
@@ -406,9 +411,10 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	// Отрисовка конечного тайла
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
-	if(!tile_texture)
-		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets, Params->CellWidth);
-	if(!tile_texture)
+	if (!tile_texture)
+		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
+										 Params->CellWidth);
+	if (!tile_texture)
 		return ERR_SDL;
 
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
@@ -434,37 +440,40 @@ SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture,
 	return ret;
 }
 
-Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets,
-							Params *Params, Game *Game)
+Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
+					 Game *Game)
 {
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
-	if(!(Assets->textures = (TileTexture *)SDL_malloc(1 * sizeof(TileTexture))))
+
+	// Начальное число текстур (очки, двойка, четвёрка)
+	Assets->textures_count = 3;
+
+	// Начальный буфер текстур
+	if (!(Assets->textures = (TileTexture *)SDL_malloc(Assets->textures_count *
+													   sizeof(TileTexture))))
 		return ERR_MALLOC;
 
-	SDL_Rect Tile;
-	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
+	SDL_Rect Tile; // рект с размером текста
+	//(размер ячейки * отношение размера тайла к размеру ячейки)
+	Tile.w = Tile.h = (int)(TILE_SIZE_COEFFICIENT * Params->CellWidth);
 
-	Assets->textures[TEX_SCORE].val = TEX_SCORE;
-	Assets->textures_count = 0;
-	if (!(Assets->textures[TEX_SCORE].tex = CreateTileTexture(rend, 2, Assets, Params->CellWidth)))
-	{
-		return ERR_SDL;
-	}
-	Assets->textures_count = 1;
+	// Текстура очков (пока заглушка)
+	Assets->textures[0].val = 0;
+	Assets->textures[0].tex = 0;
 
-	if (!(Assets->textures[TEX_SQ2].tex = CreateTileTexture(rend, 2, Assets, Params->CellWidth)))
-	{
-		/*В случае ошибки память будет освобождена на выходе*/
-		return ERR_SDL;
-	}
+	// Текстура двойки
 	Assets->textures[1].val = 2;
-
-	if (!(Assets->textures[TEX_SQ4].tex = CreateTileTexture(rend, 4, Assets, Params->CellWidth)))
-	{
-		/*В случае ошибки память будет освобождена на выходе*/
+	if (!(Assets->textures[1].tex =
+			  CreateMessageTexture(rend, &txt_col, &Assets->cols[COL_SQ2],
+								   &Tile, FONT, "2", SDL_TRUE)))
 		return ERR_SDL;
-	}
+
+	// Текстура четвёрки
 	Assets->textures[2].val = 4;
+	if (!(Assets->textures[2].tex =
+			  CreateMessageTexture(rend, &txt_col, &Assets->cols[COL_SQ4],
+								   &Tile, FONT, "4", SDL_TRUE)))
+		return ERR_SDL;
 
 	return ERR_NO;
 }
@@ -479,7 +488,6 @@ TileTexture *UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 	// Освобождать сам массив из памяти на данном этапе не нужно,
 	// так как он заменится новыми текстурами.
 	// Его освобождение должно происходить только на выходе из программы
-	// return CreateTextureSet(rend, Assets->cols, Params, Game);
 }
 
 /*Функция поиска текстуры для bsearch*/
@@ -648,9 +656,10 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 				 Params->CellWidth * (i / Game->FieldSize);
 		SDL_Texture *tile_texture =
 			GetTextureForTile(Game->Field[i].val, Assets);
-		if(!tile_texture)
-			tile_texture = CreateTileTexture(rend, Game->Field[i].val, Assets, Params->CellWidth);
-		if(!tile_texture)
+		if (!tile_texture)
+			tile_texture = CreateTileTexture(rend, Game->Field[i].val, Assets,
+											 Params->CellWidth);
+		if (!tile_texture)
 			return ERR_SDL;
 
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
@@ -662,17 +671,17 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 					 Assets *Assets, Sint8 Index)
 {
-	if (Index == -1)//Если был передан -1, значит нового элемента нет
+	if (Index == -1) // Если был передан -1, значит нового элемента нет
 		return ERR_NO;
 
 	SDL_Rect Tile;
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
-	if(!tile_texture)
-		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets, Params->CellWidth);
-	if(!tile_texture)
+	if (!tile_texture)
+		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
+										 Params->CellWidth);
+	if (!tile_texture)
 		return ERR_SDL;
-
 
 	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер
 	 * плитки*/
