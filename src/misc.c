@@ -256,33 +256,110 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 	return (MoveFlag) ? MODE_MOVE_DOWN : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
 }
 
+// Подсчёт длинны файла, сравнение с максимальным
+static Uint32 FileLen(SDL_RWops *f)
+{
+	SDL_RWseek(f, RW_SEEK_SET, RW_SEEK_END); // Перемотка в конец
+	Uint32 len = SDL_RWtell(f);	  // Чтение размера файла
+	SDL_RWseek(f, RW_SEEK_CUR, RW_SEEK_SET);// Перемотка обратно в начало
+	return len;
+}
+
 SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 {
-	SDL_Colour *set = (SDL_Colour *)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour));
-	if (!set)
-		return NULL;
-	for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
+	//SDL_Colour *set = (SDL_Colour *)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour));
+	//if (!set)
+	//	return NULL;
+	//for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
+	//	set[i].a = 0xFF;
+
+	//if (DarkModeFlag) // Если включена тёмная тема, в цвета фона передаются соответствующие значения
+	//{
+	//	set[COL_BG].r = BG_DARK_BRIGHTNESS, set[COL_BG].g = BG_DARK_BRIGHTNESS;
+	//	set[COL_BG].b = BG_DARK_BRIGHTNESS, set[COL_FG].r = BG_LIGHT_BRIGHTNESS;
+	//	set[COL_FG].g = BG_LIGHT_BRIGHTNESS, set[COL_FG].b = BG_LIGHT_BRIGHTNESS;
+	//}
+	//else
+	//{
+	//	set[COL_BG].r = BG_LIGHT_BRIGHTNESS, set[COL_BG].g = BG_LIGHT_BRIGHTNESS;
+	//	set[COL_BG].b = BG_LIGHT_BRIGHTNESS, set[COL_FG].r = BG_DARK_BRIGHTNESS;
+	//	set[COL_FG].g = BG_DARK_BRIGHTNESS, set[COL_FG].b = BG_DARK_BRIGHTNESS;
+	//}
+	//for (Uint8 i = 2; i < COLOURS_COUNT; ++i)
+	//{
+	//	set[i].r = 0xFF;
+	//	set[i].g = 0;
+	//	set[i].b = 0;
+	//}
+	//set[COL_SQ4].g = 0xFF;
+	//return set;
+	
+	//Список названий цветов в файле
+	const char *ColNameList[] = COLOURS_LIST;
+
+	//Выделение памяти под вектор цветов, проверка
+	 SDL_Colour *set = (SDL_Colour *)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour)); 
+	 if (!set) 
+		return NULL; 
+
+	//Задание всем цветам непрозрачности
+	 for (Uint8 i = 0; i < COLOURS_COUNT; ++i)
 		set[i].a = 0xFF;
 
-	if (DarkModeFlag) // Если включена тёмная тема, в цвета фона передаются соответствующие значения
-	{
-		set[COL_BG].r = BG_DARK_BRIGHTNESS, set[COL_BG].g = BG_DARK_BRIGHTNESS;
-		set[COL_BG].b = BG_DARK_BRIGHTNESS, set[COL_FG].r = BG_LIGHT_BRIGHTNESS;
-		set[COL_FG].g = BG_LIGHT_BRIGHTNESS, set[COL_FG].b = BG_LIGHT_BRIGHTNESS;
+	//Открытие файла, из которого будет осуществлятся чтение цветов
+	SDL_RWops *ColFile = SDL_RWFromFile((DarkModeFlag) 
+		? DARK_SCHEME : LIGHT_SCHEME, "rb");
+	if (!ColFile)
+	{	//Очитка теперь безполезного набора цветов
+		SDL_free(set);
+		return NULL;
 	}
-	else
-	{
-		set[COL_BG].r = BG_LIGHT_BRIGHTNESS, set[COL_BG].g = BG_LIGHT_BRIGHTNESS;
-		set[COL_BG].b = BG_LIGHT_BRIGHTNESS, set[COL_FG].r = BG_DARK_BRIGHTNESS;
-		set[COL_FG].g = BG_DARK_BRIGHTNESS, set[COL_FG].b = BG_DARK_BRIGHTNESS;
+	//Объём файла
+	Uint32 fLen = FileLen(ColFile);
+
+	//Выделение памяти под копию файла в памяти, проверка
+	char *fCopy = (char *)SDL_malloc(fLen);
+	if (!fCopy)
+	{	//Очитка теперь безполезного набора цветов
+		SDL_free(set);
+		// Закрытие файла с цветами
+		SDL_RWclose(ColFile);
+		return NULL;
 	}
-	for (Uint8 i = 2; i < COLOURS_COUNT; ++i)
+	
+	//Копирование содержимого файла в память
+	SDL_RWread(ColFile, fCopy, sizeof(char), fLen);
+
+	//Закрытие файла с цветами
+	SDL_RWclose(ColFile);
+
+	//Пропуск шапки файла
+	char *text = SDL_strchr(fCopy, '\n') + 1;
+
+	//Цикл чтения строки
+	for (Uint8 cur = 0; cur < COLOURS_COUNT; ++cur)
 	{
-		set[i].r = 0xFF;
-		set[i].g = 0;
-		set[i].b = 0;
+		//Uint8 CurColLen = SDL_strlen(ColNameList[cur]); //Длинна текущ
+		//Если не удалось найти какой-либо цвет, цикл прерывается
+		if(!(text = SDL_strstr(text, ColNameList[cur])))
+			break;
+		//Если строка нашлась -- чтение значений
+		SDL_sscanf("%x %x %x", &set[cur].r, &set[cur].g, &set[cur].b);
 	}
-	set[COL_SQ4].g = 0xFF;
+
+	/* Если цикл был прерван из - за недостатка цветов в файле, 
+	то память очищается, осуществляется возврат NULL */
+	if (!text)
+	{	
+		// Очитка теперь безполезного набора цветов
+		SDL_free(set);
+		// Очистка памяти, завершение функции
+		SDL_free(fCopy);
+		return NULL;
+	}
+
+	//Очистка памяти, завершение функции
+	SDL_free(fCopy);
 	return set;
 }
 
