@@ -21,10 +21,20 @@
 #define BG_DARK_BRIGHTNESS		0x20//Яркость тёмного цвета
 #define BG_LIGHT_BRIGHTNESS		0xdf//Яркость светлого цвета
 
+//Используемый шрифт
 #if WIN32
-#define FONT "..\\..\\..\\monospace"
+#define FONT "..\\..\\..\\assets\\monospace"
 #else
-#define FONT "monospace"
+#define FONT "assets/monospace"
+#endif
+
+//Используемые цветовые схемы
+#if WIN32
+#define LIGHT_SCHEME "..\\..\\..\\assets\\light"
+#define DARK_SCHEME "..\\..\\..\\assets\\dark"
+#else
+#define LIGHT_SCHEME "assets/light"
+#define DARK_SCHEME "assets/dark"
 #endif
 
 enum TileMode
