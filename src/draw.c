@@ -1,5 +1,4 @@
 #include "draw.h"
-#include "main.h"
 
 static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 {
@@ -508,7 +507,7 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 	if (!text)
 		return NULL;
 	SDL_Texture *ret =
-		CreateMessageTexture(rend, ColourSet + COL_BG, ColourSet + COL_FG, Tile,
+		CreateMessageTexture(rend, ColourSet + COL_FG, ColourSet + COL_BG, Tile,
 							 FONT, text, SDL_FALSE);
 	SDL_free(text);
 	return ret;
