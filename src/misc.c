@@ -130,7 +130,7 @@ Uint8 CheckUpCombo(Game *Game, Params *Params)
 	// Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждой строки
-		for (Sint8 i = 0; i < Game->FieldSize; i++)
+		for (Sint8 i = 0; i < Game->FieldSize - 1; i++)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
