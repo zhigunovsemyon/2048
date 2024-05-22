@@ -26,6 +26,8 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 		SDL_free(tmp);
 		return NULL;
 	}
+
+	SDL_free(stringForTex);
 	Assets->textures = tmp;
 	Assets->textures_count++;
 	return Assets->textures[Assets->textures_count - 1].tex;
