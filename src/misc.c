@@ -316,7 +316,7 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 		SDL_free(set);
 		return NULL;
 	}
-	// Объём файла
+	// Объём файла + терм. символ
 	Uint32 fLen = FileLen(ColFile) + 1;
 
 	// Выделение памяти под копию файла в памяти, проверка

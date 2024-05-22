@@ -1,5 +1,36 @@
 #include "draw.h"
 
+static Uint8 MatchColForTile(Uint64 TileValue)
+{
+	switch (TileValue)
+	{
+	case 2:
+		return COL_SQ2;
+	case 4:
+		return COL_SQ4;
+	case 8:
+		return COL_SQ8;
+	case 16:
+		return COL_SQ16;
+	case 32:
+		return COL_SQ32;
+	case 64:
+		return COL_SQ64;
+	case 128:
+		return COL_SQ128;
+	case 256:
+		return COL_SQ256;
+	case 512:
+		return COL_SQ512;
+	case 1024:
+		return COL_SQ1024;
+	case 2048:
+		return COL_SQ2048;
+	default:
+		return COL_MAX;
+	}
+}
+
 SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 							   Assets *Assets, float CellWidth)
 {
@@ -19,8 +50,9 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	if (!stringForTex)
 		return NULL;
 
+	SDL_Log("для ячейки №(%lu) номер цвета: %u", TileValue, Assets->textures_count + 1);
 	if (!(tmp[Assets->textures_count].tex = CreateMessageTexture(
-			  rend, &txt_col, 1 + Assets->cols + Assets->textures_count,
+			  rend, &txt_col, Assets->cols + MatchColForTile(TileValue),
 								   &txt_size, FONT, stringForTex, SDL_TRUE)))
 	{
 		SDL_free(tmp);
