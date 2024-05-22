@@ -8,8 +8,8 @@ int main(int argc, const char **args)
 	Params Params;
 	Assets Assets;
 	SDL_Event Events;
-	Params.WinSize.x = WIN_MIN * 2;
-	Params.WinSize.y = WIN_MIN * 3;
+	Params.WinSize.x = WIN_MIN * 1.5;
+	Params.WinSize.y = WIN_MIN * 2;
 	Assets.textures = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
