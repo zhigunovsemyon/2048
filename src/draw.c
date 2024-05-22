@@ -50,7 +50,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	if (!stringForTex)
 		return NULL;
 
-	SDL_Log("для ячейки №(%lu) номер цвета: %u", TileValue, Assets->textures_count + 1);
+	SDL_Log("для ячейки №(%lu) номер цвета: %u", TileValue, MatchColForTile(TileValue));
 	if (!(tmp[Assets->textures_count].tex = CreateMessageTexture(
 			  rend, &txt_col, Assets->cols + MatchColForTile(TileValue),
 								   &txt_size, FONT, stringForTex, SDL_TRUE)))

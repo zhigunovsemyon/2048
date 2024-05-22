@@ -49,8 +49,8 @@ int main(int argc, const char **args)
 		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 		{
 			GetFieldAndTileSize(&Game, &Params);
-			if(errCode = UpdateTextureSet(rend, &Params, &Game, &Assets))
-				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game,
+			if((errCode = UpdateTextureSet(rend, &Params, &Game, &Assets)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game,
 										   &Params, &Assets);
 
 			// Рисование поля со старыми элементами
