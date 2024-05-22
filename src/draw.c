@@ -36,12 +36,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 {
 	if (!TileValue /* == 0*/)
 		return NULL;
-	TileTexture *tmp = (TileTexture *)SDL_realloc(
-		Assets->textures, sizeof(TileTexture) * (Assets->textures_count + 1));
-	if (!tmp)
-		return NULL;
 
-	tmp[Assets->textures_count].val = TileValue;
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
 	SDL_Rect txt_size;
 	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
@@ -50,19 +45,12 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	if (!stringForTex)
 		return NULL;
 
-	SDL_Log("для ячейки №(%lu) номер цвета: %u", TileValue, MatchColForTile(TileValue));
-	if (!(tmp[Assets->textures_count].tex = CreateMessageTexture(
-			  rend, &txt_col, Assets->cols + MatchColForTile(TileValue),
-								   &txt_size, FONT, stringForTex, SDL_TRUE)))
-	{
-		SDL_free(tmp);
-		return NULL;
-	}
+	SDL_Texture *tmp = CreateMessageTexture(
+		rend, &txt_col, Assets->cols + MatchColForTile(TileValue), &txt_size,
+		FONT, stringForTex, SDL_TRUE);
 
 	SDL_free(stringForTex);
-	Assets->textures = tmp;
-	Assets->textures_count++;
-	return Assets->textures[Assets->textures_count - 1].tex;
+	return tmp;
 }
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
@@ -73,7 +61,7 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 							  Assets *Assets, Sint8 Index);
 
 static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
-				  Assets *Assets)
+						 Assets *Assets)
 {
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
@@ -90,7 +78,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 		{ // Если данная ячейка пустая, или она не движется по горизонтали
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
-			if(Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
+			if (Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
 				continue;
 
 			if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
@@ -110,8 +98,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					// Копирование текущего элемента в следующий
 					Game->Field[i * Game->FieldSize + j + 1] =
 						Game->Field[i * Game->FieldSize + j];
-					Game->Field[i * Game->FieldSize + j + 1].mode =
-						TILE_OLD;
+					Game->Field[i * Game->FieldSize + j + 1].mode = TILE_OLD;
 				}
 				else
 				{
@@ -123,7 +110,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 
 				// Зануление прошлого элемента
 				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							sizeof(Tile));
+						   sizeof(Tile));
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
 											i * Game->FieldSize + j + 1))
 					return ERR_SDL;
@@ -157,7 +144,8 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	return ERR_NO;
 }
 
-static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
+static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
+						Assets *Assets)
 {
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
@@ -174,7 +162,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *
 		{ // Если данная ячейка пустая, или она не движется по горизонтали
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
-			if(Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
+			if (Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
 				continue;
 
 			if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
@@ -194,8 +182,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *
 					// Копирование текущего элемента в следующий
 					Game->Field[i * Game->FieldSize + j - 1] =
 						Game->Field[i * Game->FieldSize + j];
-					Game->Field[i * Game->FieldSize + j - 1].mode =
-						TILE_OLD;
+					Game->Field[i * Game->FieldSize + j - 1].mode = TILE_OLD;
 				}
 				else
 				{
@@ -208,7 +195,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params, Assets *
 
 				// Зануление прошлого элемента
 				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							sizeof(Tile));
+						   sizeof(Tile));
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
 											i * Game->FieldSize + j - 1))
 					return ERR_SDL;
@@ -257,7 +244,8 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждого столбца с конца
 		for (Sint8 i = 0; i < Game->FieldSize; i++)
-		{ // Если данная ячейка пустая, и она движется не по горизонтали, пропуск
+		{ // Если данная ячейка пустая, и она движется не по горизонтали,
+		  // пропуск
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
 			if (Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_Y)
@@ -280,8 +268,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					// Копирование текущего элемента в следующий
 					Game->Field[(i - 1) * Game->FieldSize + j] =
 						Game->Field[i * Game->FieldSize + j];
-					Game->Field[(i - 1) * Game->FieldSize + j].mode =
-						TILE_OLD;
+					Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_OLD;
 				}
 				else
 				{
@@ -294,7 +281,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 
 				// Зануление прошлого элемента
 				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							sizeof(Tile));
+						   sizeof(Tile));
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
 											(i - 1) * Game->FieldSize + j))
 					return ERR_SDL;
@@ -345,7 +332,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 		{ // Если данная ячейка пустая, или она не движется по горизонтали
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 				continue;
-			if(Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_Y)
+			if (Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_Y)
 				continue;
 
 			if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
@@ -365,8 +352,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					// Копирование текущего элемента в следующий
 					Game->Field[(i + 1) * Game->FieldSize + j] =
 						Game->Field[i * Game->FieldSize + j];
-					Game->Field[(i + 1) * Game->FieldSize + j].mode =
-						TILE_OLD;
+					Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_OLD;
 				}
 				else
 				{
@@ -379,7 +365,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 
 				// Зануление прошлого элемента
 				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
-							sizeof(Tile));
+						   sizeof(Tile));
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
 											(i + 1) * Game->FieldSize + j))
 					return ERR_SDL;
@@ -451,11 +437,27 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	// Отрисовка конечного тайла
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
+	
+	//Создание нового элемента, если не нашёлся
 	if (!tile_texture)
+	{
 		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
 										 Params->CellWidth);
-	if (!tile_texture)
-		return ERR_SDL;
+		//Если элемент не удалось создать
+		if (!tile_texture)
+			return ERR_SDL;
+		else
+		{
+			Assets->textures_count++;
+			TileTexture *newTexs = SDL_realloc(Assets->textures, sizeof(TileTexture) * Assets->textures_count);
+			if (!newTexs)
+				return ERR_MALLOC;
+			Assets->textures = newTexs;
+			Assets->textures[Assets->textures_count - 1].val = Game->Field[Index].val;	
+			Assets->textures[Assets->textures_count - 1].tex = tile_texture;
+		}
+	}
+
 
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
@@ -519,11 +521,11 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 }
 
 Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
-							  Assets *Assets)
+					   Assets *Assets)
 {
 	/*Освобождение всех текстур*/
 	for (Uint8 i = 1; i < Assets->textures_count; ++i)
-		if(Assets->textures[i].tex /*!= NULL*/)
+		if (Assets->textures[i].tex /*!= NULL*/)
 		{
 			SDL_DestroyTexture(Assets->textures[i].tex);
 			Assets->textures[i].tex = NULL;
@@ -533,9 +535,10 @@ Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 	Assets->textures_count = 1;
 	for (Uint8 i = 1; i < oldCount; ++i)
 	{
-		if(!Assets->textures[i].tex /*==NULL*/)
-			if(!(Assets->textures[i].tex = CreateTileTexture(
-				rend, Assets->textures[i].val, Assets, Params->CellWidth)))
+		if (!Assets->textures[i].tex /*==NULL*/)
+			if (!(Assets->textures[i].tex =
+					  CreateTileTexture(rend, Assets->textures[i].val, Assets,
+										Params->CellWidth)))
 				return ERR_SDL;
 	}
 	// Освобождать сам массив из памяти на данном этапе не нужно,
