@@ -465,7 +465,7 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	return ERR_NO;
 }
 
-SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
+SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 							 SDL_Rect *Tile, Game *Game)
 {
 	char *text;
@@ -501,7 +501,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	Assets->textures[0].val = 0;
 	SDL_Rect scoreField = {.h = (int)Params->CellWidth, 
 		.w = (int)Params->FieldSize };
-	Assets->textures[0].tex = GetScoreTexture(rend,Assets->cols, &scoreField, Game);
+	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
 	// Assets->textures[0].tex = 0;
 
 	// Текстура двойки
@@ -534,7 +534,7 @@ Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 
 	SDL_Rect scoreField = {.h = (int)Params->CellWidth, 
 		.w = (int)Params->FieldSize };
-	Assets->textures[0].tex = GetScoreTexture(rend,Assets->cols, &scoreField, Game);
+	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
 
 	Uint8 oldCount = Assets->textures_count;
 	Assets->textures_count = 1;
@@ -695,11 +695,23 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 					  Assets *Assets)
 {
 	SDL_Rect Tile;
-	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
-
 	// Рисование поля
 	if (DrawBackground(rend, Game->FieldSize, Params, Assets) /*== ERR_SDL*/)
 		return ERR_SDL;
+
+	//Положение и размер очков
+	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
+	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 - (int)Params->CellWidth;
+	Tile.w = (int)Params->FieldSize;
+	Tile.h = (int)Params->CellWidth;
+
+	//Отрисовка очков
+	if(SDL_RenderCopy(rend, Assets->textures[0].tex, NULL, &Tile))
+		return ERR_SDL;
+	
+
+	//Сброс размеров перед отрисовкой тайлов
+	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
 	{
