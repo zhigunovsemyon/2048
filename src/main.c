@@ -14,8 +14,8 @@ int main(int argc, const char **args)
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
 	// Забил очки максимальными числами для проверки строк с ними
-	Game.Score = UINT64_MAX;
-	Game.Score = UINT64_MAX;
+	Game.Score = 228;//UINT64_MAX;
+	Game.MaxScore = 1488;//UINT64_MAX;
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска*/
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
@@ -87,10 +87,12 @@ int main(int argc, const char **args)
 			if (tmpMode == MODE_WAIT || tmpMode == MODE_QUIT)
 			{
 				Params.Mode = (CheckCombo[Params.Mode](&Game, &Params))
+									//Если есть комбинации, осуществляется движение 
+									//вправо, влево, вверх, вниз
 								  ? Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
-								  : tmpMode == MODE_WAIT;
+								  : tmpMode == MODE_WAIT;//Если комбинаций нет -- режим ожидания
 			}
-			else // if == MODE_MOVE...
+			else // Если плитки всё ещё движутся
 				Params.Mode = tmpMode;
 			break;
 		}

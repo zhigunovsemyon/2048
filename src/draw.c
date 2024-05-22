@@ -105,6 +105,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					Game->Field[i * Game->FieldSize + j + 1].mode =
 						TILE_JUSTCOMBINED;
 					Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
+					Game->Score += Game->Field[i * Game->FieldSize + j + 1].val;
 				}
 				Game->Field[i * Game->FieldSize + j + 1].offset = 0;
 
@@ -189,6 +190,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					Game->Field[i * Game->FieldSize + j - 1].mode =
 						TILE_JUSTCOMBINED;
 					Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
+					Game->Score += Game->Field[i * Game->FieldSize + j - 1].val;
 				}
 				// Копирование текущего элемента в следующий
 				Game->Field[i * Game->FieldSize + j - 1].offset = 0;
@@ -275,6 +277,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					Game->Field[(i - 1) * Game->FieldSize + j].mode =
 						TILE_JUSTCOMBINED;
 					Game->Field[(i - 1) * Game->FieldSize + j].val <<= 1;
+					Game->Score += Game->Field[(i - 1) * Game->FieldSize + j].val;
 				}
 
 				Game->Field[(i - 1) * Game->FieldSize + j].offset = 0;
@@ -359,6 +362,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					Game->Field[(i + 1) * Game->FieldSize + j].mode =
 						TILE_JUSTCOMBINED;
 					Game->Field[(i + 1) * Game->FieldSize + j].val <<= 1;
+					Game->Score += Game->Field[(i + 1) * Game->FieldSize + j].val;
 				}
 				// Копирование текущего элемента в следующий
 				Game->Field[(i + 1) * Game->FieldSize + j].offset = 0;
