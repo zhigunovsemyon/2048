@@ -1,4 +1,18 @@
 #include "draw.h"
+#include "main.h"
+
+static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
+{
+	//Освобождение старой текстуры
+	SDL_DestroyTexture(Assets->textures[0].tex);
+
+	//Создание новой рисовальщиком, с учётом очков, как старых, так и новых, размеров площадки, цветов
+	SDL_Rect scoreField = {.h = Params->CellWidth, .w = Params->FieldSize};
+	if(!(Assets->textures[0].tex = CreateScoreTexture(rend, Assets->cols, &scoreField, Game)))
+		return ERR_SDL;
+	
+	return ERR_NO;
+}
 
 static Uint8 MatchColForTile(Uint64 TileValue)
 {
@@ -106,6 +120,9 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						TILE_JUSTCOMBINED;
 					Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
 					Game->Score += Game->Field[i * Game->FieldSize + j + 1].val;
+					if(UpdateScore(rend, Game, Params, Assets))
+						return ERR_SDL;
+					SDL_Log("Очков: %lu", Game->Score);
 				}
 				Game->Field[i * Game->FieldSize + j + 1].offset = 0;
 
@@ -139,6 +156,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Params->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
+		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;
@@ -191,6 +209,9 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						TILE_JUSTCOMBINED;
 					Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
 					Game->Score += Game->Field[i * Game->FieldSize + j - 1].val;
+					if(UpdateScore(rend, Game, Params, Assets))
+						return ERR_SDL;
+					SDL_Log("Очков: %lu", Game->Score);
 				}
 				// Копирование текущего элемента в следующий
 				Game->Field[i * Game->FieldSize + j - 1].offset = 0;
@@ -225,6 +246,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Params->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
+		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;
@@ -278,6 +300,9 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						TILE_JUSTCOMBINED;
 					Game->Field[(i - 1) * Game->FieldSize + j].val <<= 1;
 					Game->Score += Game->Field[(i - 1) * Game->FieldSize + j].val;
+					if(UpdateScore(rend, Game, Params, Assets))
+						return ERR_SDL;
+					SDL_Log("Очков: %lu", Game->Score);
 				}
 
 				Game->Field[(i - 1) * Game->FieldSize + j].offset = 0;
@@ -312,6 +337,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Params->Mode = MODE_MOVE_UP;
 		return ERR_NO;
+		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;
@@ -363,6 +389,9 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						TILE_JUSTCOMBINED;
 					Game->Field[(i + 1) * Game->FieldSize + j].val <<= 1;
 					Game->Score += Game->Field[(i + 1) * Game->FieldSize + j].val;
+					if(UpdateScore(rend, Game, Params, Assets))
+						return ERR_SDL;
+					SDL_Log("Очков: %lu", Game->Score);
 				}
 				// Копирование текущего элемента в следующий
 				Game->Field[(i + 1) * Game->FieldSize + j].offset = 0;
@@ -397,6 +426,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Params->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
+		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Params->Mode = MODE_ADD;

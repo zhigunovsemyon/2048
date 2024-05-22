@@ -103,6 +103,8 @@ int main(int argc, const char **args)
 		case MODE_MOVE_UP:	  // 5
 			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params, &Assets)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			if((errCode = UpdateWindowTitle(window, Game.Score)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 			SDL_RenderPresent(rend);
 			break;
 

@@ -1,5 +1,16 @@
 #include "misc.h"
 
+Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score)
+{
+	char *buf;
+	SDL_asprintf(&buf, "2048 | Очков: %lu", Score);
+	if(!buf)
+		return ERR_MALLOC;
+	SDL_SetWindowTitle(win, buf);
+	SDL_free(buf);
+	return ERR_NO;
+}
+
 void ChangeCombinedToOld(Game *Game)
 {
 	// Цикл перебора каждой строки
