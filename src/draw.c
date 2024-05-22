@@ -733,10 +733,10 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 		return ERR_SDL;
 
 	//Положение и размер очков
-	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
-	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 - (int)Params->CellWidth;
 	Tile.w = (int)Params->FieldSize;
 	Tile.h = (int)Params->CellWidth;
+	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
+	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 - Tile.h;
 
 	//Отрисовка очков
 	if(SDL_RenderCopy(rend, Assets->textures[0].tex, NULL, &Tile))
