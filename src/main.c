@@ -8,14 +8,14 @@ int main(int argc, const char **args)
 	Params Params;
 	Assets Assets;
 	SDL_Event Events;
-	Params.WinSize.x = WIN_WIDTH;
-	Params.WinSize.y = WIN_HEIGHT;
+	Params.WinSize.x = WIN_MIN * 2;
+	Params.WinSize.y = WIN_MIN * 3;
 	Assets.textures = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
 	// Забил очки максимальными числами для проверки строк с ними
-	Game.Score = 228;//UINT64_MAX;
-	Game.MaxScore = 1488;//UINT64_MAX;
+	Game.Score = 0;//UINT64_MAX;
+	Game.MaxScore = UINT64_MAX;
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска*/
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
