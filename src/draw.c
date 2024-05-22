@@ -437,39 +437,37 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	// Отрисовка конечного тайла
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
-	
-	//Создание нового элемента, если не нашёлся
+
+	// Создание нового элемента, если не нашёлся
 	if (!tile_texture)
 	{
 		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
 										 Params->CellWidth);
-		//Если элемент не удалось создать
+		// Если элемент не удалось создать
 		if (!tile_texture)
 			return ERR_SDL;
 		else
 		{
 			Assets->textures_count++;
-			TileTexture *newTexs = SDL_realloc(Assets->textures, sizeof(TileTexture) * Assets->textures_count);
+			TileTexture *newTexs = SDL_realloc(
+				Assets->textures, sizeof(TileTexture) * Assets->textures_count);
 			if (!newTexs)
 				return ERR_MALLOC;
 			Assets->textures = newTexs;
-			Assets->textures[Assets->textures_count - 1].val = Game->Field[Index].val;	
+			Assets->textures[Assets->textures_count - 1].val =
+				Game->Field[Index].val;
 			Assets->textures[Assets->textures_count - 1].tex = tile_texture;
 		}
 	}
-
 
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
 	return ERR_NO;
 }
 
-SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Texture *OldTexture,
-							 SDL_Colour *ColourSet, SDL_Rect *Tile, Game *Game)
+SDL_Texture *GetScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
+							 SDL_Rect *Tile, Game *Game)
 {
-	if (OldTexture)
-		SDL_DestroyTexture(OldTexture);
-
 	char *text;
 	SDL_asprintf(&text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score,
 				 Game->MaxScore);
@@ -501,7 +499,10 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 
 	// Текстура очков (пока заглушка)
 	Assets->textures[0].val = 0;
-	Assets->textures[0].tex = 0;
+	SDL_Rect scoreField = {.h = (int)Params->CellWidth, 
+		.w = (int)Params->FieldSize };
+	Assets->textures[0].tex = GetScoreTexture(rend,Assets->cols, &scoreField, Game);
+	// Assets->textures[0].tex = 0;
 
 	// Текстура двойки
 	Assets->textures[1].val = 2;
@@ -524,12 +525,16 @@ Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 					   Assets *Assets)
 {
 	/*Освобождение всех текстур*/
-	for (Uint8 i = 1; i < Assets->textures_count; ++i)
+	for (Uint8 i = 0; i < Assets->textures_count; ++i)
 		if (Assets->textures[i].tex /*!= NULL*/)
 		{
 			SDL_DestroyTexture(Assets->textures[i].tex);
 			Assets->textures[i].tex = NULL;
 		}
+
+	SDL_Rect scoreField = {.h = (int)Params->CellWidth, 
+		.w = (int)Params->FieldSize };
+	Assets->textures[0].tex = GetScoreTexture(rend,Assets->cols, &scoreField, Game);
 
 	Uint8 oldCount = Assets->textures_count;
 	Assets->textures_count = 1;

@@ -14,8 +14,8 @@ Uint8 DrawNewElement(SDL_Renderer *, Params *, Game *, Assets *, Sint8 Index);
 /*Обновление OldTexture или, если передан NULL, создание тексутры с числом очков
 из Game, рисовальщиком rend, с цветами из набора ColourSet, вписанный в Tile.
 Возврат кода ошибки ERR_SDL либо 0*/
-SDL_Texture *GetScoreTexture(SDL_Renderer *, SDL_Texture *OldTexture,
-							 SDL_Colour *ColourSet, SDL_Rect *Tile, Game *);
+SDL_Texture *GetScoreTexture(SDL_Renderer *, SDL_Colour *ColourSet,
+							 SDL_Rect *Tile, Game *);
 
 /*Создание рисовальщиком rend набора текстур для тайлов 2, 4, и очков,
  * используемая игрой, из набора цветов ColourSet,
