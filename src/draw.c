@@ -6,7 +6,8 @@ static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets 
 	SDL_DestroyTexture(Assets->textures[0].tex);
 
 	//Создание новой рисовальщиком, с учётом очков, как старых, так и новых, размеров площадки, цветов
-	SDL_Rect scoreField = {.h = Params->CellWidth, .w = Params->FieldSize};
+	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) /2,// Params->CellWidth,
+	.w = Params->FieldSize};
 	if(!(Assets->textures[0].tex = CreateScoreTexture(rend, Assets->cols, &scoreField, Game)))
 		return ERR_SDL;
 	
@@ -502,13 +503,13 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 							 SDL_Rect *Tile, Game *Game)
 {
 	char *text;
-	SDL_asprintf(&text, "Число очков:\n%lu\nРекорд:\n%lu", Game->Score,
+	SDL_asprintf(&text, "Число очков: %lu\nРекорд: %lu", Game->Score,
 				 Game->MaxScore);
 	if (!text)
 		return NULL;
 	SDL_Texture *ret =
 		CreateMessageTexture(rend, ColourSet + COL_FG, ColourSet + COL_BG, Tile,
-							 FONT, text, SDL_FALSE);
+							 FONT, text, SDL_TRUE);
 	SDL_free(text);
 	return ret;
 }
@@ -532,7 +533,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 
 	// Текстура очков (пока заглушка)
 	Assets->textures[0].val = 0;
-	SDL_Rect scoreField = {.h = (int)Params->CellWidth, 
+	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) / 2, 
 		.w = (int)Params->FieldSize };
 	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
 	// Assets->textures[0].tex = 0;
@@ -565,7 +566,7 @@ Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 			Assets->textures[i].tex = NULL;
 		}
 
-	SDL_Rect scoreField = {.h = (int)Params->CellWidth, 
+	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) / 2, //(int)Params->CellWidth, 
 		.w = (int)Params->FieldSize };
 	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
 
@@ -734,7 +735,8 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 
 	//Положение и размер очков
 	Tile.w = (int)Params->FieldSize;
-	Tile.h = (int)Params->CellWidth;
+	Tile.h =
+		(Params->WinSize.y - (int)Params->FieldSize) / 2; //(int)Params->CellWidth;
 	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
 	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 - Tile.h;
 

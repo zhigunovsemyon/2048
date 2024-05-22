@@ -15,7 +15,7 @@ int main(int argc, const char **args)
 	SDL_Renderer *rend = NULL;
 	// Забил очки максимальными числами для проверки строк с ними
 	Game.Score = 0;//UINT64_MAX;
-	Game.MaxScore = UINT64_MAX;
+	Game.MaxScore = 0;UINT64_MAX;
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска*/
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
