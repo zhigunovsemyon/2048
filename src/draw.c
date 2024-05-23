@@ -5,6 +5,10 @@ static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets 
 	//Освобождение старой текстуры
 	SDL_DestroyTexture(Assets->textures[0].tex);
 
+	//Обновление рекорда
+	if (Game->Score > Game->MaxScore)
+		Game->MaxScore = Game->Score;	
+
 	//Создание новой рисовальщиком, с учётом очков, как старых, так и новых, размеров площадки, цветов
 	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) /2,// Params->CellWidth,
 	.w = Params->FieldSize};

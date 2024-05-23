@@ -13,9 +13,7 @@ int main(int argc, const char **args)
 	Assets.textures = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
-	// Забил очки максимальными числами для проверки строк с ними
-	Game.Score = 0;//UINT64_MAX;
-	Game.MaxScore = 0;UINT64_MAX;
+	Game.Score = 0,	Game.MaxScore = 0;
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска*/
 	Game.FieldSize = LaunchOptions(argc, args, &Params);
