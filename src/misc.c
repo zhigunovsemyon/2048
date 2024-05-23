@@ -643,8 +643,9 @@ Sint32 MaxOfTwo(Sint32 a, Sint32 b)
 	return (a < b) ? b : a;
 }
 
-Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
+Game StartUp(int argc, const char **argv, Params *Settings)
 {
+	Game Game;
 	// Базовые параметры работы игры
 	Uint8 FieldSize = 4;
 	Settings->Flags = (FLAG_VSYNC | FLAG_DARKMODE | FLAG_ARROWKEY);
@@ -747,7 +748,12 @@ Uint8 LaunchOptions(int argc, const char **argv, Params *Settings)
 			continue;
 		}
 	}
-	return FieldSize;
+
+	Game.Score = 0,	Game.MaxScore = 0;
+	// Выделение памяти под игровое поле
+	Game.Field = (Tile *)SDL_calloc(sizeof(Tile), _SQ(FieldSize));
+	Game.FieldSize = (Game.Field/* != NULL */) ? FieldSize : 0;
+	return Game;
 }
 
 Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,

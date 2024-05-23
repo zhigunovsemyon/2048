@@ -4,7 +4,6 @@ int main(int argc, const char **args)
 	srand(time(NULL));
 	Uint8 errCode;
 	Sint8 NewElementIndex = -1;
-	Game Game;
 	Params Params;
 	Assets Assets;
 	SDL_Event Events;
@@ -13,13 +12,11 @@ int main(int argc, const char **args)
 	Assets.textures = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
-	Game.Score = 0,	Game.MaxScore = 0;
 
-	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска*/
-	Game.FieldSize = LaunchOptions(argc, args, &Params);
-	Game.Field = (Tile *)SDL_calloc(sizeof(Tile), // Выделение памяти под игровое поле
-									Game.FieldSize * Game.FieldSize);
-	if (!Game.Field)
+	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска,
+	 * подгрузка файла с прогрессом*/
+	Game Game = StartUp(argc, args, &Params);
+	if (!Game.FieldSize)
 		return ERR_MALLOC;
 
 	/*Создание набора цветов*/
