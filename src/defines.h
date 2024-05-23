@@ -15,9 +15,13 @@
 #define ANIM_SPEED 500.0f			//Скорость анимации
 #define MIN_FRAMETIME 1				//Минимальное время кадра (1 = 1000FPS, 16 = 60 FPS)
 #define CHANCE_OF_FOUR 10			//Шанс выпадения 4ки
-//
-//#define BG_DARK_BRIGHTNESS		0x20//Яркость тёмного цвета
-//#define BG_LIGHT_BRIGHTNESS		0xdf//Яркость светлого цвета
+
+//Файл, содержащий игровой прогресс
+#if WIN32
+#define SAVE_FILE "..\\..\\..\\save"
+#else
+#define SAVE_FILE "save"
+#endif
 
 //Используемый шрифт
 #if WIN32
@@ -34,6 +38,26 @@
 #define LIGHT_SCHEME "assets/light"
 #define DARK_SCHEME "assets/dark"
 #endif
+
+//Число всех цветов в игре
+#define COLOURS_COUNT 14
+enum ColourIndexes
+{
+	COL_BG,
+	COL_FG,
+	COL_SQ2,
+	COL_SQ4,
+	COL_SQ8,
+	COL_SQ16,
+	COL_SQ32,
+	COL_SQ64,
+	COL_SQ128,
+	COL_SQ256,
+	COL_SQ512,
+	COL_SQ1024,
+	COL_SQ2048,
+	COL_MAX
+};
 
 //Ожидаемые цвета
 #define COLOURS_LIST {	"background", \
@@ -58,26 +82,6 @@ enum TileMode
 	TILE_MOVE_Y,//Тайл, движимый по вертикали
 	TILE_COMBINED,		//Тайл, на который будет наложен соседний 
 	TILE_JUSTCOMBINED	//Тайл, который был получен наложением
-};
-
-//Число всех цветов в игре
-#define COLOURS_COUNT 14
-enum ColourIndexes
-{
-	COL_BG,
-	COL_FG,
-	COL_SQ2,
-	COL_SQ4,
-	COL_SQ8,
-	COL_SQ16,
-	COL_SQ32,
-	COL_SQ64,
-	COL_SQ128,
-	COL_SQ256,
-	COL_SQ512,
-	COL_SQ1024,
-	COL_SQ2048,
-	COL_MAX
 };
 
 //Число всех текстур в игре
