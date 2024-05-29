@@ -56,8 +56,8 @@ int main(int argc, const char **args)
 
 		switch (Params.Mode)
 		{
-		case MODE_QUIT:		// 0
-		case MODE_GAMEOVER: // 1
+		case MODE_USERQUIT: // 0
+		case MODE_QUIT:		// 1
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 		//Режим ожидания, во время которого пользователь может выбрать направление движения
