@@ -210,7 +210,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		case SDL_KEYUP: // Если была нажата любая клавиша
 			SDL_DestroyTexture(greet);
 			//Если нажата клавиша Q -- осуществляется выход из игры, в противном случае -- начало игры
-			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
+			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_USERQUIT : NextMode;
 			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			SDL_free(message);
 			return ERR_NO;

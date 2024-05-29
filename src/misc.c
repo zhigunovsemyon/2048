@@ -471,7 +471,7 @@ void SetMode(SDL_Event *event, Params *Params)
 	{
 	// Если был запрошен выход из программы
 	case SDL_QUIT:
-		Params->Mode = MODE_QUIT;
+		Params->Mode = MODE_USERQUIT;
 		return;
 
 		break;
@@ -482,7 +482,7 @@ void SetMode(SDL_Event *event, Params *Params)
 		// из программы
 		if (event->key.keysym.scancode == SDL_SCANCODE_Q)
 		{
-			Params->Mode = MODE_QUIT;
+			Params->Mode = MODE_USERQUIT;
 			return;
 		}
 		if (Params->Mode != MODE_WAIT)
