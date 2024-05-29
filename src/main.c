@@ -32,9 +32,8 @@ int main(int argc, const char **args)
 	if ((errCode = Greeting(window, rend, &Events, &Assets, &Params, &Game, MODE_ADD)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
-	// Подсчёт размера поля и каждой ячейки поля
+	// Подсчёт размера поля и каждой ячейки поля. Создание соответствующих текстур
 	GetFieldAndTileSize(&Game, &Params);
-
 	if ((errCode =  InitTextureSet(rend, &Assets, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
@@ -61,19 +60,24 @@ int main(int argc, const char **args)
 		case MODE_GAMEOVER: // 1
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
+		//Режим ожидания, во время которого пользователь может выбрать направление движения
 		case MODE_WAIT: // 11
 			continue;
 
+		//Добавление нового элемента
 		case MODE_ADD: // 12
-			ChangeCombinedToOld(&Game);
-			NewElementIndex = AddElement(&Game);
-			Game.Field[NewElementIndex].size = 0;
+			// преобразование сложенного на прошлом цикле элемента в обычный старый
+			ChangeCombinedToOld(&Game); 
+			NewElementIndex = AddElement(&Game);	//Добавление нового элемента, возврат его индекса
+			Game.Field[NewElementIndex].size = 0;	//сброс размера для дальнейшей отрисовки
+
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
 			В противном случае там -1, что приведёт к выходу из программы*/
 			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
 			dtCount(); // Сброс счётчика времени кадра перед отрисовкой
 			break;
 
+		//Режимы проверки поля в каждом из направлений
 		case MODE_CHECK_RIGHT: // 7
 		case MODE_CHECK_LEFT:  // 8
 		case MODE_CHECK_DOWN:  // 9
@@ -94,24 +98,31 @@ int main(int argc, const char **args)
 			break;
 		}
 
+		// Режимы отрисовки сдвига ячеек в каждом из направлений
 		case MODE_MOVE_RIGHT: // 3
 		case MODE_MOVE_LEFT:  // 4
 		case MODE_MOVE_DOWN:  // 5
 		case MODE_MOVE_UP:	  // 6
+			//Вызов нужной функции сдвига, в соответствии с направлением
 			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params, &Assets)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			//Обновление заголовка на случай сложенной комбинации
 			if((errCode = UpdateWindowTitle(window, Game.Score)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			//Отображение изменений на экране
 			SDL_RenderPresent(rend);
 			break;
 
+		//Режим отрисовки добавления нового элемента
 		case MODE_DRAW_NEW: // 2
 			// Рисование поля со старыми элементами
 			if ((errCode = DrawOldElements(rend, &Params, &Game, &Assets) /*== ERR_SDL*/))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
+			//Отрисовка нового элемента
 			if ((errCode = DrawNewElement(rend, &Params, &Game, &Assets, NewElementIndex)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			//Отображение изменений на экране
 			SDL_RenderPresent(rend);
 
 			/*Если размер был сброшен, значит цикл отрисовки пора прервать,
