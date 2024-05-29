@@ -474,9 +474,6 @@ void SetMode(SDL_Event *event, Params *Params)
 		Params->Mode = MODE_QUIT;
 		return;
 
-	case SDL_MOUSEBUTTONUP:
-		if (Params->Flags & FLAG_MOUSEOFF)
-			return;
 		break;
 
 	case SDL_KEYUP: // Если была нажата клавиша
@@ -653,7 +650,7 @@ Game StartUp(int argc, const char **argv, Params *Settings)
 	// Если игра была запущена без флагов,
 	Uint8 Setters =
 		(argc == 1) ? 0 : // то используется стандартная раскладка
-			(VSYNC_UNSET | COL_UNSET | KEY_UNSET | MOUSE_UNSET | SIZE_UNSET);
+			(VSYNC_UNSET | COL_UNSET | KEY_UNSET | SIZE_UNSET);
 
 	/*Перебор аргументов, с которыми была запущена игра. Если их не было,
 	 * цикл ниже будет пропущен*/
@@ -696,20 +693,6 @@ Game StartUp(int argc, const char **argv, Params *Settings)
 		{
 			Setters &= ~SIZE_UNSET;
 			FieldSize = 6;
-			continue;
-		}
-
-		if (!SDL_strcmp(argv[i], "--nomouse") && (Setters & MOUSE_UNSET))
-		{
-			Settings->Flags |= FLAG_MOUSEOFF;
-			Setters &= ~MOUSE_UNSET;
-			continue;
-		}
-
-		if (!SDL_strcmp(argv[i], "--mouse") && (Setters & MOUSE_UNSET))
-		{
-			Setters &= ~MOUSE_UNSET;
-			Settings->Flags &= ~FLAG_MOUSEOFF;
 			continue;
 		}
 

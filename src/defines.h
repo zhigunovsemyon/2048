@@ -113,8 +113,7 @@ enum Errors
 
 enum Flags
 {
-	FLAG_DARKMODE = 1,	//Флаг тёмной/светлой темы
-	FLAG_MOUSEOFF = 2,	//Флаг включенной/отключенной мыши
+	FLAG_DARKMODE = 2,	//Флаг тёмной/светлой темы
 	FLAG_ARROWKEY = 4,	//Флаг управления со стрелок
 	FLAG_VIMKEY = 8,	//Флаг управления с клавиш vi
 	FLAG_WASDKEY = 0x10,//Флаг управления с клавиш WASD

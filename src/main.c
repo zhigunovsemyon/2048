@@ -134,9 +134,8 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			   Uint8 NextMode)
 { // Создание сообщения
 	char *message;
-	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", "Добро пожаловать в игру 2048!", //Заголовок
+	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", "Добро пожаловать в игру 2048!", //Заголовок
 				"Включён ", (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим",	//Цветовой режим
-				"Управление мышью ",(Params->Flags & FLAG_MOUSEOFF) ? "отключено" : "включено", //Управление мышью
 				"V-Sync ", (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен",	//v-sync
 				"Используется управление ",(Params->Flags & FLAG_WASDKEY) ? "WASD" //схема управления wasd
 				: (Params->Flags & FLAG_VIMKEY) ? "vi" : "стрелками",			// либо vi, либо стрелки
@@ -194,14 +193,6 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		case SDL_QUIT:
 			SDL_DestroyTexture(greet);
 			Params->Mode = MODE_QUIT;
-			return ERR_NO;
-
-		case SDL_MOUSEBUTTONUP:
-			if (Params->Flags & FLAG_MOUSEOFF)
-				continue;
-			SDL_DestroyTexture(greet);
-			Params->Mode = NextMode;
-			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			return ERR_NO;
 
 		case SDL_KEYUP: // Если была нажата клавиша

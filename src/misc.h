@@ -5,10 +5,9 @@
 enum SetFlags
 {
 	KEY_UNSET	= 1,
-	COL_UNSET	= 2,
-	MOUSE_UNSET = 4,	
-	SIZE_UNSET	= 8,
-	VSYNC_UNSET = 0x10
+	COL_UNSET	= 2,	
+	SIZE_UNSET	= 4,
+	VSYNC_UNSET = 8
 };
 Uint8 CheckRightMove(Game *Game, Params *Params);
 Uint8 CheckLeftMove(Game *Game, Params *Params);
