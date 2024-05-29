@@ -57,13 +57,14 @@ int main(int argc, const char **args)
 
 		switch (Params.Mode)
 		{
-		case MODE_QUIT: // 0
+		case MODE_QUIT:		// 0
+		case MODE_GAMEOVER: // 1
 			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
-		case MODE_WAIT: // 10
+		case MODE_WAIT: // 11
 			continue;
 
-		case MODE_ADD: // 11
+		case MODE_ADD: // 12
 			ChangeCombinedToOld(&Game);
 			NewElementIndex = AddElement(&Game);
 			Game.Field[NewElementIndex].size = 0;
@@ -73,10 +74,10 @@ int main(int argc, const char **args)
 			dtCount(); // Сброс счётчика времени кадра перед отрисовкой
 			break;
 
-		case MODE_CHECK_RIGHT: // 6
-		case MODE_CHECK_LEFT:  // 7
-		case MODE_CHECK_DOWN:  // 8
-		case MODE_CHECK_UP: {  // 9
+		case MODE_CHECK_RIGHT: // 7
+		case MODE_CHECK_LEFT:  // 8
+		case MODE_CHECK_DOWN:  // 9
+		case MODE_CHECK_UP: {  // 10
 			// Может вернуть move, quit или wait
 			Uint8 tmpMode = CheckMove[Params.Mode](&Game, &Params);
 			dtCount();
@@ -93,10 +94,10 @@ int main(int argc, const char **args)
 			break;
 		}
 
-		case MODE_MOVE_RIGHT: // 2
-		case MODE_MOVE_LEFT:  // 3
-		case MODE_MOVE_DOWN:  // 4
-		case MODE_MOVE_UP:	  // 5
+		case MODE_MOVE_RIGHT: // 3
+		case MODE_MOVE_LEFT:  // 4
+		case MODE_MOVE_DOWN:  // 5
+		case MODE_MOVE_UP:	  // 6
 			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params, &Assets)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 			if((errCode = UpdateWindowTitle(window, Game.Score)))
@@ -104,7 +105,7 @@ int main(int argc, const char **args)
 			SDL_RenderPresent(rend);
 			break;
 
-		case MODE_DRAW_NEW: // 1
+		case MODE_DRAW_NEW: // 2
 			// Рисование поля со старыми элементами
 			if ((errCode = DrawOldElements(rend, &Params, &Game, &Assets) /*== ERR_SDL*/))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
@@ -120,9 +121,6 @@ int main(int argc, const char **args)
 				NewElementIndex = -1;
 				Params.Mode = MODE_WAIT;
 			}
-			break;
-
-		default:
 			break;
 		}
 	}
