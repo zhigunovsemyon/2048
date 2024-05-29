@@ -50,12 +50,6 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings);
  уже выставленного режима работы и некоторого события */
 void SetMode(SDL_Event *event, Params *Params);
 
-//Вычисление меньшего из двух чисел
-int MinOfTwo(int,int);
-
-//Вычисление большего из двух чисел
-int MaxOfTwo(int,int);
-
 //Вызов SDL, создание окна под данным названием и рисовальщика 
 Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 					  const SDL_Point *WinSize, Uint8 Flags);

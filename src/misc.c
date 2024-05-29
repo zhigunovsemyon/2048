@@ -630,16 +630,6 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
 	return ERR_NO;
 }
 
-Sint32 MinOfTwo(Sint32 a, Sint32 b)
-{
-	return (a > b) ? b : a;
-}
-
-Sint32 MaxOfTwo(Sint32 a, Sint32 b)
-{
-	return (a < b) ? b : a;
-}
-
 Game InitParamsAndGame(int argc, const char **argv, Params *Settings)
 {
 	Game Game;
