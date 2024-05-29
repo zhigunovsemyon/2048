@@ -1,5 +1,10 @@
 #include "main.h"
 
+Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
+{
+	return ERR_NO;
+}
+
 int main(int argc, const char **args)
 {
 	srand(time(NULL));
@@ -58,7 +63,11 @@ int main(int argc, const char **args)
 		{
 		case MODE_USERQUIT: // 0
 		case MODE_QUIT:		// 1
-			return SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			//Сохранение прогресса, либо только лишь рекорда
+			errCode = SaveGame(&Game, &Params, SAVE_FILE);
+			return (errCode) ? //Если произошла ошибка
+				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
+				SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 		//Режим ожидания, во время которого пользователь может выбрать направление движения
 		case MODE_WAIT: // 11
