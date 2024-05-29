@@ -185,17 +185,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 				return ERR_SDL;
 			}
 
-			// Заливка фона
-			if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_BG])))
-			{
-				SDL_free(message);
-				return ERR_SDL;
-			}
-			if (SDL_RenderClear(rend))
-			{
-				SDL_free(message);
-				return ERR_SDL;
-			}
+			// Отрисовка новой текстуры приветствия
 			if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
 			{
 				SDL_free(message);
@@ -204,6 +194,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			SDL_RenderPresent(rend);
 		}
 
+		//Возможные события
 		switch (ev->type)
 		{
 		default:
@@ -216,8 +207,9 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			Params->Mode = MODE_QUIT;
 			return ERR_NO;
 
-		case SDL_KEYUP: // Если была нажата клавиша
+		case SDL_KEYUP: // Если была нажата любая клавиша
 			SDL_DestroyTexture(greet);
+			//Если нажата клавиша Q -- осуществляется выход из игры, в противном случае -- начало игры
 			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
 			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			SDL_free(message);
