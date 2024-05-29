@@ -149,7 +149,6 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 
 	SDL_Texture *greet =
 		CreateMessageTexture(rend, &Assets->cols[COL_FG], &Assets->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
-	SDL_free(message);
 	if (!greet)
 		return ERR_SDL;
 
@@ -172,15 +171,27 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			greet = CreateMessageTexture(rend, &Assets->cols[COL_FG], &Assets->cols[COL_BG], &txt_size, FONT, message,
 										 SDL_FALSE);
 			if (!greet)
+			{
+				SDL_free(message);
 				return ERR_SDL;
+			}
 
 			// Заливка фона
 			if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_BG])))
+			{
+				SDL_free(message);
 				return ERR_SDL;
+			}
 			if (SDL_RenderClear(rend))
+			{
+				SDL_free(message);
 				return ERR_SDL;
+			}
 			if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
+			{
+				SDL_free(message);
 				return ERR_SDL;
+			}
 			SDL_RenderPresent(rend);
 		}
 
@@ -192,6 +203,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		// Если был запрошен выход из программы
 		case SDL_QUIT:
 			SDL_DestroyTexture(greet);
+			SDL_free(message);
 			Params->Mode = MODE_QUIT;
 			return ERR_NO;
 
@@ -199,6 +211,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			SDL_DestroyTexture(greet);
 			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
 			SDL_SetWindowTitle(window, "2048 | Очков: 0");
+			SDL_free(message);
 			return ERR_NO;
 		}
 	}
