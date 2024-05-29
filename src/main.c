@@ -16,7 +16,7 @@ int main(int argc, const char **args)
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска,
 	 * подгрузка файла с прогрессом*/
-	Game Game = StartUp(argc, args, &Params);
+	Game Game = InitParamsAndGame(argc, args, &Params);
 	if (!Game.FieldSize)
 		return ERR_MALLOC;
 

@@ -44,7 +44,7 @@ void GetFieldAndTileSize(Game *Game, Params *Params);
 
 /* На основе параметров запуска игры argv, в количестве argc, подбирается схема управления
  * и размер игрового поля. По умолчанию используются стрелки с мышью, поле имеет  размер 4x4*/
-Game StartUp(int argc, const char **argv, Params *Settings);
+Game InitParamsAndGame(int argc, const char **argv, Params *Settings);
 
 /*Функция меняет режим работы программы на основе
  уже выставленного режима работы и некоторого события */

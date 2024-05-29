@@ -640,7 +640,7 @@ Sint32 MaxOfTwo(Sint32 a, Sint32 b)
 	return (a < b) ? b : a;
 }
 
-Game StartUp(int argc, const char **argv, Params *Settings)
+Game InitParamsAndGame(int argc, const char **argv, Params *Settings)
 {
 	Game Game;
 	// Базовые параметры работы игры
