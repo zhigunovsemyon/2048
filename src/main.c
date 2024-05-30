@@ -2,6 +2,16 @@
 
 Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
 {
+	//Если игра закончилась переполнением поля, при этом рекорд 
+	//не был обновлён, сохранять прогресс нет необходимости
+	if (Params->Mode == MODE_QUIT && Game->Score < Game->MaxScore)
+		return ERR_NO;
+
+	//Открытие файла, в который будет записан прогресс
+	// SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
+	//
+	// //Закрытие файла
+	// SDL_RWclose(fptr);
 	return ERR_NO;
 }
 
