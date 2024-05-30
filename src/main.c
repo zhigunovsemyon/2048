@@ -1,10 +1,9 @@
 #include "main.h"
-#include "defines.h"
 
 Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
 {
 	/*Возможные пути программы
-	 * 1. Игра окончилась геймовером, рекорд не обновлён
+	 * 1. Игра окончилась геймовером, рекорд не обновлён (вынесен из функции)
 	 *		сохранять ничего не нужно
 	 * 2. Выход запрошен пользователем, рекорд не обновлён
 	 *		нужно открыть файл и сохранить всю игру -- очки, поле
@@ -13,11 +12,6 @@ Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
 	 * 4. Игра окончилась геймовером, рекорд обновлён
 	 *		нужно открыть файл и сохранить только рекорд, остальное -- признаком незагрузки
 	 * */
-
-	//Если игра закончилась переполнением поля, при этом рекорд 
-	//не был обновлён, сохранять прогресс нет необходимости
-	if (Params->Mode == MODE_QUIT && Game->Score < Game->MaxScore)
-		return ERR_NO;
 
 	//Открытие файла, в который будет записан прогресс
 	// SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
@@ -93,6 +87,12 @@ int main(int argc, const char **args)
 		case MODE_USERQUIT: // 0
 		case MODE_QUIT:		// 1
 			//Сохранение прогресса, либо только лишь рекорда
+
+			//Если игра закончилась переполнением поля, при этом рекорд 
+			//не был обновлён, сохранять прогресс нет необходимости
+			if (Params.Mode == MODE_QUIT && Game.Score < Game.MaxScore)
+				SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+
 			errCode = SaveGame(&Game, &Params, SAVE_FILE);
 			return (errCode) ? //Если произошла ошибка
 				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
