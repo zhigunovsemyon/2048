@@ -1,6 +1,6 @@
 #include "main.h"
 
-Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
+Uint8 SaveGame(Game *game, Params *Params, const char *filename)
 {
 	/*Возможные пути программы
 	 * 1. Игра окончилась геймовером, рекорд не обновлён (вынесен из функции)
@@ -20,6 +20,17 @@ Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
 		SDL_SetError("Не удалось сохранить в файл!");
 		return ERR_FILE;
 	}
+
+	//если выход произошёл из-за переполнения поля, осуществляется сброс поля и очков
+	if(Params->Mode == MODE_QUIT)
+	{
+		SDL_memset(game->Field, 0, _SQ(game->FieldSize));
+		game->Score = 0;
+	}
+
+	//Сохранение игры
+	SDL_RWwrite(fptr, game, sizeof(Game), 1);
+	SDL_RWwrite(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
 
 	//Закрытие файла
 	SDL_RWclose(fptr);
