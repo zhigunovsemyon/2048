@@ -188,7 +188,10 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 				"Используется размер поля ", Game->FieldSize, //Информация о размерах поля
 				"Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
 	if (!message)
+	{
+		SDL_SetError("ошибка выделения памяти!");
 		return ERR_MALLOC;
+	}
 
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
@@ -196,10 +199,16 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 	SDL_Texture *greet =
 		CreateMessageTexture(rend, &Assets->cols[COL_FG], &Assets->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
 	if (!greet)
+	{
+		SDL_SetError("ошибка создания текстуры приветствия!");
 		return ERR_SDL;
+	}
 
 	if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
+	{
+		SDL_SetError("ошибка вставки текстуры!");
 		return ERR_SDL;
+	}
 	SDL_RenderPresent(rend);
 
 	while (SDL_TRUE)
@@ -218,6 +227,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 										 SDL_FALSE);
 			if (!greet)
 			{
+				SDL_SetError("ошибка создания текстуры приветствия!");
 				SDL_free(message);
 				return ERR_SDL;
 			}
@@ -226,6 +236,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
 			{
 				SDL_free(message);
+				SDL_SetError("ошибка вставки текстуры!");
 				return ERR_SDL;
 			}
 			SDL_RenderPresent(rend);
