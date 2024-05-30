@@ -1,4 +1,5 @@
 #include "main.h"
+#include "defines.h"
 
 Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
 {
@@ -44,11 +45,17 @@ int main(int argc, const char **args)
 	 * подгрузка файла с прогрессом*/
 	Game Game = InitParamsAndGame(argc, args, &Params);
 	if (!Game.FieldSize)
-		return ERR_MALLOC;
+	{
+		SDL_SetError("ошибка выделения памяти!");
+		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
+	}
 
 	/*Создание набора цветов*/
 	if (!(Assets.cols = CreateColourSet(FLAG_DARKMODE & Params.Flags)))
-		return ERR_MALLOC;
+	{
+		SDL_SetError("ошибка выделения памяти!");
+		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
+	}
 
 	// Создание окна и рисовальщика
 	if ((errCode = CreateWorkspace(&window, &rend, "Добро пожаловать", &Params.WinSize, Params.Flags)))
