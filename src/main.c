@@ -110,7 +110,7 @@ int main(int argc, const char **args)
 									//Если есть комбинации, осуществляется движение 
 									//вправо, влево, вверх, вниз
 								  ? Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
-								  : MODE_WAIT;//Если комбинаций нет -- режим ожидания
+								  : tmpMode;//Если комбинаций нет -- режим ожидания или выхода
 			}
 			else // Если плитки всё ещё движутся
 				Params.Mode = tmpMode;
