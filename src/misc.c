@@ -5,7 +5,10 @@ Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score)
 	char *buf;
 	SDL_asprintf(&buf, "2048 | Очков: %lu", Score);
 	if(!buf)
+	{
+		SDL_SetError("ошибка выделения памяти!");
 		return ERR_MALLOC;
+	}
 	SDL_SetWindowTitle(win, buf);
 	SDL_free(buf);
 	return ERR_NO;
