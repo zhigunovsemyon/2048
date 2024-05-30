@@ -490,7 +490,10 @@ Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
 			TileTexture *newTexs = SDL_realloc(
 				Assets->textures, sizeof(TileTexture) * Assets->textures_count);
 			if (!newTexs)
+			{
+				SDL_SetError("ошибка выделения памяти!");
 				return ERR_MALLOC;
+			}
 			Assets->textures = newTexs;
 			Assets->textures[Assets->textures_count - 1].val =
 				Game->Field[Index].val;
@@ -529,7 +532,10 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	// Начальный буфер текстур
 	if (!(Assets->textures = (TileTexture *)SDL_malloc(Assets->textures_count *
 													   sizeof(TileTexture))))
+	{
+		SDL_SetError("ошибка выделения памяти!");
 		return ERR_MALLOC;
+	}
 
 	SDL_Rect Tile; // рект с размером текста
 	//(размер ячейки * отношение размера тайла к размеру ячейки)
