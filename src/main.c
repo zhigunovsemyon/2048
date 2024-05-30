@@ -14,10 +14,15 @@ Uint8 SaveGame(Game *Game, Params *Params, const char *filename)
 	 * */
 
 	//Открытие файла, в который будет записан прогресс
-	// SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
-	//
-	// //Закрытие файла
-	// SDL_RWclose(fptr);
+	SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
+	if (!fptr)
+	{
+		SDL_SetError("Не удалось сохранить в файл!");
+		return ERR_FILE;
+	}
+
+	//Закрытие файла
+	SDL_RWclose(fptr);
 	return ERR_NO;
 }
 
