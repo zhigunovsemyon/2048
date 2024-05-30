@@ -53,7 +53,10 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 							   Assets *Assets, float CellWidth)
 {
 	if (!TileValue /* == 0*/)
+	{
+		SDL_SetError("Попытка подобрать текстуру для 0!");
 		return NULL;
+	}
 
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
 	SDL_Rect txt_size;
@@ -61,7 +64,10 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 	char *stringForTex;
 	SDL_asprintf(&stringForTex, "%lu", TileValue);
 	if (!stringForTex)
+	{
+		SDL_SetError("ошибка выделения памяти!");
 		return NULL;
+	}
 
 	SDL_Texture *tmp = CreateMessageTexture(
 		rend, &txt_col, Assets->cols + MatchColForTile(TileValue), &txt_size,
@@ -513,7 +519,10 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 	SDL_asprintf(&text, "Число очков: %lu\nРекорд: %lu", Game->Score,
 				 Game->MaxScore);
 	if (!text)
+	{	
+		SDL_SetError("Ошибка выделения памяти!");
 		return NULL;
+	}
 	SDL_Texture *ret =
 		CreateMessageTexture(rend, ColourSet + COL_FG, ColourSet + COL_BG, Tile,
 							 FONT, text, SDL_TRUE);
@@ -623,7 +632,10 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	SDL_Surface *txt_surf;
 
 	if (!message)
+	{
+		SDL_SetError("ошибка выделения памяти!");
 		return NULL;
+	}
 
 	Uint8 scaler =
 		CountLines(message); // Отношение размера буквы к размеру окна

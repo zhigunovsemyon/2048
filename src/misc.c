@@ -320,7 +320,10 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	SDL_Colour *set =
 		(SDL_Colour *)SDL_malloc(COLOURS_COUNT * sizeof(SDL_Colour));
 	if (!set)
+	{	
+		SDL_SetError("Ошибка выделения памяти!");
 		return NULL;
+	}
 
 	// Открытие файла, из которого будет осуществлятся чтение цветов
 	SDL_RWops *ColFile =
@@ -328,6 +331,7 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	if (!ColFile)
 	{ // Очитка теперь безполезного набора цветов
 		SDL_free(set);
+		SDL_SetError("Ошибка выделения памяти!");
 		return NULL;
 	}
 	// Объём файла + терм. символ
@@ -338,6 +342,7 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	if (!fCopy)
 	{ // Очитка теперь безполезного набора цветов
 		SDL_free(set);
+		SDL_SetError("Ошибка выделения памяти!");
 		// Закрытие файла с цветами
 		SDL_RWclose(ColFile);
 		return NULL;
@@ -373,6 +378,7 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 		SDL_free(set);
 		// Очистка памяти, завершение функции
 		SDL_free(fCopy);
+		SDL_SetError("Ошибка выделения памяти!");
 		return NULL;
 	}
 
