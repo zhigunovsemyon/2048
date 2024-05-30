@@ -163,7 +163,6 @@ Uint8 CheckUpCombo(Game *Game, Params *Params)
 Uint8 CheckRightMove(Game *Game, Params *Params)
 {
 	Uint8 QuitFlag = 1, MoveFlag = 0;
-	SDL_Log("Проверка справа");
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца с конца
@@ -199,7 +198,6 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 Uint8 CheckLeftMove(Game *Game, Params *Params)
 {
 	Uint8 MoveFlag = 0, QuitFlag = 1;
-	SDL_Log("Проверка слева");
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца
@@ -234,7 +232,6 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 Uint8 CheckUpMove(Game *Game, Params *Params)
 {
 	Uint8 MoveFlag = 0, QuitFlag = 1;
-	SDL_Log("Проверка сверху");
 	// Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждой строки
@@ -270,7 +267,6 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 {
 	Uint8 QuitFlag = 1;
 	Uint8 MoveFlag = 0;
-	SDL_Log("Проверка снизу");
 	// Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждой строки
