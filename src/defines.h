@@ -110,7 +110,8 @@ enum Errors
 	ERR_NO,		//Отсутствие ошибок
 	ERR_SDL,	//Ошибка SDL
 	ERR_MALLOC,	//Ошибка malloc
-	ERR_TTF		//Ошибка SDL_ttf
+	ERR_TTF,	//Ошибка SDL_ttf
+	ERR_FILE	//Ошибка работы с файлом
 };
 
 enum Flags
