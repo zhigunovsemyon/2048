@@ -38,6 +38,7 @@ int main(int argc, const char **args)
 	Params.WinSize.x = WIN_MIN * 1.5;
 	Params.WinSize.y = WIN_MIN * 2;
 	Assets.textures = NULL;
+	Assets.cols = NULL;
 	SDL_Window *window = NULL;
 	SDL_Renderer *rend = NULL;
 
