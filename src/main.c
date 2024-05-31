@@ -1,7 +1,6 @@
 #include "main.h"
-#include "misc.h"
 
-Uint8 SaveGame(Game *game, Params *Params, const char *filename)
+Uint8 SaveGame(Game *game, const char *filename)
 {
 	/*Возможные пути программы
 	 * 1. Игра окончилась геймовером, рекорд не обновлён (вынесен из функции)
@@ -23,7 +22,7 @@ Uint8 SaveGame(Game *game, Params *Params, const char *filename)
 	}
 
 	//если выход произошёл из-за переполнения поля, осуществляется сброс поля и очков
-	if(Params->Mode == MODE_QUIT)
+	if(game->Mode == MODE_QUIT)
 	{
 		SDL_memset(game->Field, 0, _SQ(game->FieldSize));
 		game->Score = 0;
@@ -55,7 +54,7 @@ int main(int argc, const char **args)
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска,
 	 * подгрузка файла с прогрессом*/
-	Game Game = InitParamsAndGame(argc, args, &Params);
+	Game Game = InitParamsAndGame(argc, args, &Params, SAVE_FILE);
 	if (!Game.FieldSize)
 	{
 		SDL_SetError("ошибка выделения памяти!");
@@ -85,7 +84,7 @@ int main(int argc, const char **args)
 	// Игровой цикл
 	while (SDL_TRUE)
 	{
-		SetMode(&Events, &Params); // Выбор режима работы в данный момент
+		SetMode(&Events, &Game, &Params); // Выбор режима работы в данный момент
 		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 		{
 			GetFieldAndTileSize(&Game, &Params);
@@ -99,7 +98,7 @@ int main(int argc, const char **args)
 			SDL_RenderPresent(rend);
 		}
 
-		switch (Params.Mode)
+		switch (Game.Mode)
 		{
 		case MODE_USERQUIT: // 0
 		case MODE_QUIT:		// 1
@@ -107,10 +106,10 @@ int main(int argc, const char **args)
 
 			//Если игра закончилась переполнением поля, при этом рекорд 
 			//не был обновлён, сохранять прогресс нет необходимости
-			if (Params.Mode == MODE_QUIT && Game.Score < Game.MaxScore)
+			if (Game.Mode == MODE_QUIT && Game.Score < Game.MaxScore)
 				SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
-			errCode = SaveGame(&Game, &Params, SAVE_FILE);
+			errCode = SaveGame(&Game, SAVE_FILE);
 			return (errCode) ? //Если произошла ошибка
 				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
 				SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
@@ -128,7 +127,7 @@ int main(int argc, const char **args)
 
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
 			В противном случае там -1, что приведёт к выходу из программы*/
-			Params.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
+			Game.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
 			dtCount(); // Сброс счётчика времени кадра перед отрисовкой
 			break;
 
@@ -138,18 +137,18 @@ int main(int argc, const char **args)
 		case MODE_CHECK_DOWN:  // 9
 		case MODE_CHECK_UP: {  // 10
 			// Может вернуть move, quit или wait
-			Uint8 tmpMode = CheckMove[Params.Mode](&Game, &Params);
+			Uint8 tmpMode = CheckMove[Game.Mode](&Game, &Params);
 			dtCount();
 			if (tmpMode == MODE_WAIT || tmpMode == MODE_QUIT)
 			{
-				Params.Mode = (CheckCombo[Params.Mode](&Game, &Params))
+				Game.Mode = (CheckCombo[Game.Mode](&Game, &Params))
 									//Если есть комбинации, осуществляется движение 
 									//вправо, влево, вверх, вниз
-								  ? Params.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
+								  ? Game.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
 								  : tmpMode;//Если комбинаций нет -- режим ожидания или выхода
 			}
 			else // Если плитки всё ещё движутся
-				Params.Mode = tmpMode;
+				Game.Mode = tmpMode;
 			break;
 		}
 
@@ -159,7 +158,7 @@ int main(int argc, const char **args)
 		case MODE_MOVE_DOWN:  // 5
 		case MODE_MOVE_UP:	  // 6
 			//Вызов нужной функции сдвига, в соответствии с направлением
-			if ((errCode = DoMove[Params.Mode](rend, &Game, &Params, &Assets)))
+			if ((errCode = DoMove[Game.Mode](rend, &Game, &Params, &Assets)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 			//Обновление заголовка на случай сложенной комбинации
 			if((errCode = UpdateWindowTitle(window, Game.Score)))
@@ -185,7 +184,7 @@ int main(int argc, const char **args)
 			if (!Game.Field[NewElementIndex].size)
 			{
 				NewElementIndex = -1;
-				Params.Mode = MODE_WAIT;
+				Game.Mode = MODE_WAIT;
 			}
 			break;
 		}
@@ -270,13 +269,13 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		case SDL_QUIT:
 			SDL_DestroyTexture(greet);
 			SDL_free(message);
-			Params->Mode = MODE_QUIT;
+			Game->Mode = MODE_QUIT;
 			return ERR_NO;
 
 		case SDL_KEYUP: // Если была нажата любая клавиша
 			SDL_DestroyTexture(greet);
 			//Если нажата клавиша Q -- осуществляется выход из игры, в противном случае -- начало игры
-			Params->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_USERQUIT : NextMode;
+			Game->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_USERQUIT : NextMode;
 			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			SDL_free(message);
 			return ERR_NO;

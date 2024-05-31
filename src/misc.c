@@ -464,7 +464,7 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 	return (rand() % (b - a)) + a;
 }
 
-void SetMode(SDL_Event *event, Params *Params)
+void SetMode(SDL_Event *event, Game *Game, Params *Params)
 {
 	// Определение событий
 	while (!SDL_PollEvent(event))
@@ -476,7 +476,7 @@ void SetMode(SDL_Event *event, Params *Params)
 	{
 	// Если был запрошен выход из программы
 	case SDL_QUIT:
-		Params->Mode = MODE_USERQUIT;
+		Game->Mode = MODE_USERQUIT;
 		return;
 
 		break;
@@ -487,10 +487,10 @@ void SetMode(SDL_Event *event, Params *Params)
 		// из программы
 		if (event->key.keysym.scancode == SDL_SCANCODE_Q)
 		{
-			Params->Mode = MODE_USERQUIT;
+			Game->Mode = MODE_USERQUIT;
 			return;
 		}
-		if (Params->Mode != MODE_WAIT)
+		if (Game->Mode != MODE_WAIT)
 			return;
 		/*дальнейший код выполняется только в режиме MODE_WAIT*/
 		switch (event->key.keysym.scancode)
@@ -498,57 +498,57 @@ void SetMode(SDL_Event *event, Params *Params)
 			/*Наборы клавиш "ВПРАВО" для разных схем*/
 		case SDL_SCANCODE_L:
 			if ((Params->Flags & FLAG_VIMKEY))
-				Params->Mode = MODE_CHECK_RIGHT;
+				Game->Mode = MODE_CHECK_RIGHT;
 			return;
 		case SDL_SCANCODE_D:
 			if ((Params->Flags & FLAG_WASDKEY))
-				Params->Mode = MODE_CHECK_RIGHT;
+				Game->Mode = MODE_CHECK_RIGHT;
 			return;
 		case SDL_SCANCODE_RIGHT:
 			if ((Params->Flags & FLAG_ARROWKEY))
-				Params->Mode = MODE_CHECK_RIGHT;
+				Game->Mode = MODE_CHECK_RIGHT;
 			return;
 
 			/*Наборы клавиш "ВЛЕВО" для разных схем*/
 		case SDL_SCANCODE_H:
 			if ((Params->Flags & FLAG_VIMKEY))
-				Params->Mode = MODE_CHECK_LEFT;
+				Game->Mode = MODE_CHECK_LEFT;
 			return;
 		case SDL_SCANCODE_A:
 			if ((Params->Flags & FLAG_WASDKEY))
-				Params->Mode = MODE_CHECK_LEFT;
+				Game->Mode = MODE_CHECK_LEFT;
 			return;
 		case SDL_SCANCODE_LEFT:
 			if ((Params->Flags & FLAG_ARROWKEY))
-				Params->Mode = MODE_CHECK_LEFT;
+				Game->Mode = MODE_CHECK_LEFT;
 			return;
 
 			/*Наборы клавиш "ВВЕРХ" для разных схем*/
 		case SDL_SCANCODE_K:
 			if ((Params->Flags & FLAG_VIMKEY))
-				Params->Mode = MODE_CHECK_UP;
+				Game->Mode = MODE_CHECK_UP;
 			return;
 		case SDL_SCANCODE_W:
 			if ((Params->Flags & FLAG_WASDKEY))
-				Params->Mode = MODE_CHECK_UP;
+				Game->Mode = MODE_CHECK_UP;
 			return;
 		case SDL_SCANCODE_UP:
 			if ((Params->Flags & FLAG_ARROWKEY))
-				Params->Mode = MODE_CHECK_UP;
+				Game->Mode = MODE_CHECK_UP;
 			return;
 
 			/*Наборы клавиш "ВНИЗ" для разных схем*/
 		case SDL_SCANCODE_J:
 			if ((Params->Flags & FLAG_VIMKEY))
-				Params->Mode = MODE_CHECK_DOWN;
+				Game->Mode = MODE_CHECK_DOWN;
 			return;
 		case SDL_SCANCODE_S:
 			if ((Params->Flags & FLAG_WASDKEY))
-				Params->Mode = MODE_CHECK_DOWN;
+				Game->Mode = MODE_CHECK_DOWN;
 			return;
 		case SDL_SCANCODE_DOWN:
 			if ((Params->Flags & FLAG_ARROWKEY))
-				Params->Mode = MODE_CHECK_DOWN;
+				Game->Mode = MODE_CHECK_DOWN;
 			return;
 
 		default:
@@ -635,10 +635,8 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
 	return ERR_NO;
 }
 
-Game InitParamsAndGame(int argc, const char **argv, Params *Settings)
-{
-	Game Game;
-	// Базовые параметры работы игры
+Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char *filename)
+{	// Базовые параметры работы игры
 	Uint8 FieldSize = 4;
 	Settings->Flags = (FLAG_VSYNC | FLAG_DARKMODE | FLAG_ARROWKEY);
 
@@ -726,11 +724,24 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings)
 			continue;
 		}
 	}
-
+	Game Game;
 	Game.Score = 0,	Game.MaxScore = 0;
 	// Выделение памяти под игровое поле
 	Game.Field = (Tile *)SDL_calloc(sizeof(Tile), _SQ(FieldSize));
-	Game.FieldSize = (Game.Field/* != NULL */) ? FieldSize : 0;
+	if(!Game.Field)
+	{
+		Game.FieldSize = 0;
+		return Game;
+	}
+
+	Game.FieldSize =  FieldSize;
+
+	/*План чтения файла сохранения
+	 * 1. Если размеры не совпадают -- поле создаётся по новому
+	 *		В остальных случаях копируется содержимое файла
+	 * 2. Если поле пустое -- значит нужно добавить элемент */
+
+	// SDL_RWops *fptr = SDL_RWFromFile(filename, "rb");
 
 	//Добавление начального элемента
 	if (Game.FieldSize)

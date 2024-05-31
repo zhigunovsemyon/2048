@@ -146,7 +146,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_RIGHT;
+		Game->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 	}
 	/* Если CheckMove вернул флаг возможности смещения элемента,
@@ -156,19 +156,19 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	 нового элемента*/
 	if (CheckRightMove(Game, Params) == MODE_MOVE_RIGHT)
 	{
-		Params->Mode = MODE_MOVE_RIGHT;
+		Game->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 	}
 
 	// Если возможно сложение вправо
 	if (CheckRightCombo(Game, Params))
 	{
-		Params->Mode = MODE_MOVE_RIGHT;
+		Game->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
 		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
-	Params->Mode = MODE_ADD;
+	Game->Mode = MODE_ADD;
 	return ERR_NO;
 }
 
@@ -235,7 +235,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_LEFT;
+		Game->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
 	/* Если CheckMove вернул флаг возможности смещения элемента,
@@ -245,19 +245,19 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	 нового элемента*/
 	if (CheckLeftMove(Game, Params) == MODE_MOVE_LEFT)
 	{
-		Params->Mode = MODE_MOVE_LEFT;
+		Game->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 	}
 
 	// Если возможно сложение вправо
 	if (CheckLeftCombo(Game, Params))
 	{
-		Params->Mode = MODE_MOVE_LEFT;
+		Game->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
 		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
-	Params->Mode = MODE_ADD;
+	Game->Mode = MODE_ADD;
 	return ERR_NO;
 }
 
@@ -325,7 +325,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_UP;
+		Game->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
 	/* Если CheckMove вернул флаг возможности смещения элемента,
@@ -335,19 +335,19 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	 нового элемента*/
 	if (CheckUpMove(Game, Params) == MODE_MOVE_UP)
 	{
-		Params->Mode = MODE_MOVE_UP;
+		Game->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 	}
 
 	// Если возможно сложение вправо
 	if (CheckUpCombo(Game, Params))
 	{
-		Params->Mode = MODE_MOVE_UP;
+		Game->Mode = MODE_MOVE_UP;
 		return ERR_NO;
 		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
-	Params->Mode = MODE_ADD;
+	Game->Mode = MODE_ADD;
 	return ERR_NO;
 }
 
@@ -413,7 +413,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	}
 	if (Flag)
 	{
-		Params->Mode = MODE_MOVE_DOWN;
+		Game->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
 	/* Если CheckMove вернул флаг возможности смещения элемента,
@@ -423,19 +423,19 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	 нового элемента*/
 	if (CheckDownMove(Game, Params) == MODE_MOVE_DOWN)
 	{
-		Params->Mode = MODE_MOVE_DOWN;
+		Game->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 	}
 
 	// Если возможно сложение вправо
 	if (CheckDownCombo(Game, Params))
 	{
-		Params->Mode = MODE_MOVE_DOWN;
+		Game->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
 		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
-	Params->Mode = MODE_ADD;
+	Game->Mode = MODE_ADD;
 	return ERR_NO;
 }
 

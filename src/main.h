@@ -41,6 +41,7 @@ typedef struct
 	Uint8 FieldSize;//Размер поля
 	Uint64 Score;	//Текущий счёт
 	Uint64 MaxScore;//Максимальный счёт
+	Uint8 Mode;		//Текущий этап игры
 }
 Game;
 
@@ -48,7 +49,6 @@ Game;
 typedef struct 
 {
 	Uint8 Flags;
-	Uint8 Mode;
 	SDL_Point WinSize;
 	float CellWidth;
 	float FieldSize;

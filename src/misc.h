@@ -44,11 +44,11 @@ void GetFieldAndTileSize(Game *Game, Params *Params);
 
 /* На основе параметров запуска игры argv, в количестве argc, подбирается схема управления
  * и размер игрового поля. По умолчанию используются стрелки с мышью, поле имеет  размер 4x4*/
-Game InitParamsAndGame(int argc, const char **argv, Params *Settings);
+Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char *filename);
 
 /*Функция меняет режим работы программы на основе
  уже выставленного режима работы и некоторого события */
-void SetMode(SDL_Event *event, Params *Params);
+void SetMode(SDL_Event *, Game *, Params *);
 
 //Вызов SDL, создание окна под данным названием и рисовальщика 
 Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
