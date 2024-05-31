@@ -542,26 +542,37 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	//(размер ячейки * отношение размера тайла к размеру ячейки)
 	Tile.w = Tile.h = (int)(TILE_SIZE_COEFFICIENT * Params->CellWidth);
 
-	// Текстура очков (пока заглушка)
+	// Текстура очков
 	Assets->textures[0].val = 0;
 	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) / 2, 
 		.w = (int)Params->FieldSize };
 	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
-	// Assets->textures[0].tex = 0;
+
+	//Нахождение максимальной клетки
+	Uint64 maxVal = 2;
+	for (Uint8 cur = 0; cur < _SQ(Game->FieldSize); cur++)
+	{
+		if (maxVal < Game->Field[cur].val)
+			maxVal = Game->Field[cur].val;
+	}
+
+	for (Uint64 i = 1, val = 2; val <= maxVal; val <<= 1, i++)
+	{
+		Assets->textures[i].val = val;
+		if (!(Assets->textures[i].tex = CreateTileTexture(
+				  rend, Assets->textures[i].val, Assets, Params->CellWidth)))
+			return ERR_SDL;
+		
+	}
 
 	// Текстура двойки
-	Assets->textures[1].val = 2;
-	if (!(Assets->textures[1].tex =
-			  CreateMessageTexture(rend, &txt_col, &Assets->cols[COL_SQ2],
-								   &Tile, FONT, "2", SDL_TRUE)))
-		return ERR_SDL;
 
 	// Текстура четвёрки
-	Assets->textures[2].val = 4;
+	/*Assets->textures[2].val = 4;
 	if (!(Assets->textures[2].tex =
 			  CreateMessageTexture(rend, &txt_col, &Assets->cols[COL_SQ4],
 								   &Tile, FONT, "4", SDL_TRUE)))
-		return ERR_SDL;
+		return ERR_SDL;*/
 
 	return ERR_NO;
 }
