@@ -22,7 +22,7 @@ Uint8 SaveGame(Game *game, const char *filename)
 	}
 
 	//если выход произошёл из-за переполнения поля, осуществляется сброс поля и очков
-	if(game->Mode == MODE_QUIT)
+	if(game->Mode == MODE_GAMEOVER)
 	{
 		SDL_memset(game->Field, 0, _SQ(game->FieldSize));
 		game->Score = 0;
@@ -100,13 +100,13 @@ int main(int argc, const char **args)
 
 		switch (Game.Mode)
 		{
-		case MODE_USERQUIT: // 0
-		case MODE_QUIT:		// 1
+		case MODE_QUIT: // 0
+		case MODE_GAMEOVER:		// 1
 			//Сохранение прогресса, либо только лишь рекорда
 
 			//Если игра закончилась переполнением поля, при этом рекорд 
 			//не был обновлён, сохранять прогресс нет необходимости
-			if (Game.Mode == MODE_QUIT && Game.Score < Game.MaxScore)
+			if (Game.Mode == MODE_GAMEOVER && Game.Score < Game.MaxScore)
 				SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 			errCode = SaveGame(&Game, SAVE_FILE);
@@ -127,7 +127,7 @@ int main(int argc, const char **args)
 
 			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
 			В противном случае там -1, что приведёт к выходу из программы*/
-			Game.Mode = (NewElementIndex < 0) ? MODE_QUIT : MODE_DRAW_NEW;
+			Game.Mode = (NewElementIndex < 0) ? MODE_GAMEOVER : MODE_DRAW_NEW;
 			dtCount(); // Сброс счётчика времени кадра перед отрисовкой
 			break;
 
@@ -139,7 +139,7 @@ int main(int argc, const char **args)
 			// Может вернуть move, quit или wait
 			Uint8 tmpMode = CheckMove[Game.Mode](&Game, &Params);
 			dtCount();
-			if (tmpMode == MODE_WAIT || tmpMode == MODE_QUIT)
+			if (tmpMode == MODE_WAIT || tmpMode == MODE_GAMEOVER)
 			{
 				Game.Mode = (CheckCombo[Game.Mode](&Game, &Params))
 									//Если есть комбинации, осуществляется движение 
@@ -269,13 +269,13 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		case SDL_QUIT:
 			SDL_DestroyTexture(greet);
 			SDL_free(message);
-			Game->Mode = MODE_QUIT;
+			Game->Mode = MODE_GAMEOVER;
 			return ERR_NO;
 
 		case SDL_KEYUP: // Если была нажата любая клавиша
 			SDL_DestroyTexture(greet);
 			//Если нажата клавиша Q -- осуществляется выход из игры, в противном случае -- начало игры
-			Game->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_USERQUIT : NextMode;
+			Game->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
 			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			SDL_free(message);
 			return ERR_NO;

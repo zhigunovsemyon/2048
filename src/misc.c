@@ -192,7 +192,7 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_RIGHT : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_RIGHT : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
 Uint8 CheckLeftMove(Game *Game, Params *Params)
@@ -226,7 +226,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_LEFT : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_LEFT : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
 Uint8 CheckUpMove(Game *Game, Params *Params)
@@ -260,7 +260,7 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_UP : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_UP : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
 Uint8 CheckDownMove(Game *Game, Params *Params)
@@ -295,7 +295,7 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 			}
 		}
 	}
-	return (MoveFlag) ? MODE_MOVE_DOWN : (QuitFlag) ? MODE_QUIT : MODE_WAIT;
+	return (MoveFlag) ? MODE_MOVE_DOWN : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
 // Подсчёт длинны файла, сравнение с максимальным
@@ -476,7 +476,7 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 	{
 	// Если был запрошен выход из программы
 	case SDL_QUIT:
-		Game->Mode = MODE_USERQUIT;
+		Game->Mode = MODE_QUIT;
 		return;
 
 		break;
@@ -487,7 +487,7 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 		// из программы
 		if (event->key.keysym.scancode == SDL_SCANCODE_Q)
 		{
-			Game->Mode = MODE_USERQUIT;
+			Game->Mode = MODE_QUIT;
 			return;
 		}
 		if (Game->Mode != MODE_WAIT)
