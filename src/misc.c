@@ -479,23 +479,14 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 		Game->Mode = MODE_QUIT;
 		return;
 
-		break;
-
 	case SDL_KEYUP: // Если была нажата клавиша
-
-		// Если програма отображает перемещение ячейки, то возможно только выйти
-		// из программы
-		if (event->key.keysym.scancode == SDL_SCANCODE_Q)
-		{
-			Game->Mode = MODE_QUIT;
-			return;
-		}
-		if (Game->Mode != MODE_WAIT)
-			return;
-		/*дальнейший код выполняется только в режиме MODE_WAIT*/
 		switch (event->key.keysym.scancode)
 		{
-			/*Наборы клавиш "ВПРАВО" для разных схем*/
+		case SDL_SCANCODE_Q:
+			Game->Mode = MODE_QUIT;
+			return;
+		
+		/*Наборы клавиш "ВПРАВО" для разных схем*/
 		case SDL_SCANCODE_L:
 			if ((Params->Flags & FLAG_VIMKEY))
 				Game->Mode = MODE_CHECK_RIGHT;
@@ -747,7 +738,6 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 		// Добавление начального элемента
 		game.Field[AddElement(&game)].mode = TILE_OLD;
 		game.MaxScore = game.Score = 0;
-
 	}
 	return game;
 }

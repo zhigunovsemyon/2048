@@ -77,7 +77,9 @@ int main(int argc, const char **args)
 	// Игровой цикл
 	while (SDL_TRUE)
 	{
-		SetMode(&Events, &Game, &Params); // Выбор режима работы в данный момент
+		if (Game.Mode == MODE_WAIT)
+			SetMode(&Events, &Game, &Params); // Выбор режима работы в данный момент
+	
 		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
 		{
 			GetFieldAndTileSize(&Game, &Params);
