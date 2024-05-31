@@ -1,6 +1,4 @@
 #include "draw.h"
-#include "main.h"
-#include <SDL2/SDL_stdinc.h>
 
 static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 {
@@ -526,12 +524,10 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 
 Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 					 Game *Game)
-{
+{	//Цвет текста
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
 
-	// Начальное число текстур (очки, двойка, четвёрка)
-
-	// Начальный буфер текстур
+	// Начальный буфер для текстуры с очками
 	if (!(Assets->textures = (TileTexture *)SDL_malloc(sizeof(TileTexture))))
 	{
 		SDL_SetError("ошибка выделения памяти!");
@@ -548,38 +544,33 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 		.w = (int)Params->FieldSize };
 	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
 
-	//Нахождение максимальной клетки
+	/* Нахождение максимальной клетки. Если размер некоторой ячейки больше 
+	максимальной, максимальный размер обновляется */
 	Uint64 maxVal = 2;
 	for (Uint8 cur = 0; cur < _SQ(Game->FieldSize); cur++)
-	{
 		if (maxVal < Game->Field[cur].val)
 			maxVal = Game->Field[cur].val;
-	}
 
+	//Выделение памяти всем ячейкам, вплоть до максимальной
 	Assets->textures_count = 2;
 	for (Uint64 val = 2; val <= maxVal; Assets->textures_count++, val <<= 1)
-	{
-		TileTexture *newPtr = (TileTexture *)SDL_realloc(Assets->textures, sizeof(TileTexture) * Assets->textures_count);
+	{	//Перевыделение памяти под нужное число текстур, проверка
+		TileTexture *newPtr = (TileTexture *)SDL_realloc(Assets->textures, 
+								sizeof(TileTexture) * Assets->textures_count);
 		if(!newPtr)
 		{
 			SDL_SetError("ошибка выделения памяти!");
 			return ERR_MALLOC;
 		}
-		Assets->textures = newPtr;
+		Assets->textures = newPtr; //Перезапись буфера
+
+		//Создание крайней текстуры
 		Assets->textures[Assets->textures_count - 1].val = val;
 		if (!(Assets->textures[Assets->textures_count - 1].tex = CreateTileTexture(
 				  rend, Assets->textures[Assets->textures_count - 1].val, Assets, Params->CellWidth)))
 			return ERR_SDL;
 	}
-
-	// Текстура двойки
-
-	// Текстура четвёрки
-	/*Assets->textures[2].val = 4;
-	if (!(Assets->textures[2].tex =
-			  CreateMessageTexture(rend, &txt_col, &Assets->cols[COL_SQ4],
-								   &Tile, FONT, "4", SDL_TRUE)))
-		return ERR_SDL;*/
+	Assets->textures_count--;//Откат переполненного счётчика текстур
 
 	return ERR_NO;
 }

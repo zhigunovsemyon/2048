@@ -70,7 +70,7 @@ int main(int argc, const char **args)
 			//Если игра закончилась переполнением поля, при этом рекорд 
 			//не был обновлён, сохранять прогресс нет необходимости
 			if (Game.Mode == MODE_GAMEOVER && Game.Score < Game.MaxScore)
-				SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+				return SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 			errCode = SaveGame(&Game, SAVE_FILE);
 			return (errCode) ? //Если произошла ошибка
