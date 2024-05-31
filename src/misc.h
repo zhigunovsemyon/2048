@@ -22,6 +22,9 @@ Uint8 CheckDownCombo(Game *Game, Params *Params);
 void ChangeCombinedToOld(Game *Game);
 Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score);
 
+/*Сохранение игрового процесса game в файл finename*/
+Uint8 SaveGame(Game *, const char *filename);
+
 //Считает число переносов строки 
 Uint8 CountLines(const char *source);
 

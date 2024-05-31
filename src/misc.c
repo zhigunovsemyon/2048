@@ -14,6 +14,24 @@ Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score)
 	return ERR_NO;
 }
 
+Uint8 SaveGame(Game *game, const char *filename)
+{ // Открытие файла, в который будет записан прогресс
+	SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
+	if (!fptr)
+	{
+		SDL_SetError("Не удалось сохранить в файл!");
+		return ERR_FILE;
+	}
+
+	// Сохранение игры
+	SDL_RWwrite(fptr, game, sizeof(Game), 1);
+	SDL_RWwrite(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
+
+	// Закрытие файла
+	SDL_RWclose(fptr);
+	return ERR_NO;
+}
+
 void ChangeCombinedToOld(Game *Game)
 {
 	// Цикл перебора каждой строки

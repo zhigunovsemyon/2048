@@ -125,8 +125,8 @@ enum Flags
 
 enum Modes 
 {
-	MODE_QUIT,	//Выход из игры пользователем
-	MODE_GAMEOVER,		//Завершение игры по заполнению поля
+	MODE_QUIT,		//Выход из игры пользователем
+	MODE_GAMEOVER,	//Завершение игры по заполнению поля
 	MODE_DRAW_NEW,	//Рисование нового элемента
 	MODE_MOVE_RIGHT,//перемещение вправо
 	MODE_MOVE_LEFT,	//перемещение влево

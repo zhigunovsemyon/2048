@@ -1,35 +1,4 @@
 #include "main.h"
-
-Uint8 SaveGame(Game *game, const char *filename)
-{
-	/*Возможные пути программы
-	 * 1. Игра окончилась геймовером, рекорд не обновлён (вынесен из функции)
-	 *		сохранять ничего не нужно
-	 * 2. Выход запрошен пользователем, рекорд не обновлён
-	 *		нужно открыть файл и сохранить всю игру -- очки, поле
-	 * 3. Выход запрошен пользователем, рекорд обновлён
-	 *		нужно открыть файл и сохранить всю игру -- очки, поле
-	 * 4. Игра окончилась геймовером, рекорд обновлён
-	 *		нужно открыть файл и сохранить всю игру, признаком незагрузки будет MODE_GAMEOVER
-	 * */
-
-	//Открытие файла, в который будет записан прогресс
-	SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
-	if (!fptr)
-	{
-		SDL_SetError("Не удалось сохранить в файл!");
-		return ERR_FILE;
-	}
-
-	//Сохранение игры
-	SDL_RWwrite(fptr, game, sizeof(Game), 1);
-	SDL_RWwrite(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
-
-	//Закрытие файла
-	SDL_RWclose(fptr);
-	return ERR_NO;
-}
-
 int main(int argc, const char **args)
 {
 	srand(time(NULL));
