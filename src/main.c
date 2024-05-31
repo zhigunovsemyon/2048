@@ -160,13 +160,16 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 			   Uint8 NextMode)
 { // Создание сообщения
 	char *message;
-	SDL_asprintf(&message, "%s\n%s%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", "Добро пожаловать в игру 2048!", //Заголовок
-				"Включён ", (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим",	//Цветовой режим
-				"V-Sync ", (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен",	//v-sync
-				"Используется управление ",(Params->Flags & FLAG_WASDKEY) ? "WASD" //схема управления wasd
-				: (Params->Flags & FLAG_VIMKEY) ? "vi" : "стрелками",			// либо vi, либо стрелки
-				"Используется размер поля ", Game->FieldSize, //Информация о размерах поля
-				"Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
+	SDL_asprintf(&message, "%s\n%s\n%s\n%s%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", 
+		"Автор игры: Gabriele Cirulli",
+		"Автор данной реализации: Жигунов С. Н.",
+		"Добро пожаловать в игру 2048!", //Заголовок
+		"Включён ", (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим",	//Цветовой режим
+		"V-Sync ", (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен",	//v-sync
+		"Используется управление ",(Params->Flags & FLAG_WASDKEY) ? "WASD" //схема управления wasd
+		: (Params->Flags & FLAG_VIMKEY) ? "vi" : "стрелками",			// либо vi, либо стрелки
+		"Используется размер поля ", Game->FieldSize, //Информация о размерах поля
+		"Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
 	if (!message)
 	{
 		SDL_SetError("ошибка выделения памяти!");
