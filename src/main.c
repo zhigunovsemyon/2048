@@ -167,7 +167,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		"Включён ", (Params->Flags & FLAG_DARKMODE) ? "тёмный" : "светлый", " режим",	//Цветовой режим
 		"V-Sync ", (Params->Flags & FLAG_VSYNC) ? "включен" : "отключен",	//v-sync
 		"Используется управление ",(Params->Flags & FLAG_WASDKEY) ? "WASD" //схема управления wasd
-		: (Params->Flags & FLAG_VIMKEY) ? "vi" : "стрелками",			// либо vi, либо стрелки
+		: (Params->Flags & FLAG_VIKEY) ? "vi" : "стрелками",			// либо vi, либо стрелки
 		"Используется размер поля ", Game->FieldSize, //Информация о размерах поля
 		"Для выхода нажмите q.\nДля продолжения нажмите любую клавишу");
 	if (!message)

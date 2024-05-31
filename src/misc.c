@@ -510,7 +510,7 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 		
 		/*Наборы клавиш "ВПРАВО" для разных схем*/
 		case SDL_SCANCODE_L:
-			if ((Params->Flags & FLAG_VIMKEY))
+			if ((Params->Flags & FLAG_VIKEY))
 				Game->Mode = MODE_CHECK_RIGHT;
 			return;
 		case SDL_SCANCODE_D:
@@ -524,7 +524,7 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 
 			/*Наборы клавиш "ВЛЕВО" для разных схем*/
 		case SDL_SCANCODE_H:
-			if ((Params->Flags & FLAG_VIMKEY))
+			if ((Params->Flags & FLAG_VIKEY))
 				Game->Mode = MODE_CHECK_LEFT;
 			return;
 		case SDL_SCANCODE_A:
@@ -538,7 +538,7 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 
 			/*Наборы клавиш "ВВЕРХ" для разных схем*/
 		case SDL_SCANCODE_K:
-			if ((Params->Flags & FLAG_VIMKEY))
+			if ((Params->Flags & FLAG_VIKEY))
 				Game->Mode = MODE_CHECK_UP;
 			return;
 		case SDL_SCANCODE_W:
@@ -552,7 +552,7 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 
 			/*Наборы клавиш "ВНИЗ" для разных схем*/
 		case SDL_SCANCODE_J:
-			if ((Params->Flags & FLAG_VIMKEY))
+			if ((Params->Flags & FLAG_VIKEY))
 				Game->Mode = MODE_CHECK_DOWN;
 			return;
 		case SDL_SCANCODE_S:
@@ -736,7 +736,7 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 		{
 			Setters &= ~KEY_UNSET;
 			Settings->Flags &= ~FLAG_ARROWKEY;
-			Settings->Flags |= FLAG_VIMKEY;
+			Settings->Flags |= FLAG_VIKEY;
 			continue;
 		}
 	}

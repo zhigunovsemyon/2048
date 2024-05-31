@@ -118,7 +118,7 @@ enum Flags
 {
 	FLAG_DARKMODE = 2,	//Флаг тёмной/светлой темы
 	FLAG_ARROWKEY = 4,	//Флаг управления со стрелок
-	FLAG_VIMKEY = 8,	//Флаг управления с клавиш vi
+	FLAG_VIKEY = 8,	//Флаг управления с клавиш vi
 	FLAG_WASDKEY = 0x10,//Флаг управления с клавиш WASD
 	FLAG_VSYNC = 0x20	//Флаг использования VSync
 };

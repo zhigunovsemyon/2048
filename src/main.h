@@ -49,7 +49,7 @@ Game;
 typedef struct 
 {
 	/* Набор флагов : FLAG_DARKMODE, FLAG_ARROWKEY,
-	FLAG_VIMKEY, FLAG_WASDKEY, FLAG_VSYNC*/
+	FLAG_VIKEY, FLAG_WASDKEY, FLAG_VSYNC*/
 	Uint8 Flags;
 	SDL_Point WinSize;	//Размер окна по горизонтали и вертикали
 	float CellWidth;	//Размер стороны ячейки с тайлом
