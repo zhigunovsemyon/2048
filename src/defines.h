@@ -14,7 +14,7 @@
 //Коэффициенты
 #define FIELD_SIZE_COEFFICIENT 0.75f//Отношение размера поля к меньшему из размеров экрана
 #define TILE_SIZE_COEFFICIENT 0.9f	//Отношение размер тайла к размеру ячейки с тайлом
-#define ANIM_SPEED 500.0f			//Скорость анимации
+#define ANIM_SPEED 1200.0f			//Скорость анимации
 #define MIN_FRAMETIME 1				//Минимальное время кадра (1 = 1000FPS, 16 = 60 FPS)
 #define CHANCE_OF_FOUR 10			//Шанс выпадения 4ки
 
