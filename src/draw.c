@@ -75,14 +75,13 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 	// Цикл, рисующий линии поля
 	for (Uint8 i = 0; i <= TileCount; i++)
 	{
-		if (SDL_RenderDrawLine(
-				rend, Corner.x,
+		if (SDL_RenderDrawLine(rend, Corner.x,
 				Corner.y + i * TileSize, // Начало горизонатльной линии
 				Corner.x + Params->FieldSize,
 				Corner.y + i * TileSize)) // Конец горизонтальной линии
 			return ERR_SDL;
-		if (SDL_RenderDrawLine(
-				rend, Corner.x + i * TileSize,
+
+		if (SDL_RenderDrawLine(rend, Corner.x + i * TileSize,
 				Corner.y, // Начало вертикальной линии
 				Corner.x + i * TileSize,
 				Corner.y + Params->FieldSize)) // Конец вертикальной линии
@@ -132,7 +131,7 @@ static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
 	SDL_Texture *tile_texture =
 		GetTextureForTile(Game->Field[Index].val, Assets);
 
-	// Создание нового элемента, если не нашёлся
+	// Создание нового элемента, если не нашёлся среди существующих
 	if (!tile_texture)
 	{
 		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
@@ -142,21 +141,24 @@ static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
 			return ERR_SDL;
 		else
 		{
-			Assets->textures_count++;
-			TileTexture *newTexs = SDL_realloc(
-				Assets->textures, sizeof(TileTexture) * Assets->textures_count);
+			Assets->textures_count++;//Увеличение счётчика текстур
+			// Перевыделение увеличенного вектора текстур, проверка и перезапись указателя
+			TileTexture *newTexs = SDL_realloc(Assets->textures, 
+				sizeof(TileTexture) * Assets->textures_count);
 			if (!newTexs)
 			{
 				SDL_SetError("ошибка выделения памяти!");
 				return ERR_MALLOC;
 			}
 			Assets->textures = newTexs;
-			Assets->textures[Assets->textures_count - 1].val =
-				Game->Field[Index].val;
+
+			//Запись в крайний тайл его значения и новой текстуры
+			Assets->textures[Assets->textures_count - 1].val = Game->Field[Index].val;
 			Assets->textures[Assets->textures_count - 1].tex = tile_texture;
 		}
 	}
 
+	//Отрисовка элемента
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
 	return ERR_NO;
@@ -164,15 +166,15 @@ static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
 
 static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						 Assets *Assets)
-{
+{	//Отрисовка фона и старых элементов
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
 
+	//Флаг необходимости продолжения анимации
 	Uint8 Flag = 0;
-	// Размер поля
+	// Размер сдвига
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
-	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца с конца
@@ -183,17 +185,18 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 			if (Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
 				continue;
 
+			//Если элемент ещё не сдвинулся на размер целой ячейки, он отрисовывается
 			if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 			{
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
 											i * Game->FieldSize + j))
 					return ERR_SDL;
 
-				Flag++;
-				Game->Field[i * Game->FieldSize + j].offset -= change;
+				Flag++;//Подъём флага для продолжения анимации на следующем витке цикла
+				Game->Field[i * Game->FieldSize + j].offset -= change;//Сдвиг оффсета
 			}
 			else // Если элемент сдвинулся на целую ячейку
-			{
+			{	//Если элемент получился не в результате сложения
 				if (Game->Field[i * Game->FieldSize + j + 1].mode !=
 					TILE_COMBINED)
 				{
@@ -202,27 +205,34 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						Game->Field[i * Game->FieldSize + j];
 					Game->Field[i * Game->FieldSize + j + 1].mode = TILE_OLD;
 				}
-				else
-				{
+				else	//Если элемент получился в результате сложения
+				{	//В него записывается признак сложенности
 					Game->Field[i * Game->FieldSize + j + 1].mode =
 						TILE_JUSTCOMBINED;
+					//Увеличение значения сложенного тайла в 2 раза
 					Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
+					//Увеличение числа очков, обновление текстуры очков
 					Game->Score += Game->Field[i * Game->FieldSize + j + 1].val;
 					if (UpdateScore(rend, Game, Params, Assets))
 						return ERR_SDL;
 				}
+				//Сброс оффсета
 				Game->Field[i * Game->FieldSize + j + 1].offset = 0;
 
 				// Зануление прошлого элемента
 				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
 						   sizeof(Tile));
+				//Отрисовка нового элемента
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
 											i * Game->FieldSize + j + 1))
 					return ERR_SDL;
 			}
 		}
 	}
-	if (Flag)
+
+	/* Если был поднят флаг необходимости продолжения сдвига,
+		устанавливается соответствующий режим */
+	if (Flag)	
 	{
 		Game->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
