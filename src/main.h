@@ -48,19 +48,21 @@ Game;
 //Параметры игры
 typedef struct 
 {
+	/* Набор флагов : FLAG_DARKMODE, FLAG_ARROWKEY,
+	FLAG_VIMKEY, FLAG_WASDKEY, FLAG_VSYNC*/
 	Uint8 Flags;
-	SDL_Point WinSize;
-	float CellWidth;
-	float FieldSize;
+	SDL_Point WinSize;	//Размер окна по горизонтали и вертикали
+	float CellWidth;	//Размер стороны ячейки с тайлом
+	float FieldSize;	//Размер стороны поля
 }
 Params;
 
 //Ассеты игры
 typedef struct
 {
-	TileTexture *textures;
-	Uint8 textures_count;
-	SDL_Colour *cols;
+	TileTexture *textures;	//Указатель на массив тексутр
+	Uint8 textures_count;	//Количество сохранённых текстур
+	SDL_Colour *cols;		//Указатель на массив цветов
 }
 Assets;
 
@@ -73,12 +75,15 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
-используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
+Используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
 extern Uint8(**CheckMove)(Game*, Params*);
 
 /*Набор функций отрисовки сдвигов тайлов поля Game.
-используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
+Используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
 extern Uint8 (**DoMove)(SDL_Renderer*, Game *, Params *, Assets *);
+
+/*Набор функций тайлов поля Game на складываемость друг с другом.
+Используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
 extern Uint8 (**CheckCombo)(Game *, Params *);
 
 #endif // !_MAIN_H_
