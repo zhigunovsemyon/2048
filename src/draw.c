@@ -58,7 +58,9 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 		return NULL;
 	}
 
-	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
+	SDL_Colour txt_col = {.a = 0xFF}; 
+	txt_col.b = txt_col.g = txt_col.r = (TileValue == 2 || TileValue == 4)
+							 ? 0x50 : 0xFF;
 	SDL_Rect txt_size;
 	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
 	char *stringForTex;
