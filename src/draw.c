@@ -1,5 +1,7 @@
 #include "draw.h"
 
+/* Обновление текстуры с очками и учётом цветов из Assets рисовальщиком rend, 
+из игры Game, с учётом параметров Params. Возвращает код ошибки, либо 0 при штатной работе*/
 static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 {
 	//Освобождение старой текстуры
@@ -10,14 +12,14 @@ static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets 
 		Game->MaxScore = Game->Score;	
 
 	//Создание новой рисовальщиком, с учётом очков, как старых, так и новых, размеров площадки, цветов
-	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) /2,// Params->CellWidth,
-	.w = Params->FieldSize};
+	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) /2, .w = Params->FieldSize};
 	if(!(Assets->textures[0].tex = CreateScoreTexture(rend, Assets->cols, &scoreField, Game)))
 		return ERR_SDL;
 	
 	return ERR_NO;
 }
 
+//Подбор цвета для тайла с соответствующим значением TileValue
 static Uint8 MatchColForTile(Uint64 TileValue)
 {
 	switch (TileValue)
@@ -44,47 +46,121 @@ static Uint8 MatchColForTile(Uint64 TileValue)
 		return COL_SQ1024;
 	case 2048:
 		return COL_SQ2048;
-	default:
+	default://>2048
 		return COL_MAX;
 	}
-}
-
-SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
-							   Assets *Assets, float CellWidth)
-{
-	if (!TileValue /* == 0*/)
-	{
-		SDL_SetError("Попытка подобрать текстуру для 0!");
-		return NULL;
-	}
-
-	SDL_Colour txt_col = {.a = 0xFF}; 
-	txt_col.b = txt_col.g = txt_col.r = (TileValue == 2 || TileValue == 4)
-							 ? 0x50 : 0xFF;
-	SDL_Rect txt_size;
-	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
-	char *stringForTex;
-	SDL_asprintf(&stringForTex, "%lu", TileValue);
-	if (!stringForTex)
-	{
-		SDL_SetError("ошибка выделения памяти!");
-		return NULL;
-	}
-
-	SDL_Texture *tmp = CreateMessageTexture(
-		rend, &txt_col, Assets->cols + MatchColForTile(TileValue), &txt_size,
-		FONT, stringForTex, SDL_TRUE);
-
-	SDL_free(stringForTex);
-	return tmp;
 }
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
 static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
-							Assets *Assets);
-Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
-							  Assets *Assets, Sint8 Index);
+							Assets *Assets)
+{
+	// Заливка фона
+	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_BG])))
+		return ERR_SDL;
+	if (SDL_RenderClear(rend))
+		return ERR_SDL;
+
+	// Размер плитки
+	float TileSize = Params->FieldSize / TileCount; // Размер одного тайла
+	SDL_Point Corner = // Координаты угла поля
+		{(Params->WinSize.x - Params->FieldSize) * 0.5,
+		 (Params->WinSize.y - Params->FieldSize) * 0.5};
+
+	// Задание цвета фона
+	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_FG])))
+		return ERR_SDL;
+
+	// Цикл, рисующий линии поля
+	for (Uint8 i = 0; i <= TileCount; i++)
+	{
+		if (SDL_RenderDrawLine(
+				rend, Corner.x,
+				Corner.y + i * TileSize, // Начало горизонатльной линии
+				Corner.x + Params->FieldSize,
+				Corner.y + i * TileSize)) // Конец горизонтальной линии
+			return ERR_SDL;
+		if (SDL_RenderDrawLine(
+				rend, Corner.x + i * TileSize,
+				Corner.y, // Начало вертикальной линии
+				Corner.x + i * TileSize,
+				Corner.y + Params->FieldSize)) // Конец вертикальной линии
+			return ERR_SDL;
+	}
+	return ERR_NO;
+}
+
+/*Функция отрисовки одного движущегося элемента Index рисовальщиком rend 
+с учётом параметров Params, используя цвета и текстуры из Assets, поля Game, */
+static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
+									 Game *Game, Assets *Assets, Sint8 Index)
+{
+	SDL_Rect Tile;
+	// Размер одной ячейки хранится в h
+	Tile.h = Params->CellWidth;
+	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
+
+	// Положение угла поля в координатах
+	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
+	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5;
+
+	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
+	// размеров плитки и ячейки
+	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
+	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
+
+	// Сдвиг на оффсет
+	if (Game->Field[Index].mode == TILE_MOVE_X)
+	{
+		if (Game->Field[Index].offset > 0)
+			Tile.x += Tile.h - (int)Game->Field[Index].offset;
+		else
+			Tile.x -= Tile.h + (int)Game->Field[Index].offset;
+	}
+	if (Game->Field[Index].mode == TILE_MOVE_Y)
+	{
+		if (Game->Field[Index].offset > 0)
+			Tile.y += Tile.h - (int)Game->Field[Index].offset;
+		else
+			Tile.y -= Tile.h + (int)Game->Field[Index].offset;
+	}
+
+	Tile.h = Tile.w; // Запись корректной высоты плитки
+
+	// Отрисовка конечного тайла
+	SDL_Texture *tile_texture =
+		GetTextureForTile(Game->Field[Index].val, Assets);
+
+	// Создание нового элемента, если не нашёлся
+	if (!tile_texture)
+	{
+		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
+										 Params->CellWidth);
+		// Если элемент не удалось создать
+		if (!tile_texture)
+			return ERR_SDL;
+		else
+		{
+			Assets->textures_count++;
+			TileTexture *newTexs = SDL_realloc(
+				Assets->textures, sizeof(TileTexture) * Assets->textures_count);
+			if (!newTexs)
+			{
+				SDL_SetError("ошибка выделения памяти!");
+				return ERR_MALLOC;
+			}
+			Assets->textures = newTexs;
+			Assets->textures[Assets->textures_count - 1].val =
+				Game->Field[Index].val;
+			Assets->textures[Assets->textures_count - 1].tex = tile_texture;
+		}
+	}
+
+	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
+		return ERR_SDL;
+	return ERR_NO;
+}
 
 static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						 Assets *Assets)
@@ -132,7 +208,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						TILE_JUSTCOMBINED;
 					Game->Field[i * Game->FieldSize + j + 1].val <<= 1;
 					Game->Score += Game->Field[i * Game->FieldSize + j + 1].val;
-					if(UpdateScore(rend, Game, Params, Assets))
+					if (UpdateScore(rend, Game, Params, Assets))
 						return ERR_SDL;
 				}
 				Game->Field[i * Game->FieldSize + j + 1].offset = 0;
@@ -219,7 +295,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						TILE_JUSTCOMBINED;
 					Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
 					Game->Score += Game->Field[i * Game->FieldSize + j - 1].val;
-					if(UpdateScore(rend, Game, Params, Assets))
+					if (UpdateScore(rend, Game, Params, Assets))
 						return ERR_SDL;
 				}
 				// Копирование текущего элемента в следующий
@@ -307,8 +383,9 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					Game->Field[(i - 1) * Game->FieldSize + j].mode =
 						TILE_JUSTCOMBINED;
 					Game->Field[(i - 1) * Game->FieldSize + j].val <<= 1;
-					Game->Score += Game->Field[(i - 1) * Game->FieldSize + j].val;
-					if(UpdateScore(rend, Game, Params, Assets))
+					Game->Score +=
+						Game->Field[(i - 1) * Game->FieldSize + j].val;
+					if (UpdateScore(rend, Game, Params, Assets))
 						return ERR_SDL;
 				}
 
@@ -394,8 +471,9 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					Game->Field[(i + 1) * Game->FieldSize + j].mode =
 						TILE_JUSTCOMBINED;
 					Game->Field[(i + 1) * Game->FieldSize + j].val <<= 1;
-					Game->Score += Game->Field[(i + 1) * Game->FieldSize + j].val;
-					if(UpdateScore(rend, Game, Params, Assets))
+					Game->Score +=
+						Game->Field[(i + 1) * Game->FieldSize + j].val;
+					if (UpdateScore(rend, Game, Params, Assets))
 						return ERR_SDL;
 				}
 				// Копирование текущего элемента в следующий
@@ -437,73 +515,35 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	return ERR_NO;
 }
 
-Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params, Game *Game,
-							  Assets *Assets, Sint8 Index)
+
+SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
+							   Assets *Assets, float CellWidth)
 {
-	SDL_Rect Tile;
-	// Размер одной ячейки хранится в h
-	Tile.h = Params->CellWidth;
-	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
-
-	// Положение угла поля в координатах
-	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
-	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5;
-
-	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
-	// размеров плитки и ячейки
-	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
-	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
-
-	// Сдвиг на оффсет
-	if (Game->Field[Index].mode == TILE_MOVE_X)
+	if (!TileValue /* == 0*/)
 	{
-		if (Game->Field[Index].offset > 0)
-			Tile.x += Tile.h - (int)Game->Field[Index].offset;
-		else
-			Tile.x -= Tile.h + (int)Game->Field[Index].offset;
-	}
-	if (Game->Field[Index].mode == TILE_MOVE_Y)
-	{
-		if (Game->Field[Index].offset > 0)
-			Tile.y += Tile.h - (int)Game->Field[Index].offset;
-		else
-			Tile.y -= Tile.h + (int)Game->Field[Index].offset;
+		SDL_SetError("Попытка подобрать текстуру для 0!");
+		return NULL;
 	}
 
-	Tile.h = Tile.w; // Запись корректной высоты плитки
-
-	// Отрисовка конечного тайла
-	SDL_Texture *tile_texture =
-		GetTextureForTile(Game->Field[Index].val, Assets);
-
-	// Создание нового элемента, если не нашёлся
-	if (!tile_texture)
+	SDL_Colour txt_col = {.a = 0xFF}; 
+	txt_col.b = txt_col.g = txt_col.r = (TileValue == 2 || TileValue == 4)
+							 ? 0x50 : 0xFF;
+	SDL_Rect txt_size;
+	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
+	char *stringForTex;
+	SDL_asprintf(&stringForTex, "%lu", TileValue);
+	if (!stringForTex)
 	{
-		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
-										 Params->CellWidth);
-		// Если элемент не удалось создать
-		if (!tile_texture)
-			return ERR_SDL;
-		else
-		{
-			Assets->textures_count++;
-			TileTexture *newTexs = SDL_realloc(
-				Assets->textures, sizeof(TileTexture) * Assets->textures_count);
-			if (!newTexs)
-			{
-				SDL_SetError("ошибка выделения памяти!");
-				return ERR_MALLOC;
-			}
-			Assets->textures = newTexs;
-			Assets->textures[Assets->textures_count - 1].val =
-				Game->Field[Index].val;
-			Assets->textures[Assets->textures_count - 1].tex = tile_texture;
-		}
+		SDL_SetError("ошибка выделения памяти!");
+		return NULL;
 	}
 
-	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
-		return ERR_SDL;
-	return ERR_NO;
+	SDL_Texture *tmp = CreateMessageTexture(
+		rend, &txt_col, Assets->cols + MatchColForTile(TileValue), &txt_size,
+		FONT, stringForTex, SDL_TRUE);
+
+	SDL_free(stringForTex);
+	return tmp;
 }
 
 SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
@@ -710,44 +750,6 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	SDL_FreeSurface(txt_surf);
 	SDL_FreeSurface(bg); // Очистка поверхностей
 	return ret;			 // Возврат тексутры, либо NULL
-}
-
-static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
-							Assets *Assets)
-{
-	// Заливка фона
-	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_BG])))
-		return ERR_SDL;
-	if (SDL_RenderClear(rend))
-		return ERR_SDL;
-
-	// Размер плитки
-	float TileSize = Params->FieldSize / TileCount; // Размер одного тайла
-	SDL_Point Corner = // Координаты угла поля
-		{(Params->WinSize.x - Params->FieldSize) * 0.5,
-		 (Params->WinSize.y - Params->FieldSize) * 0.5};
-
-	// Задание цвета фона
-	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_FG])))
-		return ERR_SDL;
-
-	// Цикл, рисующий линии поля
-	for (Uint8 i = 0; i <= TileCount; i++)
-	{
-		if (SDL_RenderDrawLine(
-				rend, Corner.x,
-				Corner.y + i * TileSize, // Начало горизонатльной линии
-				Corner.x + Params->FieldSize,
-				Corner.y + i * TileSize)) // Конец горизонтальной линии
-			return ERR_SDL;
-		if (SDL_RenderDrawLine(
-				rend, Corner.x + i * TileSize,
-				Corner.y, // Начало вертикальной линии
-				Corner.x + i * TileSize,
-				Corner.y + Params->FieldSize)) // Конец вертикальной линии
-			return ERR_SDL;
-	}
-	return ERR_NO;
 }
 
 Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
