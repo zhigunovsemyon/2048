@@ -472,6 +472,10 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 		return;
 	}
 
+	//Если текущий режим отличается от режима ожидания ввода, то ввод не учитывается
+	if (Game->Mode != MODE_WAIT)
+		return;
+
 	switch (event->type)
 	{
 	// Если был запрошен выход из программы
