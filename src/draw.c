@@ -165,7 +165,6 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Game->Mode = MODE_MOVE_RIGHT;
 		return ERR_NO;
-		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Game->Mode = MODE_ADD;
@@ -254,7 +253,6 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Game->Mode = MODE_MOVE_LEFT;
 		return ERR_NO;
-		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Game->Mode = MODE_ADD;
@@ -344,7 +342,6 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Game->Mode = MODE_MOVE_UP;
 		return ERR_NO;
-		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Game->Mode = MODE_ADD;
@@ -432,7 +429,6 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	{
 		Game->Mode = MODE_MOVE_DOWN;
 		return ERR_NO;
-		// return (UpdateScore(rend, Game, Params, Assets)) ? ERR_SDL : ERR_NO;
 	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Game->Mode = MODE_ADD;
@@ -754,7 +750,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 	//Положение и размер очков
 	Tile.w = (int)Params->FieldSize;
 	Tile.h =
-		(Params->WinSize.y - (int)Params->FieldSize) / 2; //(int)Params->CellWidth;
+		(Params->WinSize.y - (int)Params->FieldSize) / 2;
 	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
 	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 - Tile.h;
 

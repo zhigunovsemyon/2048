@@ -17,7 +17,7 @@ int main(int argc, const char **args)
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска,
 	 * подгрузка файла с прогрессом*/
 	Game Game = InitParamsAndGame(argc, args, &Params, SAVE_FILE);
-	if (!Game.FieldSize)
+	if (!Game.Field)
 	{
 		SDL_SetError("ошибка выделения памяти!");
 		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
