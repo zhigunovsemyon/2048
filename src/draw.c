@@ -1,4 +1,6 @@
 #include "draw.h"
+#include "main.h"
+#include <SDL2/SDL_stdinc.h>
 
 static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 {
@@ -528,11 +530,9 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
 
 	// Начальное число текстур (очки, двойка, четвёрка)
-	Assets->textures_count = 3;
 
 	// Начальный буфер текстур
-	if (!(Assets->textures = (TileTexture *)SDL_malloc(Assets->textures_count *
-													   sizeof(TileTexture))))
+	if (!(Assets->textures = (TileTexture *)SDL_malloc(sizeof(TileTexture))))
 	{
 		SDL_SetError("ошибка выделения памяти!");
 		return ERR_MALLOC;
@@ -556,13 +556,20 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 			maxVal = Game->Field[cur].val;
 	}
 
-	for (Uint64 i = 1, val = 2; val <= maxVal; val <<= 1, i++)
+	Assets->textures_count = 2;
+	for (Uint64 val = 2; val <= maxVal; Assets->textures_count++, val <<= 1)
 	{
-		Assets->textures[i].val = val;
-		if (!(Assets->textures[i].tex = CreateTileTexture(
-				  rend, Assets->textures[i].val, Assets, Params->CellWidth)))
+		TileTexture *newPtr = (TileTexture *)SDL_realloc(Assets->textures, sizeof(TileTexture) * Assets->textures_count);
+		if(!newPtr)
+		{
+			SDL_SetError("ошибка выделения памяти!");
+			return ERR_MALLOC;
+		}
+		Assets->textures = newPtr;
+		Assets->textures[Assets->textures_count - 1].val = val;
+		if (!(Assets->textures[Assets->textures_count - 1].tex = CreateTileTexture(
+				  rend, Assets->textures[Assets->textures_count - 1].val, Assets, Params->CellWidth)))
 			return ERR_SDL;
-		
 	}
 
 	// Текстура двойки
