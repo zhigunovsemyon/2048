@@ -635,6 +635,8 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
 	return ERR_NO;
 }
 
+Uint8 ReadFile(const char *filename, Game *game);
+
 Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char *filename)
 {	// Базовые параметры работы игры
 	Uint8 FieldSize = 4;
@@ -724,30 +726,83 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 			continue;
 		}
 	}
-	Game Game;
-	Game.Score = 0,	Game.MaxScore = 0;
+	Game game;
 	// Выделение памяти под игровое поле
-	Game.Field = (Tile *)SDL_calloc(sizeof(Tile), _SQ(FieldSize));
-	if(!Game.Field)
+	game.Field = (Tile *)SDL_calloc(sizeof(Tile), _SQ(FieldSize));
+	if(!game.Field)
 	{
-		Game.FieldSize = 0;
-		return Game;
+		game.FieldSize = 0;
+		return game;
 	}
 
-	Game.FieldSize =  FieldSize;
+	//Запись в структуру размера поля
+	game.FieldSize = FieldSize;
 
+	/*	Если ReadFile вернул 0 --содержимое игры было прочитано из файла
+		Если 1 -- значит поле создаётся с нуля*/
+	if(ReadFile(filename, &game))
+	{
+		//Восстановление размера
+		game.FieldSize = FieldSize;
+		// Добавление начального элемента
+		game.Field[AddElement(&game)].mode = TILE_OLD;
+		game.MaxScore = game.Score = 0;
+
+	}
+	return game;
+}
+
+Uint8 ReadFile(const char *filename, Game *game)
+{
 	/*План чтения файла сохранения
 	 * 1. Если размеры не совпадают -- поле создаётся по новому
 	 *		В остальных случаях копируется содержимое файла
-	 * 2. Если поле пустое -- значит нужно добавить элемент */
+	 * 2. Если в режиме сохранён MODE_GAMEOVER, значит в файле играет роль 
 
-	// SDL_RWops *fptr = SDL_RWFromFile(filename, "rb");
+	 *только прошлый рекорд
+	 * 3. Если в режиме сохранён MODE_QUIT, значит
+	 *пользователь прервал 
+			прошлый сеанс по своему желанию
 
-	//Добавление начального элемента
-	if (Game.FieldSize)
-		Game.Field[AddElement(&Game)].mode = TILE_OLD;
+	*/
 
-	return Game;
+	/* Попытка открыть существующий файл с сохранением,
+	Если не удалось --
+	 * игра начинается по новому*/
+	SDL_RWops *fptr = SDL_RWFromFile(filename, "rb");
+	if (!fptr)	
+		return 1;
+
+	//Сохранение старого размера поля для сравнения с прочитанным
+	Uint8 BaseFieldSize = game->FieldSize;
+	Tile *oldFieldPtr = game->Field;
+
+	// Чтение прошлого режима
+	SDL_RWread(fptr, game, sizeof(Game), 1);
+	game->Field = oldFieldPtr;
+	
+	/* Если прочитанный размер не бьётся с заданным параметрами :
+	файл закрывается, возвращается признак новой игры*/
+	if (BaseFieldSize != game->FieldSize)
+	{
+		SDL_RWclose(fptr);
+		return 1;		
+	}
+	
+	/*Если в прочитанном файле сохранён режим MODE_GAMEOVER, 
+	значит игровое поле нерелевантно, в противном случае необходимо
+	скопировать поле в память*/
+	if (game->Mode == MODE_GAMEOVER)
+	{
+		game->Score = 0;		
+	}
+	else
+	{
+		SDL_RWread(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
+	}
+
+	SDL_RWclose(fptr);
+	return 0;
 }
 
 Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
