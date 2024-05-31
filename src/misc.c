@@ -731,6 +731,11 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings)
 	// Выделение памяти под игровое поле
 	Game.Field = (Tile *)SDL_calloc(sizeof(Tile), _SQ(FieldSize));
 	Game.FieldSize = (Game.Field/* != NULL */) ? FieldSize : 0;
+
+	//Добавление начального элемента
+	if (Game.FieldSize)
+		Game.Field[AddElement(&Game)].mode = TILE_OLD;
+
 	return Game;
 }
 

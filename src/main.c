@@ -1,4 +1,5 @@
 #include "main.h"
+#include "misc.h"
 
 Uint8 SaveGame(Game *game, Params *Params, const char *filename)
 {
