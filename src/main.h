@@ -71,7 +71,7 @@ Assets;
 #include "draw.h"
 
 Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *Assets,
-			   Params *Params, Game *Game, Uint8 NextMode);
+			   Params *Params, Game *Game);
 
 
 /*Набор функций расстановки сдвигов тайлов поля Game.

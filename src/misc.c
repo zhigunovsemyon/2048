@@ -1,4 +1,5 @@
 #include "misc.h"
+#include "defines.h"
 
 Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score)
 {
@@ -22,6 +23,10 @@ Uint8 SaveGame(Game *game, const char *filename)
 		SDL_SetError("Не удалось сохранить в файл!");
 		return ERR_FILE;
 	}
+
+	//Очистка поля, если игра завершилась геймовером
+	if(game->Mode == MODE_GAMEOVER)
+		SDL_memset(game->Field, 0, _SQ(game->FieldSize));
 
 	// Сохранение игры
 	SDL_RWwrite(fptr, game, sizeof(Game), 1);
@@ -761,7 +766,12 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 		// Добавление начального элемента
 		game.Field[AddElement(&game)].mode = TILE_OLD;
 		game.MaxScore = game.Score = 0;
+		//Добавление ещё одного элемента затем
+		game.Mode = MODE_ADD;
 	}
+	else 
+		game.Mode = MODE_DRAW_NEW;
+	
 	return game;
 }
 

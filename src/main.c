@@ -35,7 +35,7 @@ int main(int argc, const char **args)
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Вывод приветствия
-	if ((errCode = Greeting(window, rend, &Events, &Assets, &Params, &Game, MODE_ADD)))
+	if ((errCode = Greeting(window, rend, &Events, &Assets, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Подсчёт размера поля и каждой ячейки поля. Создание соответствующих текстур
@@ -156,8 +156,7 @@ int main(int argc, const char **args)
 
 /*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
  * параметров игры Params, настроек игры Game. Возврат нуля при отсутствии ошибок, либо SDL_ERR*/
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *Assets, Params *Params, Game *Game,
-			   Uint8 NextMode)
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *Assets, Params *Params, Game *Game)
 { // Создание сообщения
 	char *message;
 	SDL_asprintf(&message, "%s\n%s\n%s\n%s%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", 
@@ -241,7 +240,8 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		case SDL_KEYUP: // Если была нажата любая клавиша
 			SDL_DestroyTexture(greet);
 			//Если нажата клавиша Q -- осуществляется выход из игры, в противном случае -- начало игры
-			Game->Mode = (ev->key.keysym.scancode == SDL_SCANCODE_Q) ? MODE_QUIT : NextMode;
+			if (ev->key.keysym.scancode == SDL_SCANCODE_Q) 
+					Game->Mode = MODE_QUIT;
 			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			SDL_free(message);
 			return ERR_NO;
