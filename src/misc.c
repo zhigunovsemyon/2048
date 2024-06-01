@@ -769,8 +769,6 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 		//Добавление ещё одного элемента затем
 		game.Mode = MODE_ADD;
 	}
-	else 
-		game.Mode = MODE_DRAW_NEW;
 	
 	return game;
 }
@@ -818,10 +816,13 @@ Uint8 ReadFile(const char *filename, Game *game)
 	if (game->Mode == MODE_GAMEOVER)
 	{
 		game->Score = 0;		
+		game->Field[AddElement(game)].mode = TILE_OLD;
+		game->Mode = MODE_ADD;
 	}
 	else
 	{
 		SDL_RWread(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
+		game->Mode = MODE_DRAW_NEW;
 	}
 
 	SDL_RWclose(fptr);
