@@ -19,7 +19,7 @@ static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets 
 	return ERR_NO;
 }
 
-//Подбор цвета для тайла с соответствующим значением TileValue
+//Подбор индекса цвета для тайла с соответствующим значением TileValue
 static Uint8 MatchColForTile(Uint64 TileValue)
 {
 	switch (TileValue)
@@ -577,7 +577,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 		return NULL;
 	}
 
-	//Создание текстуры
+	//Создание текстуры, размеров tile_size, соответствующего цвета
 	SDL_Texture *tmp = CreateMessageTexture(
 		rend, &txt_col, Assets->cols + MatchColForTile(TileValue), &tile_size,
 		FONT, stringForTex, SDL_TRUE);
@@ -589,7 +589,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 
 SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 							 SDL_Rect *Tile, Game *Game)
-{
+{	//Текст со значением очков и рекорда
 	char *text;
 	SDL_asprintf(&text, "Число очков: %lu\nРекорд: %lu", Game->Score,
 				 Game->MaxScore);
@@ -598,9 +598,15 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 		SDL_SetError("Ошибка выделения памяти!");
 		return NULL;
 	}
+
+	/*Создание текстуры с очками, фон сливается с основным фоном, 
+	цвет текста соответствует цвету переднего плана. 
+	Размер берётся извне через рект Tile*/
 	SDL_Texture *ret =
 		CreateMessageTexture(rend, ColourSet + COL_FG, ColourSet + COL_BG, Tile,
 							 FONT, text, SDL_TRUE);
+
+	// Освобождение текста из памяти, выход
 	SDL_free(text);
 	return ret;
 }
