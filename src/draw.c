@@ -660,31 +660,26 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 					   Assets *Assets)
 {
-	/*Освобождение всех текстур*/
-	for (Uint8 i = 0; i < Assets->textures_count; ++i)
+	/*Обновление текстур тайлов*/
+	for (Uint8 i = 1; i < Assets->textures_count; ++i)
 		if (Assets->textures[i].tex /*!= NULL*/)
 		{
 			SDL_DestroyTexture(Assets->textures[i].tex);
-			Assets->textures[i].tex = NULL;
-		}
-
-	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) / 2, //(int)Params->CellWidth, 
-		.w = (int)Params->FieldSize };
-	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
-
-	Uint8 oldCount = Assets->textures_count;
-	Assets->textures_count = 1;
-	for (Uint8 i = 1; i < oldCount; ++i)
-	{
-		if (!Assets->textures[i].tex /*==NULL*/)
 			if (!(Assets->textures[i].tex =
-					  CreateTileTexture(rend, Assets->textures[i].val, Assets,
+					CreateTileTexture(rend, Assets->textures[i].val, Assets,
 										Params->CellWidth)))
 				return ERR_SDL;
-	}
-	// Освобождать сам массив из памяти на данном этапе не нужно,
-	// так как он заменится новыми текстурами.
-	// Его освобождение должно происходить только на выходе из программы
+		}
+
+	//Рект текстуры очков
+	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) / 2,
+		.w = (int)Params->FieldSize };
+
+	//Обновление текcтуры очков
+	SDL_DestroyTexture(Assets->textures[0].tex);
+	if(!(Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game)))
+		return ERR_SDL;
+
 	return ERR_NO;
 }
 
