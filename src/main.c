@@ -145,11 +145,7 @@ int main(int argc, const char **args)
 		}
 	}
 	//Сохранение прогресса, либо только лишь рекорда
-
-	//Если игра закончилась переполнением поля, при этом рекорд 
-	//не был обновлён, сохранять прогресс нет необходимости
-	errCode = SaveGame(&Game, SAVE_FILE);
-	return (errCode) ? //Если произошла ошибка
+	return (errCode = SaveGame(&Game, SAVE_FILE)) ? //Если произошла ошибка
 		PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
 		SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 }
