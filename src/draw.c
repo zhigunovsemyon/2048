@@ -559,11 +559,16 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 		return NULL;
 	}
 
+	/*Цвет текста. Если тайл имеет значение 2 или 4, 
+	то он заливаётся тёмным цветом, в противном случае -- белым */
 	SDL_Colour txt_col = {.a = 0xFF}; 
 	txt_col.b = txt_col.g = txt_col.r = (TileValue == 2 || TileValue == 4)
 							 ? 0x50 : 0xFF;
-	SDL_Rect txt_size;
-	txt_size.h = txt_size.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth);
+	//Тайл размеры тайла
+	SDL_Rect tile_size = {.w = (int)(TILE_SIZE_COEFFICIENT * CellWidth)};
+	tile_size.h = tile_size.w;
+
+	//Создание текста со значением тайла
 	char *stringForTex;
 	SDL_asprintf(&stringForTex, "%lu", TileValue);
 	if (!stringForTex)
@@ -572,10 +577,12 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
 		return NULL;
 	}
 
+	//Создание текстуры
 	SDL_Texture *tmp = CreateMessageTexture(
-		rend, &txt_col, Assets->cols + MatchColForTile(TileValue), &txt_size,
+		rend, &txt_col, Assets->cols + MatchColForTile(TileValue), &tile_size,
 		FONT, stringForTex, SDL_TRUE);
 
+	//Освобождение текста из памяти, выход
 	SDL_free(stringForTex);
 	return tmp;
 }
