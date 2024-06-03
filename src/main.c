@@ -5,7 +5,6 @@ int main(int argc, const char **args)
 	Uint8 errCode;
 	Params Params;
 	Assets Assets;
-	SDL_Event Events;
 	Params.WinSize.x = WIN_MIN * 1.5;
 	Params.WinSize.y = WIN_MIN * 2;
 	Assets.textures = NULL;
@@ -34,7 +33,7 @@ int main(int argc, const char **args)
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Вывод приветствия
-	if ((errCode = Greeting(window, rend, &Events, &Assets, &Params, &Game)))
+	if ((errCode = Greeting(window, rend, &Assets, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Подсчёт размера поля и каждой ячейки поля. Создание соответствующих текстур
@@ -42,8 +41,7 @@ int main(int argc, const char **args)
 	if ((errCode =  InitTextureSet(rend, &Assets, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
-	// Игровой цикл
-	
+	// Игровой цикл. Если он завершился ошибкой, аварийное завершение	
 	if (GameCycle(window, rend, &Assets, &Params, &Game))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
@@ -178,7 +176,7 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 
 /*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
  * параметров игры Params, настроек игры Game. Возврат нуля при отсутствии ошибок, либо SDL_ERR*/
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *Assets, Params *Params, Game *Game)
+Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game)
 { // Создание сообщения
 	char *message;
 	SDL_asprintf(&message, "%s\n%s\n%s\n%s%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n", 
@@ -197,6 +195,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		return ERR_MALLOC;
 	}
 
+	SDL_Event ev;
 	SDL_Rect txt_size;
 	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
 
@@ -217,13 +216,13 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 
 	while (SDL_TRUE)
 	{
-		while (!SDL_PollEvent(ev))
+		while (!SDL_PollEvent(&ev))
 		{ // Если событий не было, сразу осуществляется выход, режим не меняется
 			continue;
 		}
 
 		/*Если, на экране приветствия, изменился размер окна, надпись отрисовывается по новой*/
-		if (CheckForResize(window, Params, ev, WIN_MIN))
+		if (CheckForResize(window, Params, &ev, WIN_MIN))
 		{
 			SDL_DestroyTexture(greet);
 			txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
@@ -247,7 +246,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		}
 
 		//Возможные события
-		switch (ev->type)
+		switch (ev.type)
 		{
 		default:
 			continue;
@@ -262,7 +261,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, SDL_Event *ev, Assets *As
 		case SDL_KEYUP: // Если была нажата любая клавиша
 			SDL_DestroyTexture(greet);
 			//Если нажата клавиша Q -- осуществляется выход из игры, в противном случае -- начало игры
-			if (ev->key.keysym.scancode == SDL_SCANCODE_Q) 
+			if (ev.key.keysym.scancode == SDL_SCANCODE_Q) 
 					Game->Mode = MODE_QUIT;
 			SDL_SetWindowTitle(window, "2048 | Очков: 0");
 			SDL_free(message);
