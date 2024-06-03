@@ -3,6 +3,7 @@ int main(int argc, const char **args)
 {
 	srand(time(NULL));	//Инициализация рандомайзера
 	Uint8 errCode = 0;	//Код ошибок
+	
 	//Парамерты игры
 	Params Params = {	.WinSize.x = WIN_MIN * 1.5,
 						.WinSize.y = WIN_MIN * 2};
@@ -11,12 +12,15 @@ int main(int argc, const char **args)
 	Assets Assets = {	.textures = NULL,
 						.cols = NULL };
 		
+	/*Игровое поле, очки, режим игры*/
+	Game Game;
+
 	SDL_Window *window = NULL;//Окно с игрой
 	SDL_Renderer *rend = NULL;//Рисовальщик
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска,
 	 * подгрузка файла с прогрессом*/
-	Game Game = InitParamsAndGame(argc, args, &Params, SAVE_FILE);
+	Game = InitParamsAndGame(argc, args, &Params, SAVE_FILE);
 	if (!Game.Field)
 	{
 		SDL_SetError("ошибка выделения памяти!");
@@ -33,22 +37,23 @@ int main(int argc, const char **args)
 	// Создание окна и рисовальщика
 	if ((errCode = CreateWorkspace(&window, &rend, "Добро пожаловать", &Params.WinSize, Params.Flags)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
-
-	// Вывод приветствия
-	if ((errCode = Greeting(window, rend, &Assets, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
-
+	
 	// Подсчёт размера поля и каждой ячейки поля. Создание соответствующих текстур
 	GetFieldAndTileSize(&Game, &Params);
 	if ((errCode =  InitTextureSet(rend, &Assets, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
+	/* Вывод приветствия.Если пользователь захотел выйти уже с экрана приветствия,
+		в игровом цикле он сразу выйдет на MODE_QUIT */
+	if ((errCode = Greeting(window, rend, &Assets, &Params, &Game)))
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+
 	// Игровой цикл. Если он завершился ошибкой, аварийное завершение	
-	if (GameCycle(window, rend, &Assets, &Params, &Game))
+	if ((errCode = GameCycle(window, rend, &Assets, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	//Сохранение прогресса, либо только лишь рекорда
-	return (errCode = SaveGame(&Game, SAVE_FILE)) ? //Если произошла ошибка
+	return ((errCode = SaveGame(&Game, SAVE_FILE))) ? //Если произошла ошибка
 		PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
 		SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 }

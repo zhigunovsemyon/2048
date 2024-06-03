@@ -57,7 +57,7 @@ void SetMode(SDL_Event *, Game *, Params *);
 Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title, 
 					  const SDL_Point *WinSize, Uint8 Flags);
 
-//Вывести сообщение об ошибки и выйти из программы
+//Вывести сообщение об ошибке и выйти из программы
 Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window* win, SDL_Renderer* rend, Game* Game, Params *Params, Assets *Assets);
 
 //Закрытие всех окон и рисовальщиков
