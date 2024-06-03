@@ -1,16 +1,18 @@
 #include "main.h"
 int main(int argc, const char **args)
 {
-	srand(time(NULL));
-	Uint8 errCode;
-	Params Params;
-	Assets Assets;
-	Params.WinSize.x = WIN_MIN * 1.5;
-	Params.WinSize.y = WIN_MIN * 2;
-	Assets.textures = NULL;
-	Assets.cols = NULL;
-	SDL_Window *window = NULL;
-	SDL_Renderer *rend = NULL;
+	srand(time(NULL));	//Инициализация рандомайзера
+	Uint8 errCode = 0;	//Код ошибок
+	//Парамерты игры
+	Params Params = {	.WinSize.x = WIN_MIN * 1.5,
+						.WinSize.y = WIN_MIN * 2};
+
+	//Ассеты с текстурами и цветами
+	Assets Assets = {	.textures = NULL,
+						.cols = NULL };
+		
+	SDL_Window *window = NULL;//Окно с игрой
+	SDL_Renderer *rend = NULL;//Рисовальщик
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска,
 	 * подгрузка файла с прогрессом*/
