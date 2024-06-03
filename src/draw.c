@@ -850,29 +850,33 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	if (Index == -1) // Если был передан -1, значит нового элемента нет
 		return ERR_NO;
 
-	SDL_Rect Tile;
-	SDL_Texture *tile_texture =
-		GetTextureForTile(Game->Field[Index].val, Assets);
+	//Текстура тайла
+	SDL_Texture *tile_texture;
+	/*Поиск текстуры в ассетах. Если она не нашлась, она создаётся по новой*/
+	tile_texture = GetTextureForTile(Game->Field[Index].val, Assets);
 	if (!tile_texture)
 		tile_texture = CreateTileTexture(rend, Game->Field[Index].val, Assets,
 										 Params->CellWidth);
+	//Если её не удалось создать, функция завершается с ошибкой
 	if (!tile_texture)
 		return ERR_SDL;
 
-	/*Каждый виток размер растёт и записывается в Tile.w, хранящий размер
-	 * плитки*/
+	//Рект с размерами тайла
+	SDL_Rect Tile;
+	/*Каждый вызов функции размер растёт и записывается в Tile.w, 
+	хранящий размер плитки*/
 	Tile.w =
 		(int)(Game->Field[Index].size += (ANIM_SPEED * dtCount() / 1000.0f));
 
 	// Размер одной ячейки хранится в h
-	Tile.h = Params->FieldSize / Game->FieldSize;
+	Tile.h = Params->CellWidth;
 
 	// Положение угла поля в координатах
 	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
 	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5;
 
-	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
-	// размеров плитки и ячейки
+	/* Сдвиг координаты угла плитки на её положение в матрице, 
+	плюс разницу размеров плитки и ячейки */
 	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 
@@ -880,19 +884,19 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 
 	/*Если размер плитки ещё слишком мал*/
 	if (Game->Field[Index].size / TILE_SIZE_COEFFICIENT < Params->CellWidth)
-	{ // Отрисовка промежуточного значения. Если SDL_RenderCopy упал, возврат
-	  // кода ошибки
-		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
-			return ERR_SDL;
-		return ERR_NO;
+	{ /* Отрисовка промежуточного значения. Если SDL_RenderCopy упал, 
+		возврат кода ошибки */
+		return (SDL_RenderCopy(rend, tile_texture, NULL, &Tile)) ?
+			ERR_SDL : ERR_NO;
 	}
 
 	// Отрисовка окончательного положения квадрата
 	Tile.h = Params->FieldSize / Game->FieldSize;
 	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
-	// Положение угла поля в координатах
-	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
-	// размеров плитки и ячейки
+
+	/* Положение угла поля в координатах
+	Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
+	размеров плитки и ячейки */
 	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5 +
 			 (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
 	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 +
@@ -902,8 +906,9 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	// Отрисовка конечного тайла
 	if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 		return ERR_SDL;
-	Game->Field[Index].mode =
-		TILE_OLD; // Установка флага, что теперь эта ячейка отрисована
+	
+	// Установка флага, что теперь эта ячейка отрисована
+	Game->Field[Index].mode = TILE_OLD; 
 	Game->Field[Index].size = 0; // Сброс параметра размера
 	return ERR_NO;
 }
