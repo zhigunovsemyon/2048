@@ -261,15 +261,15 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 
 static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						Assets *Assets)
-{
+{	//Отрисовка старых элементов
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
 
+	//Флаг необходимости продолжения анимации
 	Uint8 Flag = 0;
-	// Размер поля
+	// Размер сдвига
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
-	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца с конца
@@ -280,6 +280,8 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 			if (Game->Field[i * Game->FieldSize + j].mode != TILE_MOVE_X)
 				continue;
 
+			/* Если элемент ещё не сдвинулся на размер целой ячейки, 
+			он отрисовывается, флаг анимации поднимается, сдвиг уменьшается*/
 			if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 			{
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
@@ -289,8 +291,8 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 				Flag++;
 				Game->Field[i * Game->FieldSize + j].offset += change;
 			}
-			else
-			{
+			else // Если элемент сдвинулся на целую ячейку
+			{	// Если элемент получился не в результате сложения
 				if (Game->Field[i * Game->FieldSize + j - 1].mode !=
 					TILE_COMBINED)
 				{
@@ -299,11 +301,13 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						Game->Field[i * Game->FieldSize + j];
 					Game->Field[i * Game->FieldSize + j - 1].mode = TILE_OLD;
 				}
-				else
-				{
+				else // Если элемент получился в результате сложения
+				{ // В него записывается признак сложенности
 					Game->Field[i * Game->FieldSize + j - 1].mode =
 						TILE_JUSTCOMBINED;
+					//Увеличение его размерности в два раза
 					Game->Field[i * Game->FieldSize + j - 1].val <<= 1;
+					//Увеличение числа очков, обновление соответствующей текстуры
 					Game->Score += Game->Field[i * Game->FieldSize + j - 1].val;
 					if (UpdateScore(rend, Game, Params, Assets))
 						return ERR_SDL;
@@ -314,12 +318,16 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 				// Зануление прошлого элемента
 				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
 						   sizeof(Tile));
+				//Отрисовка нового элемента
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
 											i * Game->FieldSize + j - 1))
 					return ERR_SDL;
 			}
 		}
 	}
+
+	/* Если был поднят флаг необходимости продолжения сдвига,
+		устанавливается соответствующий режим */
 	if (Flag)
 	{
 		Game->Mode = MODE_MOVE_LEFT;
@@ -357,7 +365,6 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	// Размер поля
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
-	/*Умножение всех оффсетов на ширину ячейки */
 	// Цикл перебора каждой строки
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждого столбца с конца
