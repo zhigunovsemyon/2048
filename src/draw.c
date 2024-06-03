@@ -613,11 +613,17 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 
 Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 					 Game *Game)
-{	//Цвет текста
-	SDL_Colour txt_col = {0xFF, 0xFF, 0xFF, 0xFF};
+{	/* Нахождение номинала максимальной клетки. Если у некоторой ячейки он больше 
+	максимальной, максимальный размер обновляется */
+	Uint64 maxVal = 2;
+	for (Uint8 cur = 0; cur < _SQ(Game->FieldSize); cur++)
+		if (maxVal < Game->Field[cur].val)
+			maxVal = Game->Field[cur].val;
 
-	// Начальный буфер для текстуры с очками
-	if (!(Assets->textures = (TileTexture *)SDL_malloc(sizeof(TileTexture))))
+	/* Выделение памяти под нужное число текстур -- текстуру очков +
+	тексутры тайлов (log2(макс_значение)) */
+	if (!(Assets->textures = (TileTexture *)SDL_malloc(sizeof(TileTexture) 
+								* (1 + (SDL_log(maxVal) / SDL_log(2))))))
 	{
 		SDL_SetError("ошибка выделения памяти!");
 		return ERR_MALLOC;
@@ -626,37 +632,24 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	SDL_Rect Tile; // рект с размером текста
 	//(размер ячейки * отношение размера тайла к размеру ячейки)
 	Tile.w = Tile.h = (int)(TILE_SIZE_COEFFICIENT * Params->CellWidth);
-
-	// Текстура очков
+	
+	//Рект очков
+	SDL_Rect scoreField = {
+	.h = (Params->WinSize.y - (int)Params->FieldSize) / 2, //промежуток между краем экрана и поля
+		.w = (int)Params->FieldSize };					//ширина поля
+	
+	//Создание текстуры очков
 	Assets->textures[0].val = 0;
-	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) / 2, 
-		.w = (int)Params->FieldSize };
 	Assets->textures[0].tex = CreateScoreTexture(rend,Assets->cols, &scoreField, Game);
 
-	/* Нахождение максимальной клетки. Если размер некоторой ячейки больше 
-	максимальной, максимальный размер обновляется */
-	Uint64 maxVal = 2;
-	for (Uint8 cur = 0; cur < _SQ(Game->FieldSize); cur++)
-		if (maxVal < Game->Field[cur].val)
-			maxVal = Game->Field[cur].val;
-
-	//Выделение памяти всем ячейкам, вплоть до максимальной
+	//Создание текстур всем ячейкам, вплоть до максимальной
 	Assets->textures_count = 2;
 	for (Uint64 val = 2; val <= maxVal; Assets->textures_count++, val <<= 1)
-	{	//Перевыделение памяти под нужное число текстур, проверка
-		TileTexture *newPtr = (TileTexture *)SDL_realloc(Assets->textures, 
-								sizeof(TileTexture) * Assets->textures_count);
-		if(!newPtr)
-		{
-			SDL_SetError("ошибка выделения памяти!");
-			return ERR_MALLOC;
-		}
-		Assets->textures = newPtr; //Перезапись буфера
-
+	{
 		//Создание крайней текстуры
 		Assets->textures[Assets->textures_count - 1].val = val;
-		if (!(Assets->textures[Assets->textures_count - 1].tex = CreateTileTexture(
-				  rend, Assets->textures[Assets->textures_count - 1].val, Assets, Params->CellWidth)))
+		if (!(Assets->textures[Assets->textures_count - 1].tex = CreateTileTexture(rend, 
+			Assets->textures[Assets->textures_count - 1].val, Assets, Params->CellWidth)))
 			return ERR_SDL;
 	}
 	Assets->textures_count--;//Откат переполненного счётчика текстур
