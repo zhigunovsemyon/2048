@@ -38,14 +38,14 @@ int main(int argc, const char **args)
 	if ((errCode = CreateWorkspace(&window, &rend, "Добро пожаловать", &Params.WinSize, Params.Flags)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 	
-	// Подсчёт размера поля и каждой ячейки поля. Создание соответствующих текстур
-	GetFieldAndTileSize(&Game, &Params);
-	if ((errCode =  InitTextureSet(rend, &Assets, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
-
 	/* Вывод приветствия.Если пользователь захотел выйти уже с экрана приветствия,
 		в игровом цикле он сразу выйдет на MODE_QUIT */
 	if ((errCode = Greeting(window, rend, &Assets, &Params, &Game)))
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+
+	// Подсчёт размера поля и каждой ячейки поля. Создание соответствующих текстур
+	GetFieldAndTileSize(&Game, &Params);
+	if ((errCode =  InitTextureSet(rend, &Assets, &Params, &Game)))
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Игровой цикл. Если он завершился ошибкой, аварийное завершение	
@@ -63,9 +63,9 @@ int main(int argc, const char **args)
 Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 				Assets *Assets, Params *Params, Game *Game)
 {
-	Uint8 errCode = 0;
-	SDL_Event Events;
-	Sint8 NewElementIndex = -1;
+	Uint8 errCode = 0;	//Код ошибки
+	SDL_Event Events;	//Юнион событий
+	Sint8 NewElementIndex = -1;	//Индекс нового элемента
 
 	//Непосредственно цикл
 	while (SDL_TRUE)
@@ -87,6 +87,7 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 			SDL_RenderPresent(rend);
 		}
 
+		//Обработка возможных событий
 		switch (Game->Mode)
 		{
 		case MODE_QUIT:		// 0
