@@ -1,5 +1,4 @@
 #include "main.h"
-#include "defines.h"
 int main(int argc, const char **args)
 {
 	srand(time(NULL));	//Инициализация рандомайзера

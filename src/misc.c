@@ -653,7 +653,48 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
 	return ERR_NO;
 }
 
-Uint8 ReadFile(const char *filename, Game *game);
+static Uint8 ReadFile(const char *filename, Game *game)
+{	/* Попытка открыть существующий файл с сохранением,
+	Если не удалось --
+	 * игра начинается по новому*/
+	SDL_RWops *fptr = SDL_RWFromFile(filename, "rb");
+	if (!fptr)	
+		return 1;
+
+	//Сохранение старого размера поля для сравнения с прочитанным
+	Uint8 BaseFieldSize = game->FieldSize;
+	Tile *oldFieldPtr = game->Field;
+
+	// Чтение прошлого режима
+	SDL_RWread(fptr, game, sizeof(Game), 1);
+	game->Field = oldFieldPtr;
+	
+	/* Если прочитанный размер не бьётся с заданным параметрами :
+	файл закрывается, возвращается признак новой игры*/
+	if (BaseFieldSize != game->FieldSize)
+	{
+		SDL_RWclose(fptr);
+		return 1;		
+	}
+	
+	/*Если в прочитанном файле сохранён режим MODE_GAMEOVER, 
+	значит игровое поле нерелевантно, в противном случае необходимо
+	скопировать поле в память*/
+	if (game->Mode == MODE_GAMEOVER)
+	{
+		game->Score = 0;		
+		game->Field[AddElement(game)].mode = TILE_OLD;
+		game->Mode = MODE_ADD;
+	}
+	else
+	{
+		SDL_RWread(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
+		game->Mode = MODE_DRAW_NEW;
+	}
+
+	SDL_RWclose(fptr);
+	return 0;
+}
 
 Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char *filename)
 {	// Базовые параметры работы игры
@@ -772,62 +813,6 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 	return game;
 }
 
-Uint8 ReadFile(const char *filename, Game *game)
-{
-	/*План чтения файла сохранения
-	 * 1. Если размеры не совпадают -- поле создаётся по новому
-	 *		В остальных случаях копируется содержимое файла
-	 * 2. Если в режиме сохранён MODE_GAMEOVER, значит в файле играет роль 
-
-	 *только прошлый рекорд
-	 * 3. Если в режиме сохранён MODE_QUIT, значит
-	 *пользователь прервал 
-			прошлый сеанс по своему желанию
-
-	*/
-
-	/* Попытка открыть существующий файл с сохранением,
-	Если не удалось --
-	 * игра начинается по новому*/
-	SDL_RWops *fptr = SDL_RWFromFile(filename, "rb");
-	if (!fptr)	
-		return 1;
-
-	//Сохранение старого размера поля для сравнения с прочитанным
-	Uint8 BaseFieldSize = game->FieldSize;
-	Tile *oldFieldPtr = game->Field;
-
-	// Чтение прошлого режима
-	SDL_RWread(fptr, game, sizeof(Game), 1);
-	game->Field = oldFieldPtr;
-	
-	/* Если прочитанный размер не бьётся с заданным параметрами :
-	файл закрывается, возвращается признак новой игры*/
-	if (BaseFieldSize != game->FieldSize)
-	{
-		SDL_RWclose(fptr);
-		return 1;		
-	}
-	
-	/*Если в прочитанном файле сохранён режим MODE_GAMEOVER, 
-	значит игровое поле нерелевантно, в противном случае необходимо
-	скопировать поле в память*/
-	if (game->Mode == MODE_GAMEOVER)
-	{
-		game->Score = 0;		
-		game->Field[AddElement(game)].mode = TILE_OLD;
-		game->Mode = MODE_ADD;
-	}
-	else
-	{
-		SDL_RWread(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
-		game->Mode = MODE_DRAW_NEW;
-	}
-
-	SDL_RWclose(fptr);
-	return 0;
-}
-
 Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
 					 Uint16 win_min)
 {
@@ -852,11 +837,15 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
 
 static Uint8 (*int_CheckMove[])(Game *, Params *) = {
 	CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
-
 static Uint8 (*int_CheckCombo[])(Game *, Params *) = {
 	CheckRightCombo, CheckLeftCombo, CheckDownCombo, CheckUpCombo};
+
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN,
 MODE_CHECK_UP*/
 Uint8 (**CheckMove)(Game *, Params *) = int_CheckMove - MODE_CHECK_RIGHT;
+
+/*Набор функций проверки тайлов поля Game на складываемость.
+используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN,
+MODE_CHECK_UP*/
 Uint8 (**CheckCombo)(Game *, Params *) = int_CheckCombo - MODE_CHECK_RIGHT;
