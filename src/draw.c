@@ -705,18 +705,25 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 								  SDL_Colour *bg_col, SDL_Rect *txt_size,
 								  const char *font_name, const char *message,
 								  Uint8 IsCentred)
-{
+{	//используемый шрифт
 	TTF_Font *font;
-	SDL_Surface *txt_surf;
+
+	//Поверхность, в которой будет текст
+	SDL_Surface *txt_surf, 
+				*bg;//поверхность фона
 
 	if (!message)
 	{
-		SDL_SetError("ошибка выделения памяти!");
+		SDL_SetError("отсутствует текст для текстуры!");
 		return NULL;
 	}
 
-	Uint8 scaler =
-		CountLines(message); // Отношение размера буквы к размеру окна
+	// Отношение размера буквы к размеру окна
+	Uint8 scaler;
+
+	/*Для начала отношение берётся по числу строк, 
+	Если текст не помещается в txt_size, скейлер наращивается*/
+	scaler = CountLines(message); 
 	do
 	{
 		// Открытие шрифта, проверка
@@ -749,10 +756,9 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		txt_surf->clip_rect.y += ((txt_size->h - txt_surf->h) / 2);
 	}
 
-	// Создание поверхности с фоном, проверка
-	SDL_Surface *bg = SDL_CreateRGBSurfaceWithFormat(
-		0, txt_size->w, txt_size->h, 32, SDL_PIXELFORMAT_ARGB8888);
-	if (!bg)
+	// Создание поверхности с фоном, проверка	
+	if (!(bg = SDL_CreateRGBSurfaceWithFormat(
+		0, txt_size->w, txt_size->h, 32, SDL_PIXELFORMAT_ARGB8888)))
 	{
 		SDL_FreeSurface(txt_surf);
 		TTF_CloseFont(font);
@@ -778,12 +784,13 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 		return NULL;
 	}
 
-	// Создание текстуры из поверхности с надписью, проверка на корректность
-	// осуществляется вовне
+	/*Создание текстуры из поверхности с надписью, 
+	проверка на корректность осуществляется вовне*/
 	SDL_Texture *ret = SDL_CreateTextureFromSurface(rend, bg);
 	TTF_CloseFont(font); // Закрытие шрифта
+	// Очистка поверхностей
 	SDL_FreeSurface(txt_surf);
-	SDL_FreeSurface(bg); // Очистка поверхностей
+	SDL_FreeSurface(bg); 
 	return ret;			 // Возврат тексутры, либо NULL
 }
 
