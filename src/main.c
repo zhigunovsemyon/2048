@@ -44,7 +44,8 @@ int main(int argc, const char **args)
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Игровой цикл
-	while (SDL_TRUE)
+	uint8_t runs = SDL_TRUE;
+	while (runs)
 	{
 		SetMode(&Events, &Game, &Params); // Выбор режима работы в данный момент
 	
@@ -65,17 +66,8 @@ int main(int argc, const char **args)
 		{
 		case MODE_QUIT: // 0
 		case MODE_GAMEOVER:		// 1
-			//Сохранение прогресса, либо только лишь рекорда
-
-			//Если игра закончилась переполнением поля, при этом рекорд 
-			//не был обновлён, сохранять прогресс нет необходимости
-			if (Game.Mode == MODE_GAMEOVER && Game.Score < Game.MaxScore)
-				return SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
-
-			errCode = SaveGame(&Game, SAVE_FILE);
-			return (errCode) ? //Если произошла ошибка
-				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
-				SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			runs = SDL_FALSE;
+			break;
 
 		//Режим ожидания, во время которого пользователь может выбрать направление движения
 		case MODE_WAIT: // 11
@@ -152,6 +144,14 @@ int main(int argc, const char **args)
 			break;
 		}
 	}
+	//Сохранение прогресса, либо только лишь рекорда
+
+	//Если игра закончилась переполнением поля, при этом рекорд 
+	//не был обновлён, сохранять прогресс нет необходимости
+	errCode = SaveGame(&Game, SAVE_FILE);
+	return (errCode) ? //Если произошла ошибка
+		PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
+		SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 }
 
 /*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
