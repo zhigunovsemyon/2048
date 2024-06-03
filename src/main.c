@@ -51,6 +51,8 @@ int main(int argc, const char **args)
 		SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 }
 
+/* Цикл игры Game в окне window рисовальщиком rend,
+	с параметрами Params и применением текстур и цветов в Assets */
 Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 				Assets *Assets, Params *Params, Game *Game)
 {
@@ -58,21 +60,21 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 	SDL_Event Events;
 	Sint8 NewElementIndex = -1;
 
+	//Непосредственно цикл
 	while (SDL_TRUE)
 	{
 		SetMode(&Events, Game, Params); // Выбор режима работы в данный момент
 
-		if (CheckForResize(window, Params, &Events,
-						   WIN_MIN)) // Проверка на изменение размера
-		{
+		// Проверка на изменение размера
+		if (CheckForResize(window, Params, &Events, WIN_MIN))
+		{	//Получение размера поля и тайлов в пикселях, обновление набора текстур
 			GetFieldAndTileSize(Game, Params);
 			if ((errCode = UpdateTextureSet(rend, Params, Game, Assets)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
 												  Params, Assets);
 
 			// Рисование поля со старыми элементами
-			if ((errCode = DrawOldElements(rend, Params, Game,
-										   Assets) /*== ERR_SDL*/))
+			if ((errCode = DrawOldElements(rend, Params, Game, Assets)))
 				PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
 										   Params, Assets);
 			SDL_RenderPresent(rend);
@@ -255,7 +257,7 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *P
 		case SDL_QUIT:
 			SDL_DestroyTexture(greet);
 			SDL_free(message);
-			Game->Mode = MODE_GAMEOVER;
+			Game->Mode = MODE_QUIT;
 			return ERR_NO;
 
 		case SDL_KEYUP: // Если была нажата любая клавиша
