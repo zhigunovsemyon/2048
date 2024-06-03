@@ -3,7 +3,6 @@ int main(int argc, const char **args)
 {
 	srand(time(NULL));
 	Uint8 errCode;
-	Sint8 NewElementIndex = -1;
 	Params Params;
 	Assets Assets;
 	SDL_Event Events;
@@ -44,66 +43,91 @@ int main(int argc, const char **args)
 		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 
 	// Игровой цикл
-	uint8_t runs = SDL_TRUE;
-	while (runs)
-	{
-		SetMode(&Events, &Game, &Params); // Выбор режима работы в данный момент
 	
-		if (CheckForResize(window, &Params, &Events, WIN_MIN)) // Проверка на изменение размера
+	if (GameCycle(window, rend, &Assets, &Params, &Game))
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+
+	//Сохранение прогресса, либо только лишь рекорда
+	return (errCode = SaveGame(&Game, SAVE_FILE)) ? //Если произошла ошибка
+		PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
+		SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+}
+
+Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
+				Assets *Assets, Params *Params, Game *Game)
+{
+	Uint8 errCode = 0;
+	SDL_Event Events;
+	Sint8 NewElementIndex = -1;
+
+	while (SDL_TRUE)
+	{
+		SetMode(&Events, Game, Params); // Выбор режима работы в данный момент
+
+		if (CheckForResize(window, Params, &Events,
+						   WIN_MIN)) // Проверка на изменение размера
 		{
-			GetFieldAndTileSize(&Game, &Params);
-			if((errCode = UpdateTextureSet(rend, &Params, &Game, &Assets)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game,
-										   &Params, &Assets);
+			GetFieldAndTileSize(Game, Params);
+			if ((errCode = UpdateTextureSet(rend, Params, Game, Assets)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
+												  Params, Assets);
 
 			// Рисование поля со старыми элементами
-			if ((errCode = DrawOldElements(rend, &Params, &Game, &Assets) /*== ERR_SDL*/))
-				PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			if ((errCode = DrawOldElements(rend, Params, Game,
+										   Assets) /*== ERR_SDL*/))
+				PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
+										   Params, Assets);
 			SDL_RenderPresent(rend);
 		}
 
-		switch (Game.Mode)
+		switch (Game->Mode)
 		{
-		case MODE_QUIT: // 0
-		case MODE_GAMEOVER:		// 1
-			runs = SDL_FALSE;
-			break;
+		case MODE_QUIT:		// 0
+		case MODE_GAMEOVER: // 1
+			return errCode;
 
-		//Режим ожидания, во время которого пользователь может выбрать направление движения
+		// Режим ожидания, во время которого пользователь может выбрать
+		// направление движения
 		case MODE_WAIT: // 11
 			continue;
 
-		//Добавление нового элемента
+		// Добавление нового элемента
 		case MODE_ADD: // 12
-			// преобразование сложенного на прошлом цикле элемента в обычный старый
-			ChangeCombinedToOld(&Game); 
-			NewElementIndex = AddElement(&Game);	//Добавление нового элемента, возврат его индекса
-			Game.Field[NewElementIndex].size = 0;	//сброс размера для дальнейшей отрисовки
+			// преобразование сложенного на прошлом цикле элемента в обычный
+			// старый
+			ChangeCombinedToOld(Game);
+			NewElementIndex = AddElement(
+				Game); // Добавление нового элемента, возврат его индекса
+			Game->Field[NewElementIndex].size =
+				0; // сброс размера для дальнейшей отрисовки
 
-			/*Если было найдено место для нового элемента, оно хранится в NewElementIndex.
-			В противном случае там -1, что приведёт к выходу из программы*/
-			Game.Mode = (NewElementIndex < 0) ? MODE_GAMEOVER : MODE_DRAW_NEW;
+			/*Если было найдено место для нового элемента, оно хранится в
+			NewElementIndex. В противном случае там -1, что приведёт к выходу из
+			программы*/
+			Game->Mode = (NewElementIndex < 0) ? MODE_GAMEOVER : MODE_DRAW_NEW;
 			dtCount(); // Сброс счётчика времени кадра перед отрисовкой
 			break;
 
-		//Режимы проверки поля в каждом из направлений
+		// Режимы проверки поля в каждом из направлений
 		case MODE_CHECK_RIGHT: // 7
 		case MODE_CHECK_LEFT:  // 8
 		case MODE_CHECK_DOWN:  // 9
 		case MODE_CHECK_UP: {  // 10
 			// Может вернуть move, quit или wait
-			Uint8 tmpMode = CheckMove[Game.Mode](&Game, &Params);
+			Uint8 tmpMode = CheckMove[Game->Mode](Game, Params);
 			dtCount();
 			if (tmpMode == MODE_WAIT || tmpMode == MODE_GAMEOVER)
 			{
-				Game.Mode = (CheckCombo[Game.Mode](&Game, &Params))
-									//Если есть комбинации, осуществляется движение 
-									//вправо, влево, вверх, вниз
-								  ? Game.Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
-								  : tmpMode;//Если комбинаций нет -- режим ожидания или выхода
+				Game->Mode =
+					(CheckCombo[Game->Mode](Game, Params))
+						// Если есть комбинации, осуществляется движение
+						// вправо, влево, вверх, вниз
+						? Game->Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
+						: tmpMode; // Если комбинаций нет -- режим ожидания или
+								   // выхода
 			}
 			else // Если плитки всё ещё движутся
-				Game.Mode = tmpMode;
+				Game->Mode = tmpMode;
 			break;
 		}
 
@@ -112,42 +136,44 @@ int main(int argc, const char **args)
 		case MODE_MOVE_LEFT:  // 4
 		case MODE_MOVE_DOWN:  // 5
 		case MODE_MOVE_UP:	  // 6
-			//Вызов нужной функции сдвига, в соответствии с направлением
-			if ((errCode = DoMove[Game.Mode](rend, &Game, &Params, &Assets)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
-			//Обновление заголовка на случай сложенной комбинации
-			if((errCode = UpdateWindowTitle(window, Game.Score)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
-			//Отображение изменений на экране
+			// Вызов нужной функции сдвига, в соответствии с направлением
+			if ((errCode = DoMove[Game->Mode](rend, Game, Params, Assets)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
+												  Params, Assets);
+			// Обновление заголовка на случай сложенной комбинации
+			if ((errCode = UpdateWindowTitle(window, Game->Score)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
+												  Params, Assets);
+			// Отображение изменений на экране
 			SDL_RenderPresent(rend);
 			break;
 
-		//Режим отрисовки добавления нового элемента
+		// Режим отрисовки добавления нового элемента
 		case MODE_DRAW_NEW: // 2
 			// Рисование поля со старыми элементами
-			if ((errCode = DrawOldElements(rend, &Params, &Game, &Assets) /*== ERR_SDL*/))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			if ((errCode = DrawOldElements(rend, Params, Game,
+										   Assets) /*== ERR_SDL*/))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
+												  Params, Assets);
 
-			//Отрисовка нового элемента
-			if ((errCode = DrawNewElement(rend, &Params, &Game, &Assets, NewElementIndex)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
-			//Отображение изменений на экране
+			// Отрисовка нового элемента
+			if ((errCode = DrawNewElement(rend, Params, Game, Assets,
+										  NewElementIndex)))
+				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
+												  Params, Assets);
+			// Отображение изменений на экране
 			SDL_RenderPresent(rend);
 
 			/*Если размер был сброшен, значит цикл отрисовки пора прервать,
 				выставив соответстветствующие флаги */
-			if (!Game.Field[NewElementIndex].size)
+			if (!Game->Field[NewElementIndex].size)
 			{
 				NewElementIndex = -1;
-				Game.Mode = MODE_WAIT;
+				Game->Mode = MODE_WAIT;
 			}
 			break;
 		}
 	}
-	//Сохранение прогресса, либо только лишь рекорда
-	return (errCode = SaveGame(&Game, SAVE_FILE)) ? //Если произошла ошибка
-		PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets) :
-		SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
 }
 
 /*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
