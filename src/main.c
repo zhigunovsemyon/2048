@@ -65,7 +65,7 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 {
 	Uint8 errCode = 0;	//Код ошибки
 	SDL_Event Events;	//Юнион событий
-	Sint8 NewElementIndex = -1;	//Индекс нового элемента
+	Sint8 NewElementIndex = -1;	//Индекс нового элемента (-1 если такого нет)
 
 	//Непосредственно цикл
 	while (SDL_TRUE)
@@ -90,24 +90,26 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 		//Обработка возможных событий
 		switch (Game->Mode)
 		{
+		//Выход из программы по заполнению поля, или же по желанию
 		case MODE_QUIT:		// 0
 		case MODE_GAMEOVER: // 1
 			return errCode;
 
-		// Режим ожидания, во время которого пользователь может выбрать
-		// направление движения
+		/* Режим ожидания, во время которого пользователь
+		может выбрать направление движения */
 		case MODE_WAIT: // 11
 			continue;
 
 		// Добавление нового элемента
 		case MODE_ADD: // 12
-			// преобразование сложенного на прошлом цикле элемента в обычный
-			// старый
+			/* преобразование сложенного на прошлом цикле элемента
+			в обычный старый */
 			ChangeCombinedToOld(Game);
-			NewElementIndex = AddElement(
-				Game); // Добавление нового элемента, возврат его индекса
-			Game->Field[NewElementIndex].size =
-				0; // сброс размера для дальнейшей отрисовки
+
+			// Добавление нового элемента, возврат его индекса
+			NewElementIndex = AddElement(Game); 
+			// сброс размера для дальнейшей отрисовки
+			Game->Field[NewElementIndex].size = 0; 
 
 			/*Если было найдено место для нового элемента, оно хранится в
 			NewElementIndex. В противном случае там -1, что приведёт к выходу из
@@ -128,11 +130,11 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 			{
 				Game->Mode =
 					(CheckCombo[Game->Mode](Game, Params))
-						// Если есть комбинации, осуществляется движение
-						// вправо, влево, вверх, вниз
+						/* Если есть комбинации, осуществляется движение
+						вправо, влево, вверх, вниз */
 						? Game->Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
-						: tmpMode; // Если комбинаций нет -- режим ожидания или
-								   // выхода
+						/* Если комбинаций нет -- режим ожидания или выхода*/
+						: tmpMode; 
 			}
 			else // Если плитки всё ещё движутся
 				Game->Mode = tmpMode;
@@ -164,16 +166,15 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
 												  Params, Assets);
 
-			// Отрисовка нового элемента
+			// Отрисовка нового элемента, отображение
 			if ((errCode = DrawNewElement(rend, Params, Game, Assets,
 										  NewElementIndex)))
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
 												  Params, Assets);
-			// Отображение изменений на экране
 			SDL_RenderPresent(rend);
 
 			/*Если размер был сброшен, значит цикл отрисовки пора прервать,
-				выставив соответстветствующие флаги */
+				выставив соответстветствующий флаг */
 			if (!Game->Field[NewElementIndex].size)
 			{
 				NewElementIndex = -1;
