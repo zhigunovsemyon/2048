@@ -1,4 +1,5 @@
 #include "main.h"
+#include "defines.h"
 int main(int argc, const char **args)
 {
 	srand(time(NULL));	//Инициализация рандомайзера
@@ -172,6 +173,14 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
 												  Params, Assets);
 			SDL_RenderPresent(rend);
+
+			/*Если был передан индекс -1, значит нужно
+			 * переключится в режим ожидания */
+			if(NewElementIndex == -1)
+			{
+				Game->Mode = MODE_WAIT;
+				break;
+			}
 
 			/*Если размер был сброшен, значит цикл отрисовки пора прервать,
 				выставив соответстветствующий флаг */

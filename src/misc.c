@@ -1,5 +1,4 @@
 #include "misc.h"
-#include "defines.h"
 
 Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score)
 {
