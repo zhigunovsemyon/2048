@@ -183,8 +183,8 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 	}
 }
 
-/*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend, с учётом событий ev,
- * параметров игры Params, настроек игры Game. Возврат нуля при отсутствии ошибок, либо SDL_ERR*/
+/*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend,параметров игры Params, 
+настроек игры Game. Возврат нуля при отсутствии ошибок, либо кода ошибки*/
 Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game)
 { // Создание сообщения
 	char *message;
@@ -203,11 +203,13 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *P
 		SDL_SetError("ошибка выделения памяти!");
 		return ERR_MALLOC;
 	}
-
 	SDL_Event ev;
-	SDL_Rect txt_size;
-	txt_size.x = 0, txt_size.y = 0, txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
 
+	//Рект, в который будет вписан текст приветствия, равный размеру экрана
+	SDL_Rect txt_size = {.x = 0, .y = 0};
+	txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
+
+	//Создание текстуры приветствия
 	SDL_Texture *greet =
 		CreateMessageTexture(rend, &Assets->cols[COL_FG], &Assets->cols[COL_BG], &txt_size, FONT, message, SDL_FALSE);
 	if (!greet)
@@ -216,24 +218,29 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *P
 		return ERR_SDL;
 	}
 
+	//Отрисовка текстуры приветствия, отображение
 	if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
 	{
+		SDL_free(message);
+		SDL_DestroyTexture(greet); // Уничтожение старой надписи
 		SDL_SetError("ошибка вставки текстуры!");
 		return ERR_SDL;
 	}
 	SDL_RenderPresent(rend);
 
+	//Цикл ожидания ввода пользователем
 	while (SDL_TRUE)
 	{
+		// Если событий не было, цикл сразу идёт на следующий виток, режим не меняется
 		while (!SDL_PollEvent(&ev))
-		{ // Если событий не было, сразу осуществляется выход, режим не меняется
 			continue;
-		}
 
 		/*Если, на экране приветствия, изменился размер окна, надпись отрисовывается по новой*/
 		if (CheckForResize(window, Params, &ev, WIN_MIN))
 		{
-			SDL_DestroyTexture(greet);
+			SDL_DestroyTexture(greet);	//Уничтожение старой надписи
+
+			//Задание новых размеров ректа, создание новой текстуры
 			txt_size.w = Params->WinSize.x, txt_size.h = Params->WinSize.y;
 			greet = CreateMessageTexture(rend, &Assets->cols[COL_FG], &Assets->cols[COL_BG], &txt_size, FONT, message,
 										 SDL_FALSE);
@@ -244,24 +251,24 @@ Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *P
 				return ERR_SDL;
 			}
 
-			// Отрисовка новой текстуры приветствия
+			// Отрисовка новой текстуры приветствия, отображение
 			if (SDL_RenderCopy(rend, greet, NULL, &txt_size))
 			{
 				SDL_free(message);
+				SDL_DestroyTexture(greet); // Уничтожение старой надписи
 				SDL_SetError("ошибка вставки текстуры!");
 				return ERR_SDL;
 			}
 			SDL_RenderPresent(rend);
 		}
 
-		//Возможные события
+		//Обработка возможных событий
 		switch (ev.type)
 		{
 		default:
 			continue;
-
-		// Если был запрошен выход из программы
-		case SDL_QUIT:
+		
+		case SDL_QUIT:	// Если был запрошен выход из программы
 			SDL_DestroyTexture(greet);
 			SDL_free(message);
 			Game->Mode = MODE_QUIT;
