@@ -791,12 +791,12 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	// Очистка поверхностей
 	SDL_FreeSurface(txt_surf);
 	SDL_FreeSurface(bg); 
-	return ret;			 // Возврат тексутры, либо NULL
+	return ret; // Возврат тексутры, либо NULL
 }
 
 Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 					  Assets *Assets)
-{
+{	//Рект, используемый для отрисовки как очков, так и тайлов
 	SDL_Rect Tile;
 	// Рисование поля
 	if (DrawBackground(rend, Game->FieldSize, Params, Assets) /*== ERR_SDL*/)
@@ -804,8 +804,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 
 	//Положение и размер очков
 	Tile.w = (int)Params->FieldSize;
-	Tile.h =
-		(Params->WinSize.y - (int)Params->FieldSize) / 2;
+	Tile.h = (Params->WinSize.y - (int)Params->FieldSize) / 2;
 	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
 	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 - Tile.h;
 
@@ -817,29 +816,28 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 	//Сброс размеров перед отрисовкой тайлов
 	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
 
+	//Цикл отрисовки каждого тайла
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
-	{
+	{	//Если элемент не является старым, складываемым, или сложенным...
 		if (!(Game->Field[i].mode == TILE_OLD ||
 			  Game->Field[i].mode == TILE_COMBINED ||
 			  Game->Field[i].mode == TILE_JUSTCOMBINED))
-			continue;
-		// Положение угла поля в координатах +
-		// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
-		// размеров плитки и ячейки
+			continue;//он пропускается
+		
+		/* Положение угла поля в координатах +
+		Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
+		размеров плитки и ячейки */
 		Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5 +
 				 (Params->CellWidth - Tile.w) * 0.5 +
 				 Params->CellWidth * (i % Game->FieldSize);
 		Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 +
 				 (Params->CellWidth - Tile.w) * 0.5 +
 				 Params->CellWidth * (i / Game->FieldSize);
-		SDL_Texture *tile_texture =
-			GetTextureForTile(Game->Field[i].val, Assets);
-		if (!tile_texture)
-			tile_texture = CreateTileTexture(rend, Game->Field[i].val, Assets,
-											 Params->CellWidth);
-		if (!tile_texture)
-			return ERR_SDL;
 
+		//Поиск текстуры среди уже существующих
+		SDL_Texture *tile_texture =	GetTextureForTile(Game->Field[i].val, Assets);
+		
+		//Отрисовка её
 		if (SDL_RenderCopy(rend, tile_texture, NULL, &Tile))
 			return ERR_SDL;
 	}
