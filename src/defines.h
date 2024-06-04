@@ -27,9 +27,9 @@
 
 //Используемый шрифт
 #if WIN32
-#define FONT "..\\..\\..\\assets\\monospace"
+#define FONT "..\\..\\..\\assets\\font"
 #else
-#define FONT "assets/monospace"
+#define FONT "assets/font"
 #endif
 
 //Используемые цветовые схемы
