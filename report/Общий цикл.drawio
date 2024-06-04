@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-06-04T17:00:10.442Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0" etag="lC15Ub8RIJMCw-T5C8VC" version="24.4.13" type="device">
+<mxfile host="app.diagrams.net" modified="2024-06-04T17:08:31.094Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0" etag="Sne7rlcZaYkgul0wZo9y" version="24.4.13" type="device">
   <diagram name="Page-1" id="8AExiW12i_gnfEKdbFFz">
     <mxGraphModel dx="1434" dy="881" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -26,14 +26,14 @@
             <mxPoint x="110" y="620" as="targetPoint" />
             <Array as="points">
               <mxPoint x="110" y="400" />
-              <mxPoint x="110" y="880" />
-              <mxPoint x="280" y="880" />
+              <mxPoint x="110" y="890" />
+              <mxPoint x="280" y="890" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-13" value="Да" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="C6CtMf7c4fnf4AZ9hv4f-12" vertex="1" connectable="0">
           <mxGeometry x="-0.8508" y="-2" relative="1" as="geometry">
-            <mxPoint x="16" y="2" as="offset" />
+            <mxPoint x="36" y="-8" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-9" target="C6CtMf7c4fnf4AZ9hv4f-64" edge="1">
@@ -43,7 +43,7 @@
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-17" value="Нет" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="C6CtMf7c4fnf4AZ9hv4f-16" vertex="1" connectable="0">
           <mxGeometry x="-0.4154" y="-3" relative="1" as="geometry">
-            <mxPoint as="offset" />
+            <mxPoint x="-15" y="-13" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-9" value="&lt;div&gt;Игрок запросил&lt;/div&gt;&lt;div&gt;выход&lt;br&gt;&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -87,7 +87,7 @@
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-40" value="Да" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="C6CtMf7c4fnf4AZ9hv4f-39" vertex="1" connectable="0">
           <mxGeometry x="-0.3333" relative="1" as="geometry">
-            <mxPoint x="-10" y="-20" as="offset" />
+            <mxPoint x="-10" y="-10" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-35" target="C6CtMf7c4fnf4AZ9hv4f-26" edge="1">
@@ -104,7 +104,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-35" value="&lt;div&gt;Выставлен флаг&amp;nbsp;&lt;/div&gt;&lt;div&gt;переполнения?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="345" y="590" width="170" height="80" as="geometry" />
+          <mxGeometry x="335" y="590" width="170" height="80" as="geometry" />
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-62" value="Экран приветствия" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
           <mxGeometry x="210" y="280" width="120" height="60" as="geometry" />
@@ -118,7 +118,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="C6CtMf7c4fnf4AZ9hv4f-64" value="Игровой цикл" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
-          <mxGeometry x="370" y="450" width="120" height="60" as="geometry" />
+          <mxGeometry x="360" y="450" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="3MnkeBiUxJhdWhc5dT3K-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3MnkeBiUxJhdWhc5dT3K-1" target="3MnkeBiUxJhdWhc5dT3K-3">
           <mxGeometry relative="1" as="geometry" />
@@ -129,7 +129,7 @@
         <mxCell id="3MnkeBiUxJhdWhc5dT3K-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3MnkeBiUxJhdWhc5dT3K-3" target="C6CtMf7c4fnf4AZ9hv4f-62">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="3MnkeBiUxJhdWhc5dT3K-3" value="Создание наборатекстур" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+        <mxCell id="3MnkeBiUxJhdWhc5dT3K-3" value="&lt;div&gt;Создание&amp;nbsp;&lt;/div&gt;&lt;div&gt;набора текстур&lt;/div&gt;" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
           <mxGeometry x="210" y="230" width="120" height="40" as="geometry" />
         </mxCell>
       </root>
