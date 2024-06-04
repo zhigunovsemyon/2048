@@ -1,0 +1,72 @@
+<mxfile host="app.diagrams.net" modified="2024-06-04T18:52:48.517Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0" etag="UC_288Iz1a_Sbo4U_EI6" version="24.4.13" type="device">
+  <diagram name="Page-1" id="8AExiW12i_gnfEKdbFFz">
+    <mxGraphModel dx="819" dy="503" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-73" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-1" target="C6CtMf7c4fnf4AZ9hv4f-68">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-1" value="Экран приветствия" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="10" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-1" target="C6CtMf7c4fnf4AZ9hv4f-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-11" value="Переход к игровому циклу" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="430" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-68" target="C6CtMf7c4fnf4AZ9hv4f-69">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-68" value="Формирование приветствия" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="70" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-69">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="280" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-69" value="Отображение приветствия" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="140" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-72" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="C6CtMf7c4fnf4AZ9hv4f-11">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="280" y="380" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-84" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-76" target="C6CtMf7c4fnf4AZ9hv4f-77">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-76" value="&lt;div&gt;Ввод&amp;nbsp;&lt;/div&gt;&lt;div&gt;пользователя&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="210" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-79" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-77" target="C6CtMf7c4fnf4AZ9hv4f-78">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-80" value="Да" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="C6CtMf7c4fnf4AZ9hv4f-79">
+          <mxGeometry x="-0.5111" y="1" relative="1" as="geometry">
+            <mxPoint y="-11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-85" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-77" target="C6CtMf7c4fnf4AZ9hv4f-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-87" value="Нет" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="C6CtMf7c4fnf4AZ9hv4f-85">
+          <mxGeometry x="-0.7265" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-77" value="&lt;div&gt;Запрошен выход&lt;/div&gt;из игры" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="280" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-86" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C6CtMf7c4fnf4AZ9hv4f-78" target="C6CtMf7c4fnf4AZ9hv4f-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C6CtMf7c4fnf4AZ9hv4f-78" value="Выставление флага выхода из игры" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="340" width="120" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
