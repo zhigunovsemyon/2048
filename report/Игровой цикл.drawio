@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-06-05T05:51:08.302Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0" etag="nWi7DDq8Qi77GQgXYRXJ" version="24.4.13" type="device">
+<mxfile host="app.diagrams.net" modified="2024-06-05T07:16:04.584Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0" etag="JmBPv-6o8IO6z2y1il1o" version="24.4.13" type="device">
   <diagram name="Page-1" id="AscvpKJkDor2Ba45mDUg">
     <mxGraphModel dx="1024" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -46,9 +46,10 @@
             <mxPoint x="-10" y="-10" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-22" target="_LUyKltJJyNUMUL_nIZ1-38">
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-22" target="_LUyKltJJyNUMUL_nIZ1-133">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="644.0000000000002" y="220" as="sourcePoint" />
+            <mxPoint x="754.0000000000002" y="297.5" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-21" value="Режим отрисовки&lt;div&gt;&lt;div&gt;&lt;div&gt;движущегося элемента&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="_LUyKltJJyNUMUL_nIZ1-20">
@@ -56,16 +57,23 @@
             <mxPoint x="-19" y="-22" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-77" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-22" target="_LUyKltJJyNUMUL_nIZ1-76">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-77" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.839;exitY=0.68;exitDx=0;exitDy=0;entryX=0.508;entryY=0.033;entryDx=0;entryDy=0;entryPerimeter=0;exitPerimeter=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-22" target="_LUyKltJJyNUMUL_nIZ1-132">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="624" y="297.5" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="530" y="270" />
+              <mxPoint x="617" y="270" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-124" value="&lt;div&gt;Режим отрисовки&lt;/div&gt;&lt;div&gt;нового элемента&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="_LUyKltJJyNUMUL_nIZ1-77">
           <mxGeometry x="0.1301" y="2" relative="1" as="geometry">
-            <mxPoint x="-4" y="-17" as="offset" />
+            <mxPoint x="7" y="-17" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-92" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-22" target="_LUyKltJJyNUMUL_nIZ1-91">
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-92" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-22">
           <mxGeometry relative="1" as="geometry">
+            <mxPoint x="444" y="301.25" as="targetPoint" />
             <Array as="points">
               <mxPoint x="418" y="280" />
               <mxPoint x="444" y="280" />
@@ -86,17 +94,11 @@
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-29" value="&lt;div&gt;Ввод&amp;nbsp;&lt;/div&gt;&lt;div&gt;пользователем&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
           <mxGeometry x="129" y="270" width="120" height="52.5" as="geometry" />
         </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-38" target="_LUyKltJJyNUMUL_nIZ1-65">
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-133" target="_LUyKltJJyNUMUL_nIZ1-65">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="434.0000000000002" y="400" as="sourcePoint" />
-            <Array as="points">
-              <mxPoint x="754" y="370" />
-              <mxPoint x="754" y="370" />
-            </Array>
+            <mxPoint x="754" y="350" as="sourcePoint" />
+            <Array as="points" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-38" value="Отрисовка движущегося элемента" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="694" y="297.5" width="120" height="52.5" as="geometry" />
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-123" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-39" target="_LUyKltJJyNUMUL_nIZ1-8">
           <mxGeometry relative="1" as="geometry" />
@@ -173,7 +175,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-54" value="Добавление элемента" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
-          <mxGeometry x="254" y="297.5" width="120" height="60" as="geometry" />
+          <mxGeometry x="254" y="300" width="120" height="50" as="geometry" />
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-55" target="_LUyKltJJyNUMUL_nIZ1-9">
           <mxGeometry relative="1" as="geometry">
@@ -229,16 +231,14 @@
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-65" value="Отрисовка завершилась?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="681" y="450" width="146" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-76" target="_LUyKltJJyNUMUL_nIZ1-80">
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-132" target="_LUyKltJJyNUMUL_nIZ1-80">
           <mxGeometry relative="1" as="geometry">
+            <mxPoint x="624" y="350" as="sourcePoint" />
             <Array as="points">
-              <mxPoint x="631" y="350" />
-              <mxPoint x="631" y="376" />
+              <mxPoint x="616" y="360" />
+              <mxPoint x="631" y="360" />
             </Array>
           </mxGeometry>
-        </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-76" value="Отрисовка нового элемента" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="564" y="297.5" width="120" height="52.5" as="geometry" />
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-82" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-80" target="_LUyKltJJyNUMUL_nIZ1-9">
           <mxGeometry relative="1" as="geometry">
@@ -293,11 +293,10 @@
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-87" value="&lt;div&gt;Режим добавления&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="694" y="562.5" width="120" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-95" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-91" target="_LUyKltJJyNUMUL_nIZ1-94">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="_LUyKltJJyNUMUL_nIZ1-91" value="Проверка поля на сдвиг" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="384" y="301.25" width="120" height="52.5" as="geometry" />
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-95" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="_LUyKltJJyNUMUL_nIZ1-94">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="444" y="353.75" as="sourcePoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-98" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_LUyKltJJyNUMUL_nIZ1-94" target="_LUyKltJJyNUMUL_nIZ1-97">
           <mxGeometry relative="1" as="geometry" />
@@ -432,6 +431,15 @@
         </mxCell>
         <mxCell id="_LUyKltJJyNUMUL_nIZ1-128" value="&lt;div&gt;Режим&lt;br&gt;&lt;/div&gt;&lt;div&gt;выхода&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="73" y="423.75" width="56" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-131" value="Проверка поля на сдвиг" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="384" y="300" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-132" value="Отрисовка нового элемента" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="551" y="300" width="119" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="_LUyKltJJyNUMUL_nIZ1-133" value="Отрисовка движущегося элемента" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="694" y="300" width="120" height="50" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
