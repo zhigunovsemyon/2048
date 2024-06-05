@@ -47,141 +47,6 @@ void ChangeCombinedToOld(Game *Game)
 	}
 }
 
-Uint8 CheckRightCombo(Game *Game, Params *Params)
-{
-	Uint8 MoveFlag = 0;
-	// Цикл перебора каждой строки
-	for (Sint8 i = 0; i < Game->FieldSize; i++)
-	{ // Цикл перебора каждого столбца с конца
-		for (Sint8 j = Game->FieldSize - 1; j > 0; j--)
-		{ // Если данная ячейка пустая, можно пропускать
-			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-				continue;
-
-			// Если же соседние элементы равны, но не равны нулю
-			if (Game->Field[i * Game->FieldSize + j].val ==
-				Game->Field[i * Game->FieldSize + j - 1].val)
-			{
-				// Если элементы были только созданы, их можно пропускать
-				if (Game->Field[i * Game->FieldSize + j].mode ==
-						TILE_JUSTCOMBINED ||
-					Game->Field[i * Game->FieldSize + j - 1].mode ==
-						TILE_JUSTCOMBINED)
-					continue;
-
-				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
-				Game->Field[i * Game->FieldSize + j - 1].mode = TILE_MOVE_X;
-				Game->Field[i * Game->FieldSize + j - 1].offset =
-					Params->CellWidth;
-				j--; // Проверка через один элемент, а не следующего
-				MoveFlag++; // Подъём флага движения
-			}
-		}
-	}
-	return MoveFlag;
-}
-
-Uint8 CheckLeftCombo(Game *Game, Params *Params)
-{
-	Uint8 MoveFlag = 0;
-	// Цикл перебора каждой строки
-	for (Sint8 i = 0; i < Game->FieldSize; i++)
-	{ // Цикл перебора каждого столбца с начала
-		for (Sint8 j = 0; j < Game->FieldSize - 1; j++)
-		{ // Если данная ячейка пустая, можно пропускать
-			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-				continue;
-
-			// Если же соседние элементы равны, но не равны нулю
-			if (Game->Field[i * Game->FieldSize + j].val ==
-				Game->Field[i * Game->FieldSize + j + 1].val)
-			{
-				// Если элементы были только созданы, их можно пропускать
-				if (Game->Field[i * Game->FieldSize + j].mode ==
-						TILE_JUSTCOMBINED ||
-					Game->Field[i * Game->FieldSize + j + 1].mode ==
-						TILE_JUSTCOMBINED)
-					continue;
-
-				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
-				Game->Field[i * Game->FieldSize + j + 1].mode = TILE_MOVE_X;
-				Game->Field[i * Game->FieldSize + j + 1].offset =
-					-1 * Params->CellWidth;
-				j++; // Проверка через один элемент, а не следующего
-				MoveFlag++; // Подъём флага движения
-			}
-		}
-	}
-	return MoveFlag;
-}
-
-Uint8 CheckDownCombo(Game *Game, Params *Params)
-{
-	Uint8 MoveFlag = 0;
-	// Цикл перебора каждого столбца
-	for (Sint8 j = 0; j < Game->FieldSize; j++)
-	{ // Цикл перебора каждой строки
-		for (Sint8 i = Game->FieldSize - 1; i > 0; i--)
-		{ // Если данная ячейка пустая
-			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-				continue;
-					
-			// Если же соседние элементы равны, но не равны нулю
-			if (Game->Field[i * Game->FieldSize + j].val ==
-				Game->Field[(i - 1) * Game->FieldSize + j].val)
-			{
-				// Если элементы были только созданы, их можно пропускать
-				if (Game->Field[i * Game->FieldSize + j].mode ==
-						TILE_JUSTCOMBINED ||
-					Game->Field[(i - 1) * Game->FieldSize + j].mode ==
-						TILE_JUSTCOMBINED)
-					continue;
-
-				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
-				Game->Field[(i - 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;
-				Game->Field[(i - 1) * Game->FieldSize + j].offset =
-					Params->CellWidth;
-				i--; // Проверка через один элемент, а не следующего
-				MoveFlag++; // Подъём флага движения
-			}
-		}
-	}
-	return MoveFlag;
-}
-
-Uint8 CheckUpCombo(Game *Game, Params *Params)
-{
-	Uint8 MoveFlag = 0;
-	// Цикл перебора каждого столбца
-	for (Sint8 j = 0; j < Game->FieldSize; j++)
-	{ // Цикл перебора каждой строки
-		for (Sint8 i = 0; i < Game->FieldSize - 1; i++)
-		{ // Если данная ячейка пустая
-			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-				continue;
-
-			// Если же соседние элементы равны, но не равны нулю
-			if (Game->Field[i * Game->FieldSize + j].val ==
-				Game->Field[(i + 1) * Game->FieldSize + j].val)
-			{
-				// Если элементы были только созданы, их можно пропускать
-				if (Game->Field[i * Game->FieldSize + j].mode ==
-						TILE_JUSTCOMBINED ||
-					Game->Field[(i + 1) * Game->FieldSize + j].mode ==
-						TILE_JUSTCOMBINED)
-					continue;
-
-				Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
-				Game->Field[(i + 1) * Game->FieldSize + j].mode = TILE_MOVE_Y;
-				Game->Field[(i + 1) * Game->FieldSize + j].offset =
-					-1 * Params->CellWidth;
-				i++; // Проверка через один элемент, а не следующего
-				MoveFlag++; // Подъём флага движения
-			}
-		}
-	}
-	return MoveFlag;
-}
 Uint8 CheckRightMove(Game *Game, Params *Params)
 {
 	Uint8 QuitFlag = 1, MoveFlag = 0;
@@ -211,6 +76,33 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 				}
 				if (NonEmptyLine)
 					MoveFlag++; // Подъём флага движения
+			}
+			else
+			{
+				if (!j /*==0*/)
+					continue;
+				// Если же соседние элементы равны, но не равны нулю
+				if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j - 1].val)
+				{
+					QuitFlag = 0;
+					// Если элементы были только созданы, их можно пропускать
+					if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+						Game->Field[i * Game->FieldSize + j - 1].mode == TILE_JUSTCOMBINED)
+						continue;
+
+					Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+					MoveFlag++; // Подъём флага движения
+					// Проверка через один элемент, а не следующего
+					for (j--; j >= 0;j--)
+					{
+						if (Game->Field[i * Game->FieldSize + j].val)
+						{
+							Game->Field[i * Game->FieldSize + j].mode = TILE_MOVE_X;
+							Game->Field[i * Game->FieldSize + j].offset = Params->CellWidth;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -246,6 +138,33 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 				if (NonEmptyLine)
 					MoveFlag++; // Подъём флага движения
 			}
+			else
+			{
+				if(j == Game->FieldSize - 1)
+					continue;
+				// Если же соседние элементы равны, но не равны нулю
+				if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[i * Game->FieldSize + j + 1].val)
+				{
+					QuitFlag = 0;
+					// Если элементы были только созданы, их можно пропускать
+					if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+						Game->Field[i * Game->FieldSize + j + 1].mode == TILE_JUSTCOMBINED)
+						continue;
+
+					Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+					MoveFlag++; // Подъём флага движения
+					// Проверка через один элемент, а не следующего
+					for (j++; j < Game->FieldSize; j++)
+					{
+						if (Game->Field[i * Game->FieldSize + j].val)
+						{
+							Game->Field[i * Game->FieldSize + j].mode = TILE_MOVE_X;
+							Game->Field[i * Game->FieldSize + j].offset = -1 * Params->CellWidth;
+						}
+					}
+				}
+			}
 		}
 	}
 	return (MoveFlag) ? MODE_MOVE_LEFT : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
@@ -279,6 +198,32 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 				}
 				if (NonEmptyLine)
 					MoveFlag++; // Подъём флага движения
+			}
+			else
+			{
+				if (i == Game->FieldSize - 1)
+					continue;
+				// Если же соседние элементы равны, но не равны нулю
+				if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i + 1) * Game->FieldSize + j].val)
+				{
+					QuitFlag = 0;
+					// Если элементы были только созданы, их можно пропускать
+					if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+						Game->Field[(i + 1) * Game->FieldSize + j].mode == TILE_JUSTCOMBINED)
+						continue;
+
+					Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+					MoveFlag++; // Подъём флага движения
+					for (i++; i < Game->FieldSize; i++)
+					{
+						if (Game->Field[(i)*Game->FieldSize + j].val)
+						{
+							Game->Field[(i)*Game->FieldSize + j].mode = TILE_MOVE_Y;
+							Game->Field[(i)*Game->FieldSize + j].offset = -1 * Params->CellWidth;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -314,6 +259,33 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 				}
 				if (NonEmptyLine)
 					MoveFlag++; // Подъём флага движения
+			}
+			else
+			{
+				if (!i /*==0*/)
+					continue;
+				// Если же соседние элементы равны, но не равны нулю
+				if (Game->Field[i * Game->FieldSize + j].val ==
+					Game->Field[(i - 1) * Game->FieldSize + j].val)
+				{
+					QuitFlag = 0;
+					// Если элементы были только созданы, их можно пропускать
+					if (Game->Field[i * Game->FieldSize + j].mode == TILE_JUSTCOMBINED ||
+						Game->Field[(i - 1) * Game->FieldSize + j].mode == TILE_JUSTCOMBINED)
+						continue;
+
+					Game->Field[i * Game->FieldSize + j].mode = TILE_COMBINED;
+					MoveFlag++; // Подъём флага движения
+					// Расстановка через один элемент, а не следующего
+					for (i--; i >= 0; i--)
+					{
+						if (Game->Field[(i)*Game->FieldSize + j].val)
+						{
+							Game->Field[(i)*Game->FieldSize + j].mode = TILE_MOVE_Y;
+							Game->Field[(i)*Game->FieldSize + j].offset = Params->CellWidth;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -837,8 +809,8 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
 
 static Uint8 (*int_CheckMove[])(Game *, Params *) = {
 	CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
-static Uint8 (*int_CheckCombo[])(Game *, Params *) = {
-	CheckRightCombo, CheckLeftCombo, CheckDownCombo, CheckUpCombo};
+//static Uint8 (*int_CheckCombo[])(Game *, Params *) = {
+//	CheckRightCombo, CheckLeftCombo, CheckDownCombo, CheckUpCombo};
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN,
@@ -848,4 +820,4 @@ Uint8 (**CheckMove)(Game *, Params *) = int_CheckMove - MODE_CHECK_RIGHT;
 /*Набор функций проверки тайлов поля Game на складываемость.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN,
 MODE_CHECK_UP*/
-Uint8 (**CheckCombo)(Game *, Params *) = int_CheckCombo - MODE_CHECK_RIGHT;
+//Uint8 (**CheckCombo)(Game *, Params *) = int_CheckCombo - MODE_CHECK_RIGHT;

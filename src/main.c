@@ -77,13 +77,11 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 		{	//Получение размера поля и тайлов в пикселях, обновление набора текстур
 			GetFieldAndTileSize(Game, Params);
 			if ((errCode = UpdateTextureSet(rend, Params, Game, Assets)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
-												  Params, Assets);
+				return errCode;
 
 			// Рисование поля со старыми элементами
 			if ((errCode = DrawOldElements(rend, Params, Game, Assets)))
-				PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
-										   Params, Assets);
+				return errCode;
 			SDL_RenderPresent(rend);
 		}
 
@@ -122,25 +120,12 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 		case MODE_CHECK_RIGHT: // 7
 		case MODE_CHECK_LEFT:  // 8
 		case MODE_CHECK_DOWN:  // 9
-		case MODE_CHECK_UP: {  // 10
-			// Может вернуть move, quit или wait
-			Uint8 tmpMode = CheckMove[Game->Mode](Game, Params);
+		case MODE_CHECK_UP:   // 10
+			// Может вернуть move, gameover или wait
+			Game->Mode = CheckMove[Game->Mode](Game, Params);
 			dtCount();
-			if (tmpMode == MODE_WAIT || tmpMode == MODE_GAMEOVER)
-			{
-				Game->Mode =
-					(CheckCombo[Game->Mode](Game, Params))
-						/* Если есть комбинации, осуществляется движение
-						вправо, влево, вверх, вниз */
-						? Game->Mode - (MODE_CHECK_RIGHT - MODE_MOVE_RIGHT)
-						/* Если комбинаций нет -- режим ожидания или выхода*/
-						: tmpMode; 
-			}
-			else // Если плитки всё ещё движутся
-				Game->Mode = tmpMode;
 			break;
-		}
-
+		
 		// Режимы отрисовки сдвига ячеек в каждом из направлений
 		case MODE_MOVE_RIGHT: // 3
 		case MODE_MOVE_LEFT:  // 4
@@ -148,12 +133,10 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 		case MODE_MOVE_UP:	  // 6
 			// Вызов нужной функции сдвига, в соответствии с направлением
 			if ((errCode = DoMove[Game->Mode](rend, Game, Params, Assets)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
-												  Params, Assets);
+				return errCode;
 			// Обновление заголовка на случай сложенной комбинации
 			if ((errCode = UpdateWindowTitle(window, Game->Score)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
-												  Params, Assets);
+				return errCode;
 			// Отображение изменений на экране
 			SDL_RenderPresent(rend);
 			break;
@@ -163,14 +146,12 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend,
 			// Рисование поля со старыми элементами
 			if ((errCode = DrawOldElements(rend, Params, Game,
 										   Assets) /*== ERR_SDL*/))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
-												  Params, Assets);
+				return errCode;
 
 			// Отрисовка нового элемента, отображение
 			if ((errCode = DrawNewElement(rend, Params, Game, Assets,
 										  NewElementIndex)))
-				return PrintErrorAndLeaveWithCode(errCode, window, rend, Game,
-												  Params, Assets);
+				return errCode;
 			SDL_RenderPresent(rend);
 
 			/*Если был передан индекс -1, значит нужно

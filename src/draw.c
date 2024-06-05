@@ -242,20 +242,13 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 		Если поле заполнено, будет включен режим выхода, если движение
 	 невозможно, но поле содержит пустые ячейки, будет включен режим добавления
 	 нового элемента*/
-	if (CheckRightMove(Game, Params) == MODE_MOVE_RIGHT)
+	if ((Game->Mode = CheckRightMove(Game, Params)) == MODE_WAIT)
 	{
-		Game->Mode = MODE_MOVE_RIGHT;
+		Game->Mode = MODE_ADD;
 		return ERR_NO;
 	}
 
-	// Если возможно сложение вправо
-	if (CheckRightCombo(Game, Params))
-	{
-		Game->Mode = MODE_MOVE_RIGHT;
-		return ERR_NO;
-	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
-	Game->Mode = MODE_ADD;
 	return ERR_NO;
 }
 
@@ -344,12 +337,6 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 		return ERR_NO;
 	}
 
-	// Если возможно сложение вправо
-	if (CheckLeftCombo(Game, Params))
-	{
-		Game->Mode = MODE_MOVE_LEFT;
-		return ERR_NO;
-	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Game->Mode = MODE_ADD;
 	return ERR_NO;
@@ -443,12 +430,6 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 		return ERR_NO;
 	}
 
-	// Если возможно сложение вправо
-	if (CheckUpCombo(Game, Params))
-	{
-		Game->Mode = MODE_MOVE_UP;
-		return ERR_NO;
-	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Game->Mode = MODE_ADD;
 	return ERR_NO;
@@ -539,12 +520,6 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 		return ERR_NO;
 	}
 
-	// Если возможно сложение вправо
-	if (CheckDownCombo(Game, Params))
-	{
-		Game->Mode = MODE_MOVE_DOWN;
-		return ERR_NO;
-	}
 	// Если же нет, осуществляется проверка на добавление нового элемента
 	Game->Mode = MODE_ADD;
 	return ERR_NO;
