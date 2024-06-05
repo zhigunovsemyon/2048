@@ -58,8 +58,7 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{
 				QuitFlag = 0;
-				// Всем предшествующим не пустым ячейкам проставляется параметр
-				// TILE_MOVE_X и оффсет
+				// Всем предшествующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
 				for (Sint8 j2 = j - 1; j2 >= 0; j2--)
 				{ // Если ячейка не пустая
@@ -118,8 +117,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 		for (Sint8 j = 0; j < Game->FieldSize; j++)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-			{ // Всем следующим не пустым ячейкам проставляется параметр
-			  // TILE_MOVE_X и оффсет
+			{ // Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
 				QuitFlag = 0;
 				for (Sint8 j2 = j + 1; j2 < Game->FieldSize; j2++)
@@ -179,8 +177,7 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 		for (Sint8 i = 0; i < Game->FieldSize; i++)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
-			{ // Всем следующим не пустым ячейкам проставляется параметр
-			  // TILE_MOVE_X и оффсет
+			{ // Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
 				Uint8 NonEmptyLine = 0;
 				QuitFlag = 0;
 				for (Sint8 i2 = i + 1; i2 < Game->FieldSize; i2++)
