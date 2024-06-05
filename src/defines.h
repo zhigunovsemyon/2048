@@ -78,10 +78,10 @@ enum ColourIndexes
 						"square_max"	}
 enum TileMode		  		
 {					  		
-	TILE_NEW,	//Новый тайл
-	TILE_OLD,	//Статичный тайл
-	TILE_MOVE_X,//Тайл, движимый по горизонтали
-	TILE_MOVE_Y,//Тайл, движимый по вертикали
+	TILE_NEW,			//Новый тайл
+	TILE_OLD,			//Статичный тайл
+	TILE_MOVE_X,		//Тайл, движимый по горизонтали
+	TILE_MOVE_Y,		//Тайл, движимый по вертикали
 	TILE_COMBINED,		//Тайл, на который будет наложен соседний 
 	TILE_JUSTCOMBINED	//Тайл, который был получен наложением
 };
