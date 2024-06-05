@@ -404,9 +404,8 @@ void GetFieldAndTileSize(Game *Game, Params *Params)
 Sint8 AddElement(Game *Game)
 {
 	Sint8 pos;
-	Uint8 tries = 0;
 	/*Случайный перебор*/
-	for (; tries < _SQ(Game->FieldSize); tries++)
+	while (SDL_TRUE)
 	{
 		pos = RandomInt(0, _SQ(Game->FieldSize));
 		if (Game->Field[pos].val)
@@ -415,20 +414,7 @@ Sint8 AddElement(Game *Game)
 		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
 		Game->Field[pos].mode = TILE_NEW;
 		return pos; // Позиция нового элемента возвращается
-	}
-	/*Если случайно подобрать положение не удалось, функция перебирает ячейки по
-	очереди с конца, проводя аналогичную проверку*/
-	for (pos = tries - 1; pos >= 0; pos--)
-	{
-		if (Game->Field[pos].val /*!= 0*/)
-			continue;
-		/*else*/
-		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
-		Game->Field[pos].mode = TILE_NEW;
-		return pos;
-	}
-	// Если свободных ячеек не нашлось, значит возвращается соответствующий флаг
-	return -1;
+	}	
 }
 
 Uint8 dtCount(void)
