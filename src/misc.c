@@ -399,19 +399,15 @@ void GetFieldAndTileSize(Game *Game, Params *Params)
 }
 
 Sint8 AddElement(Game *Game)
-{
-	Sint8 pos;
-	/*Случайный перебор*/
-	while (SDL_TRUE)
-	{
-		pos = RandomInt(0, _SQ(Game->FieldSize));
-		if (Game->Field[pos].val)
-			continue; // Если там уже есть значение, то перебор продолжается
-		/*В противном случае в эту позицию сохраняется число*/
-		Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
-		Game->Field[pos].mode = TILE_NEW;
-		return pos; // Позиция нового элемента возвращается
-	}	
+{	//Положение элемента
+	Sint8 pos = RandomInt(0, _SQ(Game->FieldSize));
+	// Если там уже есть значение, то перебор продолжается
+	if (Game->Field[pos].val)
+			return AddElement(Game); 
+	/*В противном случае в эту позицию сохраняется число*/
+	Game->Field[pos].val = (RandomInt(0, CHANCE_OF_FOUR)) ? 2 : 4;
+	Game->Field[pos].mode = TILE_NEW;
+	return pos; // Позиция нового элемента возвращается
 }
 
 Uint8 dtCount(void)
