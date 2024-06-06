@@ -439,11 +439,10 @@ Sint32 RandomInt(Sint32 a, Sint32 b)
 
 void SetMode(SDL_Event *event, Game *Game, Params *Params)
 {
-	// Определение событий
+	/* Определение событий. Если событий не было, 
+	функция сразу завершается, режим не меняется */
 	while (!SDL_PollEvent(event))
-	{ // Если событий не было, сразу осуществляется выход, режим не меняется
 		return;
-	}
 
 	//Если текущий режим отличается от режима ожидания ввода, то ввод не учитывается
 	if (Game->Mode != MODE_WAIT)
@@ -520,15 +519,11 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 			return;
 
 		default:
-			break;
+			return;
 		}
-		break;
 	default:
-		break;
+		return;
 	}
-
-	// Если произошло не значимое событие
-	return;
 }
 
 Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window *win,
@@ -788,15 +783,8 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
 
 static Uint8 (*int_CheckMove[])(Game *, Params *) = {
 	CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
-//static Uint8 (*int_CheckCombo[])(Game *, Params *) = {
-//	CheckRightCombo, CheckLeftCombo, CheckDownCombo, CheckUpCombo};
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN,
 MODE_CHECK_UP*/
 Uint8 (**CheckMove)(Game *, Params *) = int_CheckMove - MODE_CHECK_RIGHT;
-
-/*Набор функций проверки тайлов поля Game на складываемость.
-используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN,
-MODE_CHECK_UP*/
-//Uint8 (**CheckCombo)(Game *, Params *) = int_CheckCombo - MODE_CHECK_RIGHT;
