@@ -4,3 +4,4 @@ out
 save
 enc_temp_folder
 *.bkp
+*.tmp
