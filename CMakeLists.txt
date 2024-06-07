@@ -17,11 +17,9 @@ if(WIN32)
 	set(SDL2_PATH "c:\\sdl2\\")
 	set(SDL2_TTF_PATH "c:\\sdl2_ttf\\")
 	set(LINKED_LIB SDL2::Main SDL2::TTF)
-    # /ENTRY:mainCRTStartup keeps the same "main" function instead of requiring "WinMain"
     set(SUBSYSTEM_LINKER_OPTIONS $<IF:$<CONFIG:Debug>,/SUBSYSTEM:CONSOLE,/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup>)
 else()
 	set(LINKED_LIB SDL2 SDL2_ttf)
-	set(SUBSYSTEM_LINKER_OPTIONS "$<IF:$<NOT:$<CONFIG:Debug>>,-mwindows,>")
 endif(WIN32)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 
