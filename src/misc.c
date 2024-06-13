@@ -527,15 +527,14 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 }
 
 Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window *win,
-								 SDL_Renderer *rend, Game *Game, Params *Params,
-								 Assets *Assets)
+								 SDL_Renderer *rend, Game *Game, Assets *Assets)
 {
 	SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s\n", SDL_GetError());
-	return SilentLeaveWithCode(code, win, rend, Game, Params, Assets);
+	return SilentLeaveWithCode(code, win, rend, Game, Assets);
 }
 
 Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend,
-						  Game *Game, Params *Params, Assets *Assets)
+						  Game *Game, Assets *Assets)
 {
 	// Освобождение цветов
 	if (Assets->cols)

@@ -22,40 +22,40 @@ int main(int argc, const char **args)
 	if (!Game.Field)
 	{
 		SDL_SetError("ошибка выделения памяти!");
-		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
+		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Assets);
 	}
 
 	/*Создание набора цветов*/
 	if (!(Assets.cols = CreateColourSet(FLAG_DARKMODE & Params.Flags)))
 	{
 		SDL_SetError("ошибка выделения памяти!");
-		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Params, &Assets);
+		return PrintErrorAndLeaveWithCode(ERR_MALLOC, window, rend, &Game, &Assets);
 	}
 
 	// Создание окна и рисовальщика
 	if ((errCode =
 			 CreateWorkspace(&window, &rend, "Добро пожаловать", &Params.WinSize, Params.Flags)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Assets);
 
 	/* Вывод приветствия.Если пользователь захотел выйти уже с экрана приветствия,
 		в игровом цикле он сразу выйдет на MODE_QUIT */
 	if ((errCode = Greeting(window, rend, &Assets, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Assets);
 
 	// Подсчёт размера поля и каждой ячейки поля. Создание соответствующих текстур
 	GetFieldAndTileSize(&Game, &Params);
 	if ((errCode = InitTextureSet(rend, &Assets, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Assets);
 
 	// Игровой цикл. Если он завершился ошибкой, аварийное завершение
 	if ((errCode = GameCycle(window, rend, &Assets, &Params, &Game)))
-		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+		return PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Assets);
 
 	// Сохранение прогресса, либо только лишь рекорда
 	return ((errCode = SaveGame(&Game, SAVE_FILE)))
 			   ? // Если произошла ошибка
-			   PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets)
-			   : SilentLeaveWithCode(errCode, window, rend, &Game, &Params, &Assets);
+			   PrintErrorAndLeaveWithCode(errCode, window, rend, &Game, &Assets)
+			   : SilentLeaveWithCode(errCode, window, rend, &Game, &Assets);
 }
 
 /* Цикл игры Game в окне window рисовальщиком rend,
