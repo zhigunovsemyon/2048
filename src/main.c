@@ -2,7 +2,7 @@
 int main(int argc, const char **args)
 {
 	srand(time(NULL)); // Инициализация рандомайзера
-	Uint8 errCode = 0; // Код ошибок
+	int_fast8_t errCode = 0; // Код ошибок
 
 	// Парамерты игры
 	Params Params = {.WinSize.x = WIN_MIN * 1.5, .WinSize.y = WIN_MIN * 2};
@@ -60,11 +60,12 @@ int main(int argc, const char **args)
 
 /* Цикл игры Game в окне window рисовальщиком rend,
 	с параметрами Params и применением текстур и цветов в Assets */
-Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game)
+int_fast8_t GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params,
+					  Game *Game)
 {
-	Uint8 errCode = 0; // Код ошибки
+	int_fast8_t errCode = 0;	// Код ошибки
 	SDL_Event Events;  // Юнион событий
-	Sint8 NewElementIndex = -1; // Индекс нового элемента (-1 если такого нет)
+	int_fast8_t NewElementIndex = -1; // Индекс нового элемента (-1 если такого нет)
 
 	// Непосредственно цикл
 	while (SDL_TRUE)
@@ -173,7 +174,8 @@ Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *
 
 /*Вывод приветствия в игру, отображённого в окне window, рисовальщиком rend,параметров игры Params,
 настроек игры Game. Возврат нуля при отсутствии ошибок, либо кода ошибки*/
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game)
+int_fast8_t Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params,
+					 Game *Game)
 { // Создание сообщения
 	char *message;
 	SDL_asprintf(&message, "%s\n%s\n%s\n%s%s%s\n%s%s\n%s%s\n%s%hhu\n%s\n",
