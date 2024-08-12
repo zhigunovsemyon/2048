@@ -70,8 +70,8 @@ Assets;
 #include "misc.h"
 #include "draw.h"
 
-Uint8 Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game);
-Uint8 GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game);
+int_fast8_t Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game);
+int_fast8_t GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game);
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 Используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
