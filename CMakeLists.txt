@@ -24,7 +24,7 @@ endif(WIN32)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 
 find_package (SDL2 REQUIRED)
-find_package (SDL2_TTF REQUIRED)
+find_package (SDL2_ttf REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
 
