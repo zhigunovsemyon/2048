@@ -1,11 +1,11 @@
 #include "main.h"
 int main(int argc, const char **args)
 {
-	srand(time(NULL)); // Инициализация рандомайзера
+	srand((unsigned int)time(NULL)); // Инициализация рандомайзера
 	int_fast8_t errCode = 0; // Код ошибок
 
 	// Парамерты игры
-	Params Params = {.WinSize.x = WIN_MIN * 1.5, .WinSize.y = WIN_MIN * 2};
+	Params Params = {.WinSize.x = (int)(WIN_MIN * 1.5), .WinSize.y = (int)(WIN_MIN * 2)};
 
 	// Ассеты с текстурами и цветами
 	Assets Assets = {.textures = NULL, .cols = NULL};
@@ -162,7 +162,7 @@ int_fast8_t GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Pa
 
 			/*Если размер был сброшен, значит цикл отрисовки пора прервать,
 				выставив соответстветствующий флаг */
-			if (!Game->Field[NewElementIndex].size)
+			if (Game->Field[NewElementIndex].size < 0.1f)
 			{
 				NewElementIndex = -1;
 				Game->Mode = MODE_WAIT;
