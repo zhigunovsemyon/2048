@@ -21,7 +21,7 @@ Uint8 InitTextureSet(SDL_Renderer *, Assets *, Params *, Game *);
 
 /*Создание текстуры тайла со значением TileValue, размера CellWidth,
  * рисовальщиком rend, из набора цветов cols*/
-SDL_Texture *CreateTileTexture(SDL_Renderer *, Uint64 TileValue,
+SDL_Texture *CreateTileTexture(SDL_Renderer *, Sint64 TileValue,
 							   Assets *, float CellWidth);
 
 /*Обновление рисовальщиком rend набора текстур, используемых игрой,
@@ -29,7 +29,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *, Uint64 TileValue,
 Uint8 UpdateTextureSet(SDL_Renderer *, Params *, Game *, Assets *Assets);
 
 // Подбор текстуры из набора textures для ячейки размерности TileValue
-SDL_Texture *GetTextureForTile(Uint64 TileValue, Assets *);
+SDL_Texture *GetTextureForTile(Sint64 TileValue, Assets *);
 
 /*Рисование текстуры с текстом из message рисовальщиком rend шрифтом
  * font_name, вписанной в квадрат txt_size. Текст может быть отцентрован при

@@ -1,4 +1,5 @@
 #include "draw.h"
+#include <stdint.h>
 
 /* Обновление текстуры с очками и учётом цветов из Assets рисовальщиком rend, 
 из игры Game, с учётом параметров Params. Возвращает код ошибки, либо 0 при штатной работе*/
@@ -12,7 +13,7 @@ static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets 
 		Game->MaxScore = Game->Score;	
 
 	//Создание новой рисовальщиком, с учётом очков, как старых, так и новых, размеров площадки, цветов
-	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) /2, .w = Params->FieldSize};
+	SDL_Rect scoreField = {.h = (Params->WinSize.y - (int)Params->FieldSize) /2, .w = (int)Params->FieldSize};
 	if(!(Assets->textures[0].tex = CreateScoreTexture(rend, Assets->cols, &scoreField, Game)))
 		return ERR_SDL;
 	
@@ -20,7 +21,7 @@ static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets 
 }
 
 //Подбор индекса цвета для тайла с соответствующим значением TileValue
-static Uint8 MatchColForTile(Uint64 TileValue)
+static Uint8 MatchColForTile(Sint64 TileValue)
 {
 	switch (TileValue)
 	{
@@ -65,8 +66,8 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 	// Размер плитки
 	float TileSize = Params->FieldSize / TileCount; // Размер одного тайла
 	SDL_Point Corner = // Координаты угла поля
-		{(Params->WinSize.x - Params->FieldSize) * 0.5,
-		 (Params->WinSize.y - Params->FieldSize) * 0.5};
+		{(Params->WinSize.x - (int)Params->FieldSize) / 2,
+		 (Params->WinSize.y - (int)Params->FieldSize) / 2};
 
 	// Задание цвета фона
 	if (SDL_SetRenderDrawColor(rend, SPLIT_COL_VAL(Assets->cols[COL_FG])))
@@ -76,15 +77,15 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 	for (Uint8 i = 0; i <= TileCount; i++)
 	{
 		if (SDL_RenderDrawLine(rend, Corner.x,
-				Corner.y + i * TileSize, // Начало горизонатльной линии
-				Corner.x + Params->FieldSize,
-				Corner.y + i * TileSize)) // Конец горизонтальной линии
+				(Corner.y + (int)(i * TileSize)), // Начало горизонатльной линии
+				(Corner.x + (int)Params->FieldSize),
+				(Corner.y + (int)(i * TileSize)))) // Конец горизонтальной линии
 			return ERR_SDL;
 
-		if (SDL_RenderDrawLine(rend, Corner.x + i * TileSize,
+		if (SDL_RenderDrawLine(rend, Corner.x + (int)(i * TileSize),
 				Corner.y, // Начало вертикальной линии
-				Corner.x + i * TileSize,
-				Corner.y + Params->FieldSize)) // Конец вертикальной линии
+				(Corner.x + (int)(i * TileSize)),
+				(Corner.y + (int)Params->FieldSize))) // Конец вертикальной линии
 			return ERR_SDL;
 	}
 	return ERR_NO;
@@ -93,21 +94,21 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 /*Функция отрисовки одного движущегося элемента Index рисовальщиком rend 
 с учётом параметров Params, используя цвета и текстуры из Assets, поля Game, */
 static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
-									 Game *Game, Assets *Assets, Sint8 Index)
+									 Game *Game, Assets *Assets, int_fast8_t Index)
 {
 	SDL_Rect Tile;
 	// Размер одной ячейки хранится в h
-	Tile.h = Params->CellWidth;
-	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
+	Tile.h = (int)Params->CellWidth;
+	Tile.w = (int)((float)Tile.h * TILE_SIZE_COEFFICIENT);
 
 	// Положение угла поля в координатах
-	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
-	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5;
+	Tile.x = (Params->WinSize.x - (int)Params->FieldSize) / 2;
+	Tile.y = (Params->WinSize.y - (int)Params->FieldSize) / 2;
 
 	// Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
 	// размеров плитки и ячейки
-	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
-	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5f;
+	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) / 2;
+	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) / 2;
 
 	// Сдвиг на оффсет
 	if (Game->Field[Index].mode == TILE_MOVE_X)
@@ -189,7 +190,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 			if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 			{
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											i * Game->FieldSize + j))
+											(int_fast8_t)(i * Game->FieldSize + j)))
 					return ERR_SDL;
 
 				Flag++;//Подъём флага для продолжения анимации на следующем витке цикла
@@ -224,7 +225,7 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						   sizeof(Tile));
 				//Отрисовка нового элемента
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											i * Game->FieldSize + j + 1))
+											(int_fast8_t)(i * Game->FieldSize + j + 1)))
 					return ERR_SDL;
 			}
 		}
@@ -278,7 +279,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 			if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 			{
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											i * Game->FieldSize + j))
+											(int_fast8_t)(i * Game->FieldSize + j)))
 					return ERR_SDL;
 
 				Flag++;
@@ -313,7 +314,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						   sizeof(Tile));
 				//Отрисовка нового элемента
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											i * Game->FieldSize + j - 1))
+											(int_fast8_t)(i * Game->FieldSize + j - 1)))
 					return ERR_SDL;
 			}
 		}
@@ -370,7 +371,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 			if (0 > SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 			{
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											i * Game->FieldSize + j))
+											(int_fast8_t)(i * Game->FieldSize + j)))
 					return ERR_SDL;
 
 				Flag++;
@@ -406,7 +407,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						   sizeof(Tile));
 				//Отрисовка нового элемента
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											(i - 1) * Game->FieldSize + j))
+											(int_fast8_t)((i - 1) * Game->FieldSize + j)))
 					return ERR_SDL;
 			}
 		}
@@ -447,9 +448,9 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
 	// Цикл перебора каждого столбца
-	for (Sint8 i = Game->FieldSize - 1; i >= 0; i--)
+	for (int_fast8_t i = Game->FieldSize - 1; i >= 0; i--)
 	{ // Цикл перебора каждой строки
-		for (Sint8 j = Game->FieldSize - 1; j >= 0; j--)
+		for (int_fast8_t j = Game->FieldSize - 1; j >= 0; j--)
 		{ /* Если данная ячейка пустая, и она движется 
 			не по горизонтали, пропуск*/
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
@@ -462,7 +463,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 			if (0 < SDL_roundf(Game->Field[i * Game->FieldSize + j].offset))
 			{
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											i * Game->FieldSize + j))
+											(int_fast8_t)(i * Game->FieldSize + j)))
 					return ERR_SDL;
 
 				Flag++;
@@ -496,7 +497,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 				SDL_memset(Game->Field + (i * Game->FieldSize + j), 0,
 						   sizeof(Tile));
 				if (DrawSingleMovingElement(rend, Params, Game, Assets,
-											(i + 1) * Game->FieldSize + j))
+											(int_fast8_t)((i + 1) * Game->FieldSize + j)))
 					return ERR_SDL;
 			}
 		}
@@ -525,7 +526,7 @@ static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	return ERR_NO;
 }
 
-SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Uint64 TileValue,
+SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Sint64 TileValue,
 							   Assets *Assets, float CellWidth)
 {
 	if (!TileValue /* == 0*/)
@@ -590,7 +591,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 					 Game *Game)
 {	/* Нахождение номинала максимальной клетки. Если у некоторой ячейки он больше 
 	максимальной, максимальный размер обновляется */
-	Uint64 maxVal = 2;
+	Sint64 maxVal = 2;
 	for (Uint8 cur = 0; cur < _SQ(Game->FieldSize); cur++)
 		if (maxVal < Game->Field[cur].val)
 			maxVal = Game->Field[cur].val;
@@ -598,7 +599,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	/* Выделение памяти под нужное число текстур -- текстуру очков +
 	тексутры тайлов (log2(макс_значение)) */
 	if (!(Assets->textures = (TileTexture *)SDL_malloc(sizeof(TileTexture) 
-								* (1 + (SDL_log(maxVal) / SDL_log(2))))))
+								* (size_t)((1 + (SDL_log((double)maxVal) / SDL_log(2.0)))))))
 	{
 		SDL_SetError("ошибка выделения памяти!");
 		return ERR_MALLOC;
@@ -619,7 +620,7 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 
 	//Создание текстур всем ячейкам, вплоть до максимальной
 	Assets->textures_count = 2;
-	for (Uint64 val = 2; val <= maxVal; Assets->textures_count++, val <<= 1)
+	for (Sint64 val = 2; val <= maxVal; Assets->textures_count++, val <<= 1)
 	{
 		//Создание крайней текстуры
 		Assets->textures[Assets->textures_count - 1].val = val;
@@ -661,10 +662,10 @@ Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 /*Функция поиска текстуры для bsearch*/
 static Sint32 FindTexture(void const *l, void const *r)
 {
-	return ((TileTexture const *)l)->val - ((TileTexture const *)r)->val;
+	return (Sint32)(((TileTexture const *)l)->val - ((TileTexture const *)r)->val);
 }
 
-SDL_Texture *GetTextureForTile(Uint64 TileValue, Assets *Assets)
+SDL_Texture *GetTextureForTile(Sint64 TileValue, Assets *Assets)
 {
 	TileTexture key = {.val = TileValue};
 	TileTexture *needed =
@@ -780,8 +781,8 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 	//Положение и размер очков
 	Tile.w = (int)Params->FieldSize;
 	Tile.h = (Params->WinSize.y - (int)Params->FieldSize) / 2;
-	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
-	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 - Tile.h;
+	Tile.x = (Params->WinSize.x - (int)Params->FieldSize) / 2;
+	Tile.y = (Params->WinSize.y - (int)Params->FieldSize) / 2 - Tile.h;
 
 	//Отрисовка очков
 	if(SDL_RenderCopy(rend, Assets->textures[0].tex, NULL, &Tile))
@@ -789,7 +790,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 	
 
 	//Сброс размеров перед отрисовкой тайлов
-	Tile.w = Tile.h = TILE_SIZE_COEFFICIENT * Params->CellWidth;
+	Tile.w = Tile.h = (int)(TILE_SIZE_COEFFICIENT * Params->CellWidth);
 
 	//Цикл отрисовки каждого тайла
 	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
@@ -802,12 +803,12 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 		/* Положение угла поля в координатах +
 		Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
 		размеров плитки и ячейки */
-		Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5 +
-				 (Params->CellWidth - Tile.w) * 0.5 +
-				 Params->CellWidth * (i % Game->FieldSize);
-		Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 +
-				 (Params->CellWidth - Tile.w) * 0.5 +
-				 Params->CellWidth * (i / Game->FieldSize);
+		Tile.x = (int)(((float)Params->WinSize.x - Params->FieldSize) / 2 +
+				 (Params->CellWidth - (float)Tile.w) / 2 +
+				 Params->CellWidth * (float)(i % Game->FieldSize));
+		Tile.y = (int)(((float)Params->WinSize.y - Params->FieldSize) / 2 +
+				 (Params->CellWidth - (float)Tile.w) / 2 +
+				 Params->CellWidth * (float)(i / Game->FieldSize));
 
 		//Поиск текстуры среди уже существующих
 		SDL_Texture *tile_texture =	GetTextureForTile(Game->Field[i].val, Assets);
@@ -844,16 +845,16 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 		(int)(Game->Field[Index].size += (ANIM_SPEED * dtCount() / 1000.0f));
 
 	// Размер одной ячейки хранится в h
-	Tile.h = Params->CellWidth;
+	Tile.h = (int)(Params->CellWidth);
 
 	// Положение угла поля в координатах
-	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5;
-	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5;
+	Tile.x = (int)((float)Params->WinSize.x - Params->FieldSize) / 2;
+	Tile.y = (int)((float)Params->WinSize.y - Params->FieldSize) / 2;
 
 	/* Сдвиг координаты угла плитки на её положение в матрице, 
 	плюс разницу размеров плитки и ячейки */
-	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.x += (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) / 2;
+	Tile.y += (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) / 2;
 
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
@@ -866,16 +867,16 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	}
 
 	// Отрисовка окончательного положения квадрата
-	Tile.h = Params->FieldSize / Game->FieldSize;
-	Tile.w = Tile.h * TILE_SIZE_COEFFICIENT;
+	Tile.h = (int)(Params->FieldSize / Game->FieldSize);
+	Tile.w = (int)((float)Tile.h * TILE_SIZE_COEFFICIENT);
 
 	/* Положение угла поля в координатах
 	Сдвиг координаты угла плитки на её положение в матрице, плюс разницу
 	размеров плитки и ячейки */
-	Tile.x = (Params->WinSize.x - Params->FieldSize) * 0.5 +
-			 (Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
-	Tile.y = (Params->WinSize.y - Params->FieldSize) * 0.5 +
-			 (Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) * 0.5;
+	Tile.x = (int)(((float)Params->WinSize.x - Params->FieldSize) * 0.5 +
+			 ((float)Tile.h * (Index % Game->FieldSize)) + (Tile.h - Tile.w) / 2);
+	Tile.y = (int)(((float)Params->WinSize.y - Params->FieldSize) * 0.5 +
+			 ((float)Tile.h * (Index / Game->FieldSize)) + (Tile.h - Tile.w) / 2);
 	Tile.h = Tile.w; // Запись корректной высоты плитки
 
 	// Отрисовка конечного тайла

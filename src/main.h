@@ -16,7 +16,7 @@
 //Текстура некоторого тайла
 typedef struct
 {
-	Uint64 val;//Значение тайла, для которого используется текстура
+	Sint64 val;//Значение тайла, для которого используется текстура
 	SDL_Texture *tex;//Сама текстура
 }
 TileTexture;
@@ -24,7 +24,7 @@ TileTexture;
 //Структура, описывающая один тайл
 typedef struct
 {
-	Uint64 val;//Значение ячейки
+	Sint64 val;//Значение ячейки
 	Uint8 mode;//Состояние данной плитки
 	union
 	{
@@ -39,8 +39,8 @@ typedef struct
 {
 	Tile* Field;	//Поле ячеек
 	Uint8 FieldSize;//Размер поля
-	Uint64 Score;	//Текущий счёт
-	Uint64 MaxScore;//Максимальный счёт
+	Sint64 Score;	//Текущий счёт
+	Sint64 MaxScore;//Максимальный счёт
 	Uint8 Mode;		//Текущий этап игры
 }
 Game;
