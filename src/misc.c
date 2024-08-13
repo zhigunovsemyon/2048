@@ -658,7 +658,7 @@ static int_fast8_t ReadFile(const char *filename, Game *game)
 	return 0;
 }
 
-Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char *filename)
+Game InitParamsAndGame(int argc, char **argv, Params *Settings, const char *filename)
 {	// Базовые параметры работы игры
 	int_fast8_t FieldSize = 4;
 	Settings->Flags = (FLAG_VSYNC | FLAG_DARKMODE | FLAG_ARROWKEY);
