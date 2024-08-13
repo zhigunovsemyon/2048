@@ -550,7 +550,7 @@ SDL_Texture *CreateTileTexture(SDL_Renderer *rend, Sint64 TileValue,
 
 	//Создание текста со значением тайла
 	char *stringForTex;
-	SDL_asprintf(&stringForTex, "%lu", TileValue);
+	SDL_asprintf(&stringForTex, "%ld", TileValue);
 	if (!stringForTex)
 	{
 		SDL_SetError("ошибка выделения памяти!");
@@ -571,7 +571,7 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 							 SDL_Rect *Tile, Game *Game)
 {	//Текст со значением очков и рекорда
 	char *text;
-	SDL_asprintf(&text, "Число очков: %lu\nРекорд: %lu", Game->Score,
+	SDL_asprintf(&text, "Число очков: %ld\nРекорд: %ld", Game->Score,
 				 Game->MaxScore);
 	if (!text)
 	{	
