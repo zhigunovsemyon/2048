@@ -672,66 +672,66 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 	 * цикл ниже будет пропущен*/
 	for (int_fast8_t i = 1; Setters && (i < argc); ++i)
 	{
-		if (!SDL_strcmp(argv[i], "--vsync-off") && (Setters & VSYNC_UNSET))
+		if (!SDL_strcmp(argv[i], VSYNCOFF) && (Setters & VSYNC_UNSET))
 		{
 			Setters &= ~VSYNC_UNSET;
 			Settings->Flags &= ~FLAG_VSYNC;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--vsync-on") && (Setters & VSYNC_UNSET))
+		if (!SDL_strcmp(argv[i], VSYNCON) && (Setters & VSYNC_UNSET))
 		{
 			Setters &= ~VSYNC_UNSET;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--size=3") && (Setters & SIZE_UNSET))
+		if (!SDL_strcmp(argv[i], SIZE3) && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
 			FieldSize = 3;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--size=4") && (Setters & SIZE_UNSET))
+		if (!SDL_strcmp(argv[i], SIZE4) && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--size=5") && (Setters & SIZE_UNSET))
+		if (!SDL_strcmp(argv[i], SIZE5) && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
 			FieldSize = 5;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--size=6") && (Setters & SIZE_UNSET))
+		if (!SDL_strcmp(argv[i], SIZE6) && (Setters & SIZE_UNSET))
 		{
 			Setters &= ~SIZE_UNSET;
 			FieldSize = 6;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--light") && (Setters & COL_UNSET))
+		if (!SDL_strcmp(argv[i], LIGHTMODE) && (Setters & COL_UNSET))
 		{
 			Setters &= ~COL_UNSET;
 			Settings->Flags &= ~FLAG_DARKMODE;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--dark") && (Setters & COL_UNSET))
+		if (!SDL_strcmp(argv[i], DARKMODE) && (Setters & COL_UNSET))
 		{
 			Setters &= ~COL_UNSET;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--arrows") && (Setters & KEY_UNSET))
+		if (!SDL_strcmp(argv[i], ARROWS) && (Setters & KEY_UNSET))
 		{
 			Setters &= ~KEY_UNSET;
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--wasd") && (Setters & KEY_UNSET))
+		if (!SDL_strcmp(argv[i], WASD) && (Setters & KEY_UNSET))
 		{
 			Setters &= ~KEY_UNSET;
 			Settings->Flags &= ~FLAG_ARROWKEY;
@@ -739,7 +739,7 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 			continue;
 		}
 
-		if (!SDL_strcmp(argv[i], "--vi") && (Setters & KEY_UNSET))
+		if (!SDL_strcmp(argv[i], VI) && (Setters & KEY_UNSET))
 		{
 			Setters &= ~KEY_UNSET;
 			Settings->Flags &= ~FLAG_ARROWKEY;

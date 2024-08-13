@@ -140,4 +140,17 @@ enum Modes
 	MODE_ADD,		//добавление нового элемента
 };
 
+/*Используемые параметры запуска*/
+#define VSYNCOFF  "--vsync-off" //Отключение VSync
+#define VSYNCON   "--vsync-on"  //Включение VSync
+#define SIZE3     "--size=3"    // Размер поля 3x3
+#define SIZE4     "--size=4"    // Размер поля 4x4
+#define SIZE5     "--size=5"    // Размер поля 5x5
+#define SIZE6     "--size=6"    // Размер поля 6x6
+#define LIGHTMODE "--light"     //Светлая цветовая схема
+#define DARKMODE  "--dark"      // Тёмная цветовая схема
+#define ARROWS    "--arrows"    //Управление стрелками
+#define VI        "--vi"        //Управление клавишами vi (h,j,k,l)
+#define WASD      "--wasd"      //Управление с помощью WASD
+
 #endif // !DEFINES_H
