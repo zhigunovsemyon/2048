@@ -25,7 +25,7 @@ TileTexture;
 typedef struct
 {
 	Sint64 val;//Значение ячейки
-	Uint8 mode;//Состояние данной плитки
+	int_fast8_t mode;//Состояние данной плитки
 	union
 	{
 		float size;		//Размеры новой ячейки
@@ -38,10 +38,10 @@ Tile;
 typedef struct
 {
 	Tile* Field;	//Поле ячеек
-	Uint8 FieldSize;//Размер поля
+	int_fast8_t FieldSize;//Размер поля
 	Sint64 Score;	//Текущий счёт
 	Sint64 MaxScore;//Максимальный счёт
-	Uint8 Mode;		//Текущий этап игры
+	int_fast8_t Mode;		//Текущий этап игры
 }
 Game;
 
@@ -50,7 +50,7 @@ typedef struct
 {
 	/* Набор флагов : FLAG_DARKMODE, FLAG_ARROWKEY,
 	FLAG_VIKEY, FLAG_WASDKEY, FLAG_VSYNC*/
-	Uint8 Flags;
+	uint_fast8_t Flags;
 	SDL_Point WinSize;	//Размер окна по горизонтали и вертикали
 	float CellWidth;	//Размер стороны ячейки с тайлом
 	float FieldSize;	//Размер стороны поля
@@ -61,7 +61,7 @@ Params;
 typedef struct
 {
 	TileTexture *textures;	//Указатель на массив тексутр
-	Uint8 textures_count;	//Количество сохранённых текстур
+	Sint64 textures_count;	//Количество сохранённых текстур
 	SDL_Colour *cols;		//Указатель на массив цветов
 }
 Assets;
@@ -75,10 +75,10 @@ int_fast8_t GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Pa
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 Используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN, MODE_CHECK_UP*/
-extern Uint8(**CheckMove)(Game*, Params*);
+extern int_fast8_t(**CheckMove)(Game*, Params*);
 
 /*Набор функций отрисовки сдвигов тайлов поля Game.
 Используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN, MODE_MOVE_UP*/
-extern Uint8 (**DoMove)(SDL_Renderer*, Game *, Params *, Assets *);
+extern int_fast8_t (**DoMove)(SDL_Renderer*, Game *, Params *, Assets *);
 
 #endif // !_MAIN_H_

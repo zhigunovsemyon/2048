@@ -2,7 +2,7 @@
 #define DEFINES_H
 
 //Макросы
-#define _SQ(A) (A) * (A)//Квадрат числа
+#define _SQ(A) ((A) * (A))//Квадрат числа
 #define SPLIT_COL_LINK(A) A->r, A->g, A->b, A->a//Разложение ссылки на цвет на отдельные аргументы
 #define SPLIT_COL_VAL(A)  A.r, A.g, A.b, A.a	//Разложение значения цвета на отдельные аргументы
 #define MinOfTwo(A, B) (((A) > (B)) ? (B) : (A))//Выявление меньшего из двух элементов

@@ -1,9 +1,8 @@
 #include "draw.h"
-#include <stdint.h>
 
 /* Обновление текстуры с очками и учётом цветов из Assets рисовальщиком rend, 
 из игры Game, с учётом параметров Params. Возвращает код ошибки, либо 0 при штатной работе*/
-static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
+static int_fast8_t UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets *Assets)
 {
 	//Освобождение старой текстуры
 	SDL_DestroyTexture(Assets->textures[0].tex);
@@ -21,7 +20,7 @@ static Uint8 UpdateScore(SDL_Renderer *rend, Game *Game, Params *Params, Assets 
 }
 
 //Подбор индекса цвета для тайла с соответствующим значением TileValue
-static Uint8 MatchColForTile(Sint64 TileValue)
+static int_fast8_t MatchColForTile(Sint64 TileValue)
 {
 	switch (TileValue)
 	{
@@ -54,7 +53,7 @@ static Uint8 MatchColForTile(Sint64 TileValue)
 
 /*Рисование сетки на фоне окна размера WinSize, светлой при Col_Mode = 0,
  * тёмной при Col_Mode в противном случае */
-static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
+static int_fast8_t DrawBackground(SDL_Renderer *rend, int_fast8_t TileCount, Params *Params,
 							Assets *Assets)
 {
 	// Заливка фона
@@ -74,7 +73,7 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 		return ERR_SDL;
 
 	// Цикл, рисующий линии поля
-	for (Uint8 i = 0; i <= TileCount; i++)
+	for (int_fast8_t i = 0; i <= TileCount; i++)
 	{
 		if (SDL_RenderDrawLine(rend, Corner.x,
 				(Corner.y + (int)(i * TileSize)), // Начало горизонатльной линии
@@ -93,7 +92,7 @@ static Uint8 DrawBackground(SDL_Renderer *rend, Uint8 TileCount, Params *Params,
 
 /*Функция отрисовки одного движущегося элемента Index рисовальщиком rend 
 с учётом параметров Params, используя цвета и текстуры из Assets, поля Game, */
-static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
+static int_fast8_t DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
 									 Game *Game, Assets *Assets, int_fast8_t Index)
 {
 	SDL_Rect Tile;
@@ -142,10 +141,15 @@ static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
 			return ERR_SDL;
 		else
 		{
-			Assets->textures_count++;//Увеличение счётчика текстур
+			Assets->textures_count++;//Увеличение счётчика текстур, проверка на корректность
+			if(Assets->textures_count < 0)
+			{
+				SDL_SetError("ошибка выделения памяти!");
+				return ERR_MALLOC;
+			}
 			// Перевыделение увеличенного вектора текстур, проверка и перезапись указателя
 			TileTexture *newTexs = SDL_realloc(Assets->textures, 
-				sizeof(TileTexture) * Assets->textures_count);
+				sizeof(TileTexture) * (Uint64)Assets->textures_count);
 			if (!newTexs)
 			{
 				SDL_SetError("ошибка выделения памяти!");
@@ -165,14 +169,14 @@ static Uint8 DrawSingleMovingElement(SDL_Renderer *rend, Params *Params,
 	return ERR_NO;
 }
 
-static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
+static int_fast8_t DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						 Assets *Assets)
 {	//Отрисовка фона и старых элементов
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
 
 	//Флаг необходимости продолжения анимации
-	Uint8 Flag = 0;
+	int_fast8_t Flag = 0;
 	// Размер сдвига
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
@@ -253,14 +257,14 @@ static Uint8 DoRightMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	return ERR_NO;
 }
 
-static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
+static int_fast8_t DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						Assets *Assets)
 {	//Отрисовка старых элементов
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
 
 	//Флаг необходимости продолжения анимации
-	Uint8 Flag = 0;
+	int_fast8_t Flag = 0;
 	// Размер сдвига
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
@@ -343,7 +347,7 @@ static Uint8 DoLeftMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	return ERR_NO;
 }
 
-static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
+static int_fast8_t DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 					  Assets *Assets)
 {
 	//Отрисовка старых элементов
@@ -351,7 +355,7 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 		return ERR_SDL;
 
 	// Флаг необходимости продолжения анимации
-	Uint8 Flag = 0;
+	int_fast8_t Flag = 0;
 	// Размер сдвига
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
@@ -436,14 +440,14 @@ static Uint8 DoUpMove(SDL_Renderer *rend, Game *Game, Params *Params,
 	return ERR_NO;
 }
 
-static Uint8 DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
+static int_fast8_t DoDownMove(SDL_Renderer *rend, Game *Game, Params *Params,
 						Assets *Assets)
 {	//Отрисовка старых элементов
 	if (DrawOldElements(rend, Params, Game, Assets))
 		return ERR_SDL;
 
 	//Флаг продолжения анимации
-	Uint8 Flag = 0;
+	int_fast8_t Flag = 0;
 	// Размер оффсета
 	float change = (ANIM_SPEED * dtCount() / 1000.0f);
 
@@ -587,12 +591,12 @@ SDL_Texture *CreateScoreTexture(SDL_Renderer *rend, SDL_Colour *ColourSet,
 	return ret;
 }
 
-Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
+int_fast8_t InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 					 Game *Game)
 {	/* Нахождение номинала максимальной клетки. Если у некоторой ячейки он больше 
 	максимальной, максимальный размер обновляется */
 	Sint64 maxVal = 2;
-	for (Uint8 cur = 0; cur < _SQ(Game->FieldSize); cur++)
+	for (int_fast8_t cur = 0; cur < _SQ(Game->FieldSize); cur++)
 		if (maxVal < Game->Field[cur].val)
 			maxVal = Game->Field[cur].val;
 
@@ -633,11 +637,11 @@ Uint8 InitTextureSet(SDL_Renderer *rend, Assets *Assets, Params *Params,
 	return ERR_NO;
 }
 
-Uint8 UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
+int_fast8_t UpdateTextureSet(SDL_Renderer *rend, Params *Params, Game *Game,
 					   Assets *Assets)
 {
 	/*Обновление текстур тайлов*/
-	for (Uint8 i = 1; i < Assets->textures_count; ++i)
+	for (int_fast8_t i = 1; i < Assets->textures_count; ++i)
 		if (Assets->textures[i].tex /*!= NULL*/)
 		{
 			SDL_DestroyTexture(Assets->textures[i].tex);
@@ -668,8 +672,10 @@ static Sint32 FindTexture(void const *l, void const *r)
 SDL_Texture *GetTextureForTile(Sint64 TileValue, Assets *Assets)
 {
 	TileTexture key = {.val = TileValue};
+	if (Assets->textures_count < 1)
+		return NULL;
 	TileTexture *needed =
-		SDL_bsearch(&key, Assets->textures + 1, Assets->textures_count - 1,
+		SDL_bsearch(&key, Assets->textures + 1, (Uint64)Assets->textures_count - 1,
 					sizeof(TileTexture), FindTexture);
 	// Если текстура нашлась, она возвращается, в противном случае возврат NULL
 	if (needed)
@@ -680,7 +686,7 @@ SDL_Texture *GetTextureForTile(Sint64 TileValue, Assets *Assets)
 SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 								  SDL_Colour *bg_col, SDL_Rect *txt_size,
 								  const char *font_name, const char *message,
-								  Uint8 IsCentred)
+								  int_fast8_t IsCentred)
 {	//используемый шрифт
 	TTF_Font *font;
 
@@ -695,11 +701,9 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	}
 
 	// Отношение размера буквы к размеру окна
-	Uint8 scaler;
-
 	/*Для начала отношение берётся по числу строк, 
 	Если текст не помещается в txt_size, скейлер наращивается*/
-	scaler = CountLines(message); 
+	int_fast8_t scaler = CountLines(message); 
 	do
 	{
 		// Открытие шрифта, проверка
@@ -770,7 +774,7 @@ SDL_Texture *CreateMessageTexture(SDL_Renderer *rend, SDL_Colour const *txt_col,
 	return ret; // Возврат тексутры, либо NULL
 }
 
-Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
+int_fast8_t DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 					  Assets *Assets)
 {	//Рект, используемый для отрисовки как очков, так и тайлов
 	SDL_Rect Tile;
@@ -793,7 +797,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 	Tile.w = Tile.h = (int)(TILE_SIZE_COEFFICIENT * Params->CellWidth);
 
 	//Цикл отрисовки каждого тайла
-	for (Uint8 i = 0; i < _SQ(Game->FieldSize); i++)
+	for (int_fast8_t i = 0; i < _SQ(Game->FieldSize); i++)
 	{	//Если элемент не является старым, складываемым, или сложенным...
 		if (!(Game->Field[i].mode == TILE_OLD ||
 			  Game->Field[i].mode == TILE_COMBINED ||
@@ -820,7 +824,7 @@ Uint8 DrawOldElements(SDL_Renderer *rend, Params *Params, Game *Game,
 	return ERR_NO;
 }
 
-Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
+int_fast8_t DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 					 Assets *Assets, Sint8 Index)
 {
 	if (Index == -1) // Если был передан -1, значит нового элемента нет
@@ -889,10 +893,10 @@ Uint8 DrawNewElement(SDL_Renderer *rend, Params *Params, Game *Game,
 	return ERR_NO;
 }
 
-static Uint8 (*int_DoMove[])(SDL_Renderer *, Game *, Params *, Assets *) = {
+static int_fast8_t (*int_DoMove[])(SDL_Renderer *, Game *, Params *, Assets *) = {
 	DoRightMove, DoLeftMove, DoDownMove, DoUpMove};
 /*Набор функций отрисовки сдвигов тайлов поля Game.
 используются номера MODE_MOVE_RIGHT, MODE_MOVE_LEFT, MODE_MOVE_DOWN,
 MODE_MOVE_UP*/
-Uint8 (**DoMove)(SDL_Renderer *, Game *, Params *,
+int_fast8_t (**DoMove)(SDL_Renderer *, Game *, Params *,
 				 Assets *) = int_DoMove - MODE_MOVE_RIGHT;

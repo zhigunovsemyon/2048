@@ -1,6 +1,8 @@
 #include "misc.h"
+#include <stdint.h>
+#include <time.h>
 
-Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score)
+int_fast8_t UpdateWindowTitle(SDL_Window *win, Sint64 Score)
 {
 	char *buf;
 	SDL_asprintf(&buf, "2048 | Очков: %lu", Score);
@@ -14,7 +16,7 @@ Uint8 UpdateWindowTitle(SDL_Window *win, Uint64 Score)
 	return ERR_NO;
 }
 
-Uint8 SaveGame(Game *game, const char *filename)
+int_fast8_t SaveGame(Game *game, const char *filename)
 { // Открытие файла, в который будет записан прогресс
 	SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
 	if (!fptr)
@@ -25,11 +27,11 @@ Uint8 SaveGame(Game *game, const char *filename)
 
 	//Очистка поля, если игра завершилась геймовером
 	if(game->Mode == MODE_GAMEOVER)
-		SDL_memset(game->Field, 0, _SQ(game->FieldSize));
+		SDL_memset(game->Field, 0, (size_t)_SQ(game->FieldSize));
 
 	// Сохранение игры
 	SDL_RWwrite(fptr, game, sizeof(Game), 1);
-	SDL_RWwrite(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
+	SDL_RWwrite(fptr, game->Field, sizeof(Tile), (size_t)_SQ(game->FieldSize));
 
 	// Закрытие файла
 	SDL_RWclose(fptr);
@@ -47,9 +49,9 @@ void ChangeCombinedToOld(Game *Game)
 	}
 }
 
-Uint8 CheckRightMove(Game *Game, Params *Params)
+int_fast8_t CheckRightMove(Game *Game, Params *Params)
 {
-	Uint8 QuitFlag = 1, MoveFlag = 0;
+	int_fast8_t QuitFlag = 1, MoveFlag = 0;
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца с конца
@@ -59,7 +61,7 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 			{
 				QuitFlag = 0;
 				// Всем предшествующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
-				Uint8 NonEmptyLine = 0;
+				int_fast8_t NonEmptyLine = 0;
 				for (Sint8 j2 = j - 1; j2 >= 0; j2--)
 				{ // Если ячейка не пустая
 					if (Game->Field[i * Game->FieldSize + j2].val /* != 0 */)
@@ -105,12 +107,14 @@ Uint8 CheckRightMove(Game *Game, Params *Params)
 			}
 		}
 	}
+	/*Если сдвиг возможен -- возврат соответствующего флага, в противном случае
+	  если поле заполнено -- возврат флага завершения игры, иначе -- флаг ожидания*/
 	return (MoveFlag) ? MODE_MOVE_RIGHT : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
-Uint8 CheckLeftMove(Game *Game, Params *Params)
+int_fast8_t CheckLeftMove(Game *Game, Params *Params)
 {
-	Uint8 MoveFlag = 0, QuitFlag = 1;
+	int_fast8_t MoveFlag = 0, QuitFlag = 1;
 	// Цикл перебора каждой строки
 	for (Sint8 i = 0; i < Game->FieldSize; i++)
 	{ // Цикл перебора каждого столбца
@@ -118,7 +122,7 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{ // Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
-				Uint8 NonEmptyLine = 0;
+				int_fast8_t NonEmptyLine = 0;
 				QuitFlag = 0;
 				for (Sint8 j2 = j + 1; j2 < Game->FieldSize; j2++)
 				{ // Если ячейка не пустая
@@ -165,12 +169,14 @@ Uint8 CheckLeftMove(Game *Game, Params *Params)
 			}
 		}
 	}
+	/*Если сдвиг возможен -- возврат соответствующего флага, в противном случае
+	  если поле заполнено -- возврат флага завершения игры, иначе -- флаг ожидания*/
 	return (MoveFlag) ? MODE_MOVE_LEFT : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
-Uint8 CheckUpMove(Game *Game, Params *Params)
+int_fast8_t CheckUpMove(Game *Game, Params *Params)
 {
-	Uint8 MoveFlag = 0, QuitFlag = 1;
+	int_fast8_t MoveFlag = 0, QuitFlag = 1;
 	// Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждой строки
@@ -178,7 +184,7 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 		{ // Если данная ячейка пустая
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{ // Всем следующим не пустым ячейкам проставляется параметр TILE_MOVE_X и оффсет
-				Uint8 NonEmptyLine = 0;
+				int_fast8_t NonEmptyLine = 0;
 				QuitFlag = 0;
 				for (Sint8 i2 = i + 1; i2 < Game->FieldSize; i2++)
 				{ // Если ячейка не пустая
@@ -224,13 +230,15 @@ Uint8 CheckUpMove(Game *Game, Params *Params)
 			}
 		}
 	}
+	/*Если сдвиг возможен -- возврат соответствующего флага, в противном случае
+	  если поле заполнено -- возврат флага завершения игры, иначе -- флаг ожидания*/
 	return (MoveFlag) ? MODE_MOVE_UP : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
-Uint8 CheckDownMove(Game *Game, Params *Params)
+int_fast8_t CheckDownMove(Game *Game, Params *Params)
 {
-	Uint8 QuitFlag = 1;
-	Uint8 MoveFlag = 0;
+	int_fast8_t QuitFlag = 1;
+	int_fast8_t MoveFlag = 0;
 	// Цикл перебора каждого столбца
 	for (Sint8 j = 0; j < Game->FieldSize; j++)
 	{ // Цикл перебора каждой строки
@@ -239,7 +247,7 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 			if (!Game->Field[i * Game->FieldSize + j].val /* == 0 */)
 			{ // Всем следующим не пустым ячейкам проставляется параметр
 			  // TILE_MOVE_X и оффсет
-				Uint8 NonEmptyLine = 0;
+				int_fast8_t NonEmptyLine = 0;
 				QuitFlag = 0;
 				for (Sint8 i2 = i - 1; i2 >= 0; i2--)
 				{ // Если ячейка не пустая
@@ -286,19 +294,21 @@ Uint8 CheckDownMove(Game *Game, Params *Params)
 			}
 		}
 	}
+	/*Если сдвиг возможен -- возврат соответствующего флага, в противном случае
+	  если поле заполнено -- возврат флага завершения игры, иначе -- флаг ожидания*/
 	return (MoveFlag) ? MODE_MOVE_DOWN : (QuitFlag) ? MODE_GAMEOVER : MODE_WAIT;
 }
 
 // Подсчёт длинны файла, сравнение с максимальным
-static Uint32 FileLen(SDL_RWops *f)
+static Sint64 FileLen(SDL_RWops *f)
 {
 	SDL_RWseek(f, RW_SEEK_SET, RW_SEEK_END); // Перемотка в конец
-	Uint32 len = SDL_RWtell(f); // Чтение размера файла
+	Sint64 len = SDL_RWtell(f); // Чтение размера файла
 	SDL_RWseek(f, 0, RW_SEEK_SET); // Перемотка обратно в начало
 	return len;
 }
 
-SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
+SDL_Colour *CreateColourSet(int_fast8_t DarkModeFlag)
 {
 	// Список названий цветов в файле
 	const char *ColNameList[] = COLOURS_LIST;
@@ -321,11 +331,20 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 		SDL_SetError("Ошибка выделения памяти!");
 		return NULL;
 	}
+	
 	// Объём файла + терм. символ
-	Uint32 fLen = FileLen(ColFile) + 1;
+	Sint64 fLen = FileLen(ColFile) + 1;
+	if(fLen < 1)
+	{ // Очитка теперь безполезного набора цветов
+		SDL_free(set);
+		SDL_SetError("Ошибка выделения памяти!");
+		// Закрытие файла с цветами
+		SDL_RWclose(ColFile);
+		return NULL;
+	}
 
 	// Выделение памяти под копию файла в памяти, проверка
-	char *fCopy = (char *)SDL_malloc(fLen);
+	char *fCopy = (char *)SDL_malloc((size_t)fLen);
 	if (!fCopy)
 	{ // Очитка теперь безполезного набора цветов
 		SDL_free(set);
@@ -336,7 +355,7 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	}
 
 	// Копирование содержимого файла в память
-	SDL_RWread(ColFile, fCopy, sizeof(char), fLen);
+	SDL_RWread(ColFile, fCopy, sizeof(char), (size_t)fLen);
 
 	// Закрытие файла с цветами
 	SDL_RWclose(ColFile);
@@ -345,7 +364,7 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	char *text = SDL_strchr(fCopy, '\n') + 1;
 
 	// Цикл чтения строки
-	for (Uint8 cur = 0; cur < COLOURS_COUNT; ++cur)
+	for (int_fast8_t cur = 0; cur < COLOURS_COUNT; ++cur)
 	{ // Если не удалось найти какой-либо цвет, цикл прерывается
 		if (!(text = SDL_strstr(text, ColNameList[cur])))
 			break;
@@ -374,9 +393,9 @@ SDL_Colour *CreateColourSet(Uint8 DarkModeFlag)
 	return set;
 }
 
-Uint8 CountLines(const char *source)
+int_fast8_t CountLines(const char *source)
 {
-	Uint8 i = 1; // Если в тексте нет переносов, значит там одна строка
+	int_fast8_t i = 1; // Если в тексте нет переносов, значит там одна строка
 	/*Когда функция находит перенос, она возвращает указатель на него,
 	в противном случае -- NULL, цикл завершается */
 	while ((source = SDL_strchr(source, '\n')))
@@ -392,15 +411,15 @@ void GetFieldAndTileSize(Game *Game, Params *Params)
 {
 	Params->FieldSize =
 		FIELD_SIZE_COEFFICIENT * // Отношение размера поля к размеру экрана
-		MinOfTwo(Params->WinSize.x,
-				 Params->WinSize.y); // Меньший и размеров окон
+		(float)(MinOfTwo(Params->WinSize.x,
+				 Params->WinSize.y)); // Меньший и размеров окон
 
 	Params->CellWidth = Params->FieldSize / Game->FieldSize;
 }
 
-Sint8 AddElement(Game *Game)
+int_fast8_t AddElement(Game *Game)
 {	//Положение элемента
-	Sint8 pos = RandomInt(0, _SQ(Game->FieldSize));
+	int_fast8_t pos = (int_fast8_t)RandomInt(0, (Sint32)_SQ(Game->FieldSize));
 	// Если там уже есть значение, то перебор продолжается
 	if (Game->Field[pos].val)
 			return AddElement(Game); 
@@ -410,16 +429,16 @@ Sint8 AddElement(Game *Game)
 	return pos; // Позиция нового элемента возвращается
 }
 
-Uint8 dtCount(void)
+int_fast8_t dtCount(void)
 {
 	static Uint32 lasttime = 0;
 	Uint32 newtime = SDL_GetTicks();
-	Uint8 ret = newtime - lasttime;
+	int_fast8_t ret = (int_fast8_t)((newtime - lasttime) % 255);
 	if (ret < MIN_FRAMETIME)
 	{
 		SDL_Delay(MIN_FRAMETIME);
 		newtime = SDL_GetTicks();
-		ret = newtime - lasttime;
+		ret = (int_fast8_t)((newtime - lasttime) % 255);
 	}
 	lasttime = newtime;
 	return ret; // Если прошло мало времени, возврат 1
@@ -526,14 +545,14 @@ void SetMode(SDL_Event *event, Game *Game, Params *Params)
 	}
 }
 
-Uint8 PrintErrorAndLeaveWithCode(Uint8 code, SDL_Window *win,
+int_fast8_t PrintErrorAndLeaveWithCode(int_fast8_t code, SDL_Window *win,
 								 SDL_Renderer *rend, Game *Game, Assets *Assets)
 {
 	SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s\n", SDL_GetError());
 	return SilentLeaveWithCode(code, win, rend, Game, Assets);
 }
 
-Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend,
+int_fast8_t SilentLeaveWithCode(int_fast8_t code, SDL_Window *win, SDL_Renderer *rend,
 						  Game *Game, Assets *Assets)
 {
 	// Освобождение цветов
@@ -543,7 +562,7 @@ Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend,
 	// Освобождение текстур
 	if (Assets->textures)
 	{
-		for (Uint8 i = 0; i < Assets->textures_count; ++i)
+		for (int_fast8_t i = 0; i < Assets->textures_count; ++i)
 			SDL_DestroyTexture(Assets->textures[i].tex);
 
 		SDL_free(Assets->textures);
@@ -569,8 +588,8 @@ Uint8 SilentLeaveWithCode(Uint8 code, SDL_Window *win, SDL_Renderer *rend,
 	return code;
 }
 
-Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
-					  const SDL_Point *WinSize, Uint8 Flag)
+int_fast8_t CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
+					  const SDL_Point *WinSize, uint_fast8_t Flag)
 {
 	// Вызов SDL
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
@@ -598,7 +617,7 @@ Uint8 CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *title,
 	return ERR_NO;
 }
 
-static Uint8 ReadFile(const char *filename, Game *game)
+static int_fast8_t ReadFile(const char *filename, Game *game)
 {	/* Попытка открыть существующий файл с сохранением,
 	Если не удалось --
 	 * игра начинается по новому*/
@@ -607,7 +626,7 @@ static Uint8 ReadFile(const char *filename, Game *game)
 		return 1;
 
 	//Сохранение старого размера поля для сравнения с прочитанным
-	Uint8 BaseFieldSize = game->FieldSize;
+	int_fast8_t BaseFieldSize = game->FieldSize;
 	Tile *oldFieldPtr = game->Field;
 
 	// Чтение прошлого режима
@@ -633,7 +652,7 @@ static Uint8 ReadFile(const char *filename, Game *game)
 	}
 	else
 	{
-		SDL_RWread(fptr, game->Field, sizeof(Tile), _SQ(game->FieldSize));
+		SDL_RWread(fptr, game->Field, sizeof(Tile), (size_t)_SQ(game->FieldSize));
 		game->Mode = MODE_DRAW_NEW;
 	}
 
@@ -643,17 +662,17 @@ static Uint8 ReadFile(const char *filename, Game *game)
 
 Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char *filename)
 {	// Базовые параметры работы игры
-	Uint8 FieldSize = 4;
+	int_fast8_t FieldSize = 4;
 	Settings->Flags = (FLAG_VSYNC | FLAG_DARKMODE | FLAG_ARROWKEY);
 
 	// Если игра была запущена без флагов,
-	Uint8 Setters =
+	int_fast8_t Setters =
 		(argc == 1) ? 0 : // то используется стандартная раскладка
 			(VSYNC_UNSET | COL_UNSET | KEY_UNSET | SIZE_UNSET);
 
 	/*Перебор аргументов, с которыми была запущена игра. Если их не было,
 	 * цикл ниже будет пропущен*/
-	for (Uint8 i = 1; Setters && (i < argc); ++i)
+	for (int_fast8_t i = 1; Setters && (i < argc); ++i)
 	{
 		if (!SDL_strcmp(argv[i], "--vsync-off") && (Setters & VSYNC_UNSET))
 		{
@@ -732,7 +751,7 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 	}
 	Game game;
 	// Выделение памяти под игровое поле
-	game.Field = (Tile *)SDL_calloc(sizeof(Tile), _SQ(FieldSize));
+	game.Field = (Tile *)SDL_calloc(sizeof(Tile), (size_t)_SQ(FieldSize));
 	if(!game.Field)
 	{
 		game.FieldSize = 0;
@@ -758,7 +777,7 @@ Game InitParamsAndGame(int argc, const char **argv, Params *Settings, const char
 	return game;
 }
 
-Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
+int_fast8_t CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
 					 Uint16 win_min)
 {
 	// Если был изменён размер окна
@@ -780,10 +799,10 @@ Uint8 CheckForResize(SDL_Window *win, Params *Params, SDL_Event *ev,
 	return SDL_TRUE;
 }
 
-static Uint8 (*int_CheckMove[])(Game *, Params *) = {
+static int_fast8_t (*int_CheckMove[])(Game *, Params *) = {
 	CheckRightMove, CheckLeftMove, CheckDownMove, CheckUpMove};
 
 /*Набор функций расстановки сдвигов тайлов поля Game.
 используются номера MODE_CHECK_RIGHT, MODE_CHECK_LEFT, MODE_CHECK_DOWN,
 MODE_CHECK_UP*/
-Uint8 (**CheckMove)(Game *, Params *) = int_CheckMove - MODE_CHECK_RIGHT;
+int_fast8_t (**CheckMove)(Game *, Params *) = int_CheckMove - MODE_CHECK_RIGHT;
