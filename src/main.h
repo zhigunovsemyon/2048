@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <time.h>
+#include <stdlib.h>
 
 #include "SDL.h"
 #ifndef SDL_h_

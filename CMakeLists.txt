@@ -10,6 +10,7 @@ if (POLICY CMP0141)
 endif()
 
 project ("2048" LANGUAGES C)
+set(CMAKE_C_STANDARD 11)
 file(GLOB C_FILES "src/*.c")
 
 
@@ -28,7 +29,12 @@ find_package (SDL2_ttf REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
 
-add_definitions("-Wall -Wextra -Werror -Wconversion -Wsign-conversion")
+if (WIN32)
+	add_definitions("/W3 /WX") #W4 даёт странные ошибки, Wall цепляет ошибки из SDL
+else()
+	add_definitions("-Wall -Wextra -Werror -Wconversion -Wsign-conversion")
+endif(WIN32)
+
 add_executable (${PROJECT_NAME} ${C_FILES}) 
 target_link_options(${PROJECT_NAME} PRIVATE ${SUBSYSTEM_LINKER_OPTIONS})
 target_link_libraries (${PROJECT_NAME} ${LINKED_LIB})

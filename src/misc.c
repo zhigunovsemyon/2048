@@ -1,11 +1,9 @@
 #include "misc.h"
-#include <stdint.h>
-#include <time.h>
 
 int_fast8_t UpdateWindowTitle(SDL_Window *win, Sint64 Score)
 {
 	char *buf;
-	SDL_asprintf(&buf, "2048 | Очков: %lu", Score);
+	SDL_asprintf(&buf, "2048 | Очков: %ld", Score);
 	if(!buf)
 	{
 		SDL_SetError("ошибка выделения памяти!");

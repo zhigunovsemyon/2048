@@ -1,5 +1,5 @@
 #include "main.h"
-int main(int argc, const char **args)
+int main(int argc, char *argv[])
 {
 	srand((unsigned int)time(NULL)); // Инициализация рандомайзера
 	int_fast8_t errCode = 0; // Код ошибок
@@ -18,7 +18,7 @@ int main(int argc, const char **args)
 
 	/*Установка всех флагов в нужное положение в соответствие с параметрами запуска,
 	 * подгрузка файла с прогрессом*/
-	Game = InitParamsAndGame(argc, args, &Params, SAVE_FILE);
+	Game = InitParamsAndGame(argc, argv, &Params, SAVE_FILE);
 	if (!Game.Field)
 	{
 		SDL_SetError("ошибка выделения памяти!");
