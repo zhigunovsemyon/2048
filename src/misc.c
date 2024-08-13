@@ -593,49 +593,6 @@ int_fast8_t CreateWorkspace(SDL_Window **win, SDL_Renderer **rend, const char *t
 	return ERR_NO;
 }
 
-static int_fast8_t ReadFile(const char *filename, Game *game)
-{	/* Попытка открыть существующий файл с сохранением,
-	Если не удалось --
-	 * игра начинается по новому*/
-	SDL_RWops *fptr = SDL_RWFromFile(filename, "rb");
-	if (!fptr)	
-		return 1;
-
-	//Сохранение старого размера поля для сравнения с прочитанным
-	int_fast8_t BaseFieldSize = game->FieldSize;
-	Tile *oldFieldPtr = game->Field;
-
-	// Чтение прошлого режима
-	SDL_RWread(fptr, game, sizeof(Game), 1);
-	game->Field = oldFieldPtr;
-	
-	/* Если прочитанный размер не бьётся с заданным параметрами :
-	файл закрывается, возвращается признак новой игры*/
-	if (BaseFieldSize != game->FieldSize)
-	{
-		SDL_RWclose(fptr);
-		return 1;		
-	}
-	
-	/*Если в прочитанном файле сохранён режим MODE_GAMEOVER, 
-	значит игровое поле нерелевантно, в противном случае необходимо
-	скопировать поле в память*/
-	if (game->Mode == MODE_GAMEOVER)
-	{
-		game->Score = 0;		
-		game->Field[AddElement(game)].mode = TILE_OLD;
-		game->Mode = MODE_ADD;
-	}
-	else
-	{
-		SDL_RWread(fptr, game->Field, sizeof(Tile), (size_t)_SQ(game->FieldSize));
-		game->Mode = MODE_DRAW_NEW;
-	}
-
-	SDL_RWclose(fptr);
-	return 0;
-}
-
 Game InitParamsAndGame(int argc, char **argv, Params *Settings, const char *filename)
 {	// Базовые параметры работы игры
 	int_fast8_t FieldSize = 4;
