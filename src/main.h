@@ -70,6 +70,7 @@ Assets;
 #include "defines.h"
 #include "misc.h"
 #include "draw.h"
+#include "fileio.h"
 
 int_fast8_t Greeting(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game);
 int_fast8_t GameCycle(SDL_Window *window, SDL_Renderer *rend, Assets *Assets, Params *Params, Game *Game);

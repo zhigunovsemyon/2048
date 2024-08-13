@@ -14,28 +14,6 @@ int_fast8_t UpdateWindowTitle(SDL_Window *win, Sint64 Score)
 	return ERR_NO;
 }
 
-int_fast8_t SaveGame(Game *game, const char *filename)
-{ // Открытие файла, в который будет записан прогресс
-	SDL_RWops *fptr = SDL_RWFromFile(filename, "wb");
-	if (!fptr)
-	{
-		SDL_SetError("Не удалось сохранить в файл!");
-		return ERR_FILE;
-	}
-
-	//Очистка поля, если игра завершилась геймовером
-	if(game->Mode == MODE_GAMEOVER)
-		SDL_memset(game->Field, 0, (size_t)_SQ(game->FieldSize));
-
-	// Сохранение игры
-	SDL_RWwrite(fptr, game, sizeof(Game), 1);
-	SDL_RWwrite(fptr, game->Field, sizeof(Tile), (size_t)_SQ(game->FieldSize));
-
-	// Закрытие файла
-	SDL_RWclose(fptr);
-	return ERR_NO;
-}
-
 void ChangeCombinedToOld(Game *Game)
 {
 	// Цикл перебора каждой строки

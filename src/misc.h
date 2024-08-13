@@ -9,8 +9,7 @@ enum SetFlags
 	SIZE_UNSET	= 4,
 	VSYNC_UNSET = 8
 };
-/*Если сдвиг возможен -- возврат соответствующего флага, в противном случае
-  если поле заполнено -- возврат флага завершения игры, иначе -- флаг ожидания*/
+
 /*Выставление оффсета в соответствии с параметрами игры в Game и Params
  * Возврат флага сдвига, завершения игры, либо ожидания*/
 int_fast8_t CheckRightMove(Game *, Params *);
@@ -21,8 +20,6 @@ int_fast8_t CheckDownMove(Game *, Params *);
 void ChangeCombinedToOld(Game *Game);
 int_fast8_t UpdateWindowTitle(SDL_Window *win, Sint64 Score);
 
-/*Сохранение игрового процесса game в файл finename*/
-int_fast8_t SaveGame(Game *, const char *filename);
 
 //Считает число переносов строки 
 int_fast8_t CountLines(const char *source);
